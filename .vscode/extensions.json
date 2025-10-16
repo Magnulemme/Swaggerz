@@ -1,0 +1,47 @@
+{
+  "recommendations": [
+    // React & Next.js
+    "dsznajder.es7-react-js-snippets",
+
+    // Tailwind CSS
+    "bradlc.vscode-tailwindcss",
+
+    // TypeScript & JavaScript
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // Auto Import & IntelliSense
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+
+    // Git
+    "eamodio.gitlens",
+
+    // Database & SQL
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+
+    // General Productivity
+    "usernamehw.errorlens",
+    "wayou.vscode-todo-highlight",
+    "streetsidesoftware.code-spell-checker",
+
+    // Color & Theme
+    "naumovs.color-highlight",
+
+    // Icons
+    "pkief.material-icon-theme",
+
+    // Auto Rename Tag
+    "formulahendry.auto-rename-tag",
+
+    // Bracket Pair Colorizer
+    "coenraads.bracket-pair-colorizer-2",
+
+    // Import Cost
+    "wix.vscode-import-cost",
+
+    // Console Ninja (optional - premium features)
+    "wallabyjs.console-ninja"
+  ]
+}

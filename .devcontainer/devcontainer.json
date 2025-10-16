@@ -1,0 +1,85 @@
+{
+  "name": "Streetwear Crew Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bullseye",
+  
+  // Configurazione delle porte
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Streetwear App",
+      "visibility": "public"
+    }
+  },
+  
+  // Variabili d'ambiente per il development
+  "remoteEnv": {
+    // Database - ⚠️ PLACEHOLDER - Il valore reale va nei GitHub Secrets
+    "DATABASE_URL": "${localEnv:DATABASE_URL}",
+    
+    // Better Auth Configuration
+    "BETTER_AUTH_SECRET": "dev-secret-streetwear-crew-codespaces-2024-safe-fallback",
+    "BETTER_AUTH_URL": "https://${localEnv:CODESPACE_NAME}-3000.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}",
+    "NEXT_PUBLIC_BETTER_AUTH_URL": "https://${localEnv:CODESPACE_NAME}-3000.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}",
+    "NEXT_PUBLIC_APP_URL": "https://${localEnv:CODESPACE_NAME}-3000.${localEnv:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}",
+    
+    // Email Provider - Gmail/Nodemailer
+    "EMAIL_USER": "${localEnv:EMAIL_USER}",
+    "EMAIL_PASS": "${localEnv:EMAIL_PASS}",
+    
+    // Google OAuth - ⚠️ PLACEHOLDER - I valori reali vanno nei GitHub Secrets
+    "GOOGLE_CLIENT_ID": "${localEnv:GOOGLE_CLIENT_ID}",
+    "GOOGLE_CLIENT_SECRET": "${localEnv:GOOGLE_CLIENT_SECRET}",
+    
+    // Cloudflare Turnstile Configuration
+    "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "${localEnv:NEXT_PUBLIC_TURNSTILE_SITE_KEY}",
+    "TURNSTILE_SECRET_KEY": "${localEnv:TURNSTILE_SECRET_KEY}",
+
+    // Development mode flags
+    "NODE_ENV": "development",
+    "NEXT_TELEMETRY_DISABLED": "1"
+  },
+  
+  // Features personalizzate per Node.js
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20"
+    }
+  },
+  
+  // Script di inizializzazione completi - ESEGUITI SOLO ALLA CREAZIONE
+  "onCreateCommand": {
+    "install-deps": "npm install",
+    "setup-db": "npm run db:generate || echo 'Database setup skipped - script not found'",
+    "install-claude": "npm install -g @anthropic-ai/claude-code",
+    "setup-path": "echo 'export PATH=\"$PATH:$(npm prefix -g)/bin\"' >> ~/.bashrc"
+  },
+  
+  // Script eseguito ad OGNI avvio del container
+  "postStartCommand": {
+    "verify-claude": "source ~/.bashrc && (command -v claude-code && echo '✅ Claude Code disponibile: $(claude-code --version)' || (echo '⚠️ Reinstalling Claude Code...' && npm install -g @anthropic-ai/claude-code))",
+    "welcome-message": "echo '🎉 Streetwear Crew Dev Environment Ready! Use claude-code --help to get started.'"
+  },
+  
+  // Estensioni VS Code utili per il progetto
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "typescript.preferences.importModuleSpecifier": "non-relative",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        }
+      }
+    }
+  }
+}

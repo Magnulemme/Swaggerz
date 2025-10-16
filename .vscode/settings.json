@@ -1,0 +1,56 @@
+{
+  // Editor Settings
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // ESLint Settings
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.codeActionsOnSave.mode": "all",
+
+  // Prettier Settings
+  "prettier.enable": true,
+  "prettier.requireConfig": false,
+
+  // TypeScript Settings
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "relative",
+
+  // Tailwind CSS Settings
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+
+  // File Settings
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.next": true
+  },
+
+  // Error Lens Settings
+  "errorLens.enabledDiagnosticLevels": [
+    "error",
+    "warning"
+  ],
+
+  // Material Icon Theme
+  "workbench.iconTheme": "material-icon-theme",
+
+  // Auto Save
+  "files.autoSave": "onFocusChange"
+}
