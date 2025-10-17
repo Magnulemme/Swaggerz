@@ -51,13 +51,12 @@ export default function HeroVideoBanner() {
     <div
       ref={containerRef}
       className="w-full min-h-[500px] md:min-h-[600px] h-full relative
-       lg:border-[1px] lg:border-zinc-700/50
-      lg:rounded-3xl overflow-hidden"
+      lg:border-[1px] lg:border-zinc-700/50 lg:rounded-3xl overflow-hidden"
     >
       {shouldUseShader && (
         <LiquidVideoShader
           videoSrc="/videos/hero-video-hq.mp4"
-          className="rounded-3xl"
+          className="lg:rounded-3xl"
           containerRef={containerRef}
         />
       )}
@@ -69,7 +68,7 @@ export default function HeroVideoBanner() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover rounded-3xl"
+          className="absolute inset-0 w-full h-full object-cover lg:rounded-3xl"
         >
           <source src="/videos/hero-video-hq.mp4" type="video/mp4" />
         </video>
@@ -81,7 +80,7 @@ export default function HeroVideoBanner() {
         style={{ opacity: isCalculated ? 1 : 0 }}
       >
         <div
-          className="h-full w-full px-6 pointer-events-auto grid"
+          className="h-full w-full lg:px-6 pointer-events-auto grid"
           style={{
             gridTemplateRows: `1fr auto 1fr`,
             rowGap: 0,
@@ -93,15 +92,11 @@ export default function HeroVideoBanner() {
             className="text-center self-center w-full"
             style={{ marginTop: `-${buttonOffset}px` }}
           >
-            <ShaderText
-              className="w-full"
-              fontSize="clamp(48px, 12vw, 120px)"
-            >
-              SWAGGERZ
+            <ShaderText className="w-full" fontSize="clamp(48px, 12vw, 120px)">
+              SwaggerZ
             </ShaderText>
-
-            <div className="-mt-4">
-              <p className="text-base md:text-lg text-white/70 font-light tracking-wide">
+            <div className="">
+              <p className="text-base md:text-lg  text-zinc-200 tracking-wide pt-2">
                 Streetwear and Digital art since 2025
               </p>
             </div>

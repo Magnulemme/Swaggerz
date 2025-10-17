@@ -1,12 +1,19 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
+import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
+});
+
+const pastorOfMuppets = localFont({
+  src: "../../public/fonts/PastorOfMuppets.ttf",
+  variable: "--font-pastor-of-muppets",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,6 +38,15 @@ export default function RootLayout({
           type="video/mp4"
         />
 
+        {/* Preload font Pastor of Muppets */}
+        <link
+          rel="preload"
+          href="/fonts/PastorOfMuppets.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+
         {/* Preconnect a domini esterni per immagini */}
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
@@ -43,7 +59,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${jost.variable} antialiased`}>
+      <body className={`${jost.variable} ${pastorOfMuppets.variable} antialiased`}>
         {children}
         <SpeedInsights />
       </body>

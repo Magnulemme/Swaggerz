@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import RectangularButton from './RectangularButton';
-import ShaderText from '@/components/ShaderText';
-import AvatarCanvas from '@/components/Avatar/AvatarCanvas';
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import RectangularButton from "./RectangularButton";
+import ShaderText from "@/components/ShaderText";
+import AvatarCanvas from "@/components/Avatar/AvatarCanvas";
 
 const Hero3dContent: React.FC = () => {
   const titleContainerRef = useRef<HTMLDivElement>(null);
-  const [titleFontSize, setTitleFontSize] = useState('2rem');
+  const [titleFontSize, setTitleFontSize] = useState("2rem");
+  const [shaderFontSize, setShaderFontSize] = useState("2.5rem");
 
   // Calcola dinamicamente la dimensione del titolo
   useEffect(() => {
@@ -24,14 +25,17 @@ const Hero3dContent: React.FC = () => {
       const charWidthRatio = 0.6;
 
       // Calcola fontSize ideale con margine del 10%
-      const idealFontSize = (availableWidth * 0.9) / (charCount * charWidthRatio);
+      const idealFontSize =
+        (availableWidth * 0.9) / (charCount * charWidthRatio);
 
       // Limiti min/max in px
       const minSize = 40;
       const maxSize = 50;
       const fontSize = Math.max(minSize, Math.min(maxSize, idealFontSize));
+      const shaderFontSize = fontSize * 1.25;
 
       setTitleFontSize(`${fontSize}px`);
+      setShaderFontSize(`${shaderFontSize}px`);
     };
 
     calculateFontSize();
@@ -45,12 +49,9 @@ const Hero3dContent: React.FC = () => {
   }, []);
 
   return (
-    <motion.div
-      className="group relative h-full"
-    >
+    <motion.div className="group relative h-full">
       {/* Layout responsive: colonna singola su mobile, due colonne su desktop */}
       <div className="relative h-full flex flex-col lg:flex-row p-8 lg:p-10">
-
         {/* Left Column - Text Content */}
         <div className="flex-1 flex flex-col justify-center">
           {/* Title with ShaderText preserved */}
@@ -62,35 +63,48 @@ const Hero3dContent: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             {/* Main Title - "Colleziona. Stampa." normale, "Indossa." con ShaderText */}
-            <div className="text-center lg:text-left font-jost">
+            <div className="w-full flex flex-col items-center lg:items-start lg:text-left font-jost ">
               <div
                 className="text-zinc-100 leading-none"
                 style={{ fontSize: titleFontSize, fontWeight: 900 }}
               >
-                Colleziona. Stampa.
+                Colleziona.
               </div>
-              <ShaderText
-                className="block leading-none"
-                fontSize={titleFontSize}
-                fontWeight="900"
+              <div
+                className="text-zinc-100 leading-none"
+                style={{ fontSize: titleFontSize, fontWeight: 900 }}
               >
-                Indossa.
-              </ShaderText>
+                {" "}
+                Stampa.
+              </div>
+              <div
+                style={{ fontSize: titleFontSize, lineHeight: 1 }}
+                className="w-fit mt-2"
+              >
+                <ShaderText
+                  className="block leading-none"
+                  fontSize={shaderFontSize}
+                  fontWeight="900"
+                >
+                  IndossA.
+                </ShaderText>
+              </div>
             </div>
 
             {/* Brand Description */}
             <motion.p
-              className="text-zinc-300 text-base md:text-lg text-center lg:text-left max-w-md px-4 lg:px-0 leading-relaxed"
+              className="text-zinc-300 text-base md:text-lg text-center lg:text-left max-w-md px-4 lg:px-0 leading-relaxed mt-8"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
             >
-              Personalizza i tuoi capi NFT certificati dei migliori artisti digitali, o acquista i capi esclusivi delle nostre collezioni. 
+              Personalizza i tuoi capi NFT certificati dei migliori artisti
+              digitali, o acquista i capi esclusivi delle nostre collezioni.
             </motion.p>
           </motion.div>
 
           {/* Rectangular Button */}
-          <div className='flex justify-center lg:justify-start mt-6 lg:mt-8'>
+          <div className="flex justify-center lg:justify-start mt-6 lg:mt-8">
             <RectangularButton />
           </div>
         </div>
@@ -98,7 +112,7 @@ const Hero3dContent: React.FC = () => {
         {/* Right Column - Avatars */}
         <div className="h-full lg:w-[600px] lg:flex-shrink-0">
           {/* Avatar Preview - mobile (solo uno per spazio limitato) */}
-          <div className='w-full h-full flex justify-center lg:hidden'>
+          <div className="w-full h-full flex justify-center lg:hidden">
             <div className="h-full max-w-[600px] w-full">
               <AvatarCanvas
                 avatarType="man"
