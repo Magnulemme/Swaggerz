@@ -1,9 +1,10 @@
 'use client';
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, ContactShadows } from '@react-three/drei';
 import { AvatarMan } from './AvatarMan';
 import { AvatarGirl } from './AvatarGirl';
+import { useLoadingStore } from '@/store/useLoadingStore';
 
 
 interface AvatarCanvasProps {
@@ -23,6 +24,23 @@ export default function AvatarCanvas({
   minAzimuthAngle = -Math.PI / 2,
   maxAzimuthAngle = Math.PI / 2,
 }: AvatarCanvasProps) {
+  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
+  const hasReportedReady = useRef(false);
+
+  // Traccia quando il canvas è pronto
+  useEffect(() => {
+    if (!hasReportedReady.current) {
+      // Delay per dare tempo al modello 3D di caricarsi
+      const timer = setTimeout(() => {
+        console.log('✅ 3D Models ready');
+        setComponentReady('models3d');
+        hasReportedReady.current = true;
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [setComponentReady]);
+
   return (
     <div className={`w-full h-full ${className}`}>
       <Canvas

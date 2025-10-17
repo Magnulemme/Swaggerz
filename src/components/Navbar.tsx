@@ -69,7 +69,7 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
       className={`fixed top-0 left-0 right-0 w-full z-[60] transition-all duration-500 ${
         scrolled
           ? "bg-zinc-950 border-b border-white/10 shadow-lg"
-          : "bg-transparent"
+          : "bg-transparent lg:bg-zinc-950"
       }`}
     >
       <nav className="mx-auto w-full max-w-[100vw] px-4 sm:px-6 lg:px-24 flex items-center justify-between h-16 sm:h-20">

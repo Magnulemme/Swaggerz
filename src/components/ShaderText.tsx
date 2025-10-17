@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useCallback, useId } from "react";
 import * as THREE from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { shaderTextRenderer } from "@/lib/shaderTextRenderer";
+import { useLoadingStore } from "@/store/useLoadingStore";
 
 interface ShaderTextProps {
   children?: string;
@@ -51,6 +52,8 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     y: 0,
   });
   const [isReady, setIsReady] = useState<boolean>(false);
+  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
+  const hasReportedReady = useRef<boolean>(false);
 
   // Usa il fontSize come fornito, senza cap automatici
   const scaledFontSize = React.useMemo(() => {
@@ -134,12 +137,8 @@ const ShaderText: React.FC<ShaderTextProps> = ({
           }
         }
 
-        // Doppio delay per sicurezza - lascia il browser renderizzare
-        await new Promise((resolve) => setTimeout(resolve, 150));
-        measureText();
-
-        // Misura di nuovo dopo un altro delay per essere sicuri
-        await new Promise((resolve) => setTimeout(resolve, 150));
+        // Singolo delay minimo per lasciare il browser renderizzare
+        await new Promise((resolve) => setTimeout(resolve, 50));
         measureText();
       } else {
         // Fallback per browser che non supportano document.fonts
@@ -208,6 +207,15 @@ const ShaderText: React.FC<ShaderTextProps> = ({
       shaderTextRenderer.releaseResources();
     };
   }, [textDimensions, isReady, taskId]);
+
+  // Notifica quando lo ShaderText è completamente pronto
+  useEffect(() => {
+    if (isReady && dataUrl && !hasReportedReady.current) {
+      console.log('✅ ShaderText ready');
+      setComponentReady('shaderText');
+      hasReportedReady.current = true;
+    }
+  }, [isReady, dataUrl, setComponentReady]);
 
   // Handle resize
   useEffect(() => {

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SwagLoader } from "@/components/SwagLoader";
 import "./globals.css";
 
 const jost = Jost({
@@ -33,7 +34,7 @@ export default function RootLayout({
         {/* Preload video critico - inizia il download SUBITO */}
         <link
           rel="preload"
-          href="/videos/hero-video-optimized.mp4"
+          href="/videos/hero-video-hq.mp4"
           as="video"
           type="video/mp4"
         />
@@ -60,6 +61,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${jost.variable} ${pastorOfMuppets.variable} antialiased`}>
+        <SwagLoader isPageLoader={true} />
         {children}
         <SpeedInsights />
       </body>
