@@ -51,7 +51,7 @@ const Hero3dContent: React.FC = () => {
   return (
     <motion.div className="group relative h-full">
       {/* Layout responsive: colonna singola su mobile, due colonne su desktop */}
-      <div className="relative h-full flex flex-col lg:flex-row p-8 lg:p-10">
+      <div className="relative h-full flex flex-col lg:flex-row p-8 px-6 lg:px-24 lg:p-10">
         {/* Left Column - Text Content */}
         <div className="flex-1 flex flex-col justify-center">
           {/* Title with ShaderText preserved */}
@@ -124,11 +124,11 @@ const Hero3dContent: React.FC = () => {
             </div>
           </div>
 
-          {/* Avatar singolo - desktop (lg+) - performance ottimizzate */}
-          <div className="h-full w-full hidden lg:flex justify-center max-h-[450px]">
-            {/* Avatar Man - carica solo 1 per migliori performance */}
+          {/* Due avatar - desktop (lg+) */}
+          <div className="h-full w-full hidden lg:flex justify-center gap-4 max-h-[450px]">
+            {/* Avatar Man */}
             <motion.div
-              className="aspect-[9/16] h-full"
+              className="aspect-[9/16] h-full flex-shrink-0"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -142,8 +142,21 @@ const Hero3dContent: React.FC = () => {
               />
             </motion.div>
 
-            {/* Avatar Girl - RIMOSSO per performance
-                Riduci da 2 a 1 avatar = -50% carico GPU */}
+            {/* Avatar Girl */}
+            <motion.div
+              className="aspect-[9/16] h-full flex-shrink-0"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <AvatarCanvas
+                avatarType="girl"
+                animation="idle"
+                enableZoom={false}
+                minAzimuthAngle={-Math.PI / 2}
+                maxAzimuthAngle={Math.PI / 2}
+              />
+            </motion.div>
           </div>
         </div>
       </div>

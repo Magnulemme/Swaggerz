@@ -12,6 +12,7 @@ export const fragmentShader = `
   uniform float uTime;
   uniform sampler2D uTexture;
   uniform vec2 uResolution;
+  uniform float uMouseMoving; // 1.0 = moving, 0.0 = stopped
 
   varying vec2 vUv;
 
@@ -61,30 +62,35 @@ export const fragmentShader = `
 
     vec2 distortion = vec2(0.0);
 
-    if (mouseInfluence > 0.001) {
+    // uMouseMoving va da 0.0 a 1.0 in modo fluido (già interpolato dal JS)
+    if (mouseInfluence > 0.001 && uMouseMoving > 0.01) {
       // Usa il rumore per creare onde fluide
       float noiseScale = 8.0;
       float noiseStrength = 0.15;
-      
-      // Due layer di rumore per maggiore fluidità
-      float noise1 = snoise(uv * noiseScale + uTime * 0.3);
-      float noise2 = snoise(uv * noiseScale * 0.5 - uTime * 0.2);
-      
+
+      // Due layer di rumore: combina posizione mouse + tempo per varietà
+      // uTime aggiunge movimento organico, mouse position aggiunge direzione
+      float noise1 = snoise(uv * noiseScale + adjustedMouse * 2.0 + uTime * 0.1);
+      float noise2 = snoise(uv * noiseScale * 0.5 - adjustedMouse * 1.5 + uTime * 0.15);
+
       // Combina i rumori
       vec2 noiseDistortion = vec2(noise1, noise2) * noiseStrength;
-      
+
       // Direzione verso il mouse
       vec2 toMouse = adjustedMouse - adjustedUv;
       float distToMouse = length(toMouse);
-      
+
       if (distToMouse > 0.001) {
         vec2 direction = toMouse / distToMouse;
-        
+
         // Combina attrazione + rumore
         float strength = mouseInfluence * 0.06;
         distortion = direction * strength;
         distortion += noiseDistortion * mouseInfluence;
       }
+
+      // Moltiplica la distortion per uMouseMoving per fade-out fluido
+      distortion *= uMouseMoving;
     }
 
     vec2 distortedUv = clamp(uv + distortion, 0.0, 1.0);

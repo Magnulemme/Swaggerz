@@ -98,13 +98,12 @@ export default function HeroVideoBanner() {
   return (
     <div
       ref={containerRef}
-      className="w-full max-lg:min-h-screen h-full relative
-      lg:border-[1px] lg:border-zinc-700/50 lg:rounded-3xl overflow-hidden"
+      className="w-full min-h-screen h-full relative overflow-hidden"
     >
       {shouldUseShader && (
         <LiquidVideoShader
           videoSrc="/videos/hero-video-hq.mp4"
-          className="lg:rounded-3xl"
+          className=""
           containerRef={containerRef}
         />
       )}
@@ -117,7 +116,7 @@ export default function HeroVideoBanner() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover lg:rounded-3xl"
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src="/videos/hero-video-hq.mp4" type="video/mp4" />
         </video>
@@ -129,7 +128,7 @@ export default function HeroVideoBanner() {
         style={{ opacity: isCalculated ? 1 : 0 }}
       >
         <div
-          className="h-full w-full lg:px-6 pointer-events-auto grid"
+          className="h-full w-full pointer-events-auto grid"
           style={{
             gridTemplateRows: `1fr auto 1fr`,
             rowGap: 0,
@@ -141,7 +140,7 @@ export default function HeroVideoBanner() {
             className="text-center self-center w-full"
             style={{ marginTop: `-${buttonOffset}px` }}
           >
-            <ShaderText className="w-full" fontSize="clamp(78px, 12vw, 120px)">
+            <ShaderText className="w-full" fontSize="clamp(78px, 12vw, 180px)">
               SwaggerZ
             </ShaderText>
             <div className="">
@@ -198,9 +197,9 @@ export default function HeroVideoBanner() {
         </div>
       </div>
 
-      {/* Scroll Indicator - Solo mobile/tablet */}
+      {/* Scroll Indicator - Tutte le dimensioni */}
       <div
-        className={`lg:hidden absolute bottom-8 left-1/2 -translate-x-1/2 z-50
+        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-50
           transition-opacity duration-500 pointer-events-none ${
             showScrollIndicator && isCalculated ? "opacity-100" : "opacity-0"
           }`}

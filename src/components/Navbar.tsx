@@ -69,26 +69,28 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
       className={`fixed top-0 left-0 right-0 w-full z-[60] transition-all duration-500 ${
         scrolled
           ? "bg-zinc-950 border-b border-white/10 shadow-lg"
-          : "bg-transparent lg:bg-zinc-950"
+          : "bg-transparent"
       }`}
     >
       <nav className="mx-auto w-full max-w-[100vw] px-4 sm:px-6 lg:px-24 flex items-center justify-between h-16 sm:h-20">
         <NavbarLogo />
 
-        {/* Desktop menu con NavigationMenu - AGGIUNGI viewport={false} */}
+        {/* Desktop menu con NavigationMenu - Pill-shaped container */}
         <NavigationMenu className="hidden lg:block" viewport={false}>
-          <NavigationMenuList className="flex items-center gap-2">
-            {navLinks.map((link) => (
-              <AnimatedNavLink
-                key={link.label}
-                href={link.href}
-                label={link.label}
-                icon={link.icon}
-                hasDropdown={link.hasDropdown}
-                dropdownItems={link.hasDropdown ? clothingCategories : []}
-              />
-            ))}
-          </NavigationMenuList>
+          <div className="px-6 py-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
+            <NavigationMenuList className="flex items-center gap-1">
+              {navLinks.map((link) => (
+                <AnimatedNavLink
+                  key={link.label}
+                  href={link.href}
+                  label={link.label}
+                  icon={link.icon}
+                  hasDropdown={link.hasDropdown}
+                  dropdownItems={link.hasDropdown ? clothingCategories : []}
+                />
+              ))}
+            </NavigationMenuList>
+          </div>
         </NavigationMenu>
 
         <NavbarActions cartCount={cartCount} />

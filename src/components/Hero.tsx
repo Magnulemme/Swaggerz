@@ -12,11 +12,11 @@ const BentoHero = () => {
       <HeroBackground />
 
       {/* Main content container */}
-      <div className="relative z-50 container lg:mx-auto lg:pt-32 w-full">
+      <div className="relative z-50 w-full">
         {/* Simplified Hero Grid - Only Banner and 3D Content */}
         <div className="relative grid grid-cols-2 lg:grid-cols-4 auto-rows-auto z-50">
           {/* Video Banner Section */}
-          <div className="col-span-2 lg:col-span-4 lg:row-span-2 min-h-[400px]">
+          <div className="col-span-2 lg:col-span-4 lg:row-span-2 w-full">
             <HeroVideoBanner />
           </div>
 

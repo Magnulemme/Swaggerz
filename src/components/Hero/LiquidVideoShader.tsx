@@ -28,7 +28,11 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
   const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const mouseRef = useRef(new THREE.Vector2(-10, -10));
+  const prevMouseRef = useRef(new THREE.Vector2(-10, -10));
   const animationIdRef = useRef<number | null>(null);
+  const isMovingRef = useRef(0); // 0 = stopped, 1 = moving
+  const targetMovingRef = useRef(0); // Target per lerp
+  const stopTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Use external container ref if provided, otherwise use internal
   const containerRef = externalContainerRef || internalContainerRef;
@@ -84,6 +88,7 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
           uTime: { value: 0 },
           uTexture: { value: videoTexture },
           uResolution: { value: new THREE.Vector2(1, 1) },
+          uMouseMoving: { value: 0 }, // Inizia fermo
         },
         vertexShader,
         fragmentShader,
@@ -108,7 +113,14 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
       const animate = (time: number) => {
         animationIdRef.current = requestAnimationFrame(animate);
 
-        // Update time uniform
+        // Smooth lerp per transizione fluida (velocità di fade: 0.05 = slow, 0.2 = fast)
+        const lerpSpeed = 0.1;
+        isMovingRef.current += (targetMovingRef.current - isMovingRef.current) * lerpSpeed;
+
+        // Aggiorna gli uniform nel materiale
+        if (material.uniforms.uMouseMoving) {
+          material.uniforms.uMouseMoving.value = isMovingRef.current;
+        }
         if (material.uniforms.uTime) {
           material.uniforms.uTime.value = time * 0.001;
         }
@@ -130,15 +142,42 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
 
       // Mouse events
       const container = containerRef.current;
+
       const handleMouseMove = (e: MouseEvent) => {
         const rect = canvas.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = 1.0 - (e.clientY - rect.top) / rect.height;
-        mouseRef.current.set(x, y);
+
+        // Controlla se il mouse si è effettivamente mosso
+        const dx = Math.abs(mouseRef.current.x - x);
+        const dy = Math.abs(mouseRef.current.y - y);
+
+        if (dx > 0.001 || dy > 0.001) {
+          // Il mouse si è mosso!
+          mouseRef.current.set(x, y);
+          targetMovingRef.current = 1;
+
+          // Clear timeout precedente
+          if (stopTimeoutRef.current) {
+            clearTimeout(stopTimeoutRef.current);
+          }
+
+          // Dopo 150ms di inattività, inizia il fade-out
+          stopTimeoutRef.current = setTimeout(() => {
+            targetMovingRef.current = 0;
+            console.log('🎬 Mouse stopped - fading out effect');
+          }, 150);
+        }
       };
 
       const handleMouseLeave = () => {
         mouseRef.current.set(-10, -10);
+        targetMovingRef.current = 0;
+        console.log('🎬 Mouse left - fading out effect');
+
+        if (stopTimeoutRef.current) {
+          clearTimeout(stopTimeoutRef.current);
+        }
       };
 
       if (container) {
@@ -154,6 +193,11 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
         if (animationIdRef.current) {
           cancelAnimationFrame(animationIdRef.current);
           animationIdRef.current = null;
+        }
+
+        if (stopTimeoutRef.current) {
+          clearTimeout(stopTimeoutRef.current);
+          stopTimeoutRef.current = null;
         }
 
         resizeObserver.disconnect();

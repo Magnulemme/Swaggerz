@@ -176,7 +176,7 @@ export default function AnimatedNavLink({
       <NavigationMenuItem>
         <NavigationMenuTrigger
           ref={triggerRef}
-          className="!bg-zinc-950 focus:bg-transparent data-[active]:bg-transparent h-12 px-5 py-3 overflow-visible"
+          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent h-10 px-4 py-2 overflow-visible rounded-full transition-colors"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           style={{
@@ -218,7 +218,7 @@ export default function AnimatedNavLink({
       <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
         <Link
           href={href}
-          className="!bg-zinc-950 hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent h-12 px-5 py-3 overflow-visible"
+          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent h-10 px-4 py-2 overflow-visible rounded-full transition-colors"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
