@@ -2,18 +2,46 @@
 
 import ShaderText from "@/components/ShaderText";
 import { useEffect, useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import LiquidVideoShader from "./LiquidVideoShader";
 import { useLoadingStore } from "@/store/useLoadingStore";
+import { HeroVideoButton } from "./HeroVideoButton";
 
 export default function HeroVideoBanner() {
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [shouldUseShader, setShouldUseShader] = useState(false);
   const [buttonOffset, setButtonOffset] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const setComponentReady = useLoadingStore((state) => state.setComponentReady);
+
+  // Parallax scroll tracking - solo su desktop
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Trasformazioni 2.5D per vero effetto parallax:
+  // - scale: rimpicciolisce da 1 a 0.85 (effetto zoom out)
+  // - rotateX: rotazione 3D lungo l'asse X da 0 a 15deg (testa indietro, piedi avanti)
+  // - opacity: fade out progressivo per transizione fluida
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
+  const rotateX = useTransform(scrollYProgress, [0, 1], [0, 15]);
+  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 0.8, 0]);
+
+  // Fade out separato per il contenuto (testo e button) - inizia prima per effetto elegante
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5, 0.8], [1, 0.7, 0]);
+
+  // Transform CSS completa con perspective per evitare stacking context issues
+  const transform = useTransform(
+    [scale, rotateX],
+    ([scaleVal, rotateXVal]) =>
+      `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
+  );
 
   useEffect(() => {
     const checkShaderSupport = () => {
@@ -30,10 +58,12 @@ export default function HeroVideoBanner() {
   }, []);
 
   useEffect(() => {
-    const calculateButtonOffset = () => {
-      if (buttonRef.current) {
-        const height = buttonRef.current.getBoundingClientRect().height;
-        setButtonOffset(height / 2);
+    const calculateOffsets = () => {
+      if (buttonRef.current && scrollIndicatorRef.current) {
+        const buttonHeight = buttonRef.current.getBoundingClientRect().height;
+        const scrollHeight = scrollIndicatorRef.current.getBoundingClientRect().height;
+        setButtonOffset(buttonHeight / 2);
+        setScrollOffset(scrollHeight / 2);
         setIsCalculated(true);
         // Mostra lo scroll indicator dopo che il layout è pronto
         setShowScrollIndicator(true);
@@ -42,14 +72,14 @@ export default function HeroVideoBanner() {
 
     // Usa requestAnimationFrame per calcolare dopo il primo paint
     const rafId = requestAnimationFrame(() => {
-      calculateButtonOffset();
+      calculateOffsets();
     });
 
-    window.addEventListener("resize", calculateButtonOffset);
+    window.addEventListener("resize", calculateOffsets);
 
     return () => {
       cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", calculateButtonOffset);
+      window.removeEventListener("resize", calculateOffsets);
     };
   }, []);
 
@@ -98,34 +128,46 @@ export default function HeroVideoBanner() {
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-screen h-full relative overflow-hidden"
+      className="w-full h-screen relative overflow-hidden"
     >
-      {shouldUseShader && (
-        <LiquidVideoShader
-          videoSrc="/videos/hero-video-hq.mp4"
-          className=""
-          containerRef={containerRef}
-        />
-      )}
+      {/* Video container con effetto parallax 2.5D - solo desktop */}
+      <motion.div
+        className="absolute inset-0 w-full h-full origin-center"
+        style={{
+          transform: shouldUseShader ? transform : undefined,
+          opacity: shouldUseShader ? opacity : 1,
+        }}
+      >
+        {shouldUseShader && (
+          <LiquidVideoShader
+            videoSrc="/videos/hero-video-hq.mp4"
+            className=""
+            containerRef={containerRef}
+          />
+        )}
 
-      {!shouldUseShader && (
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/videos/hero-video-hq.mp4" type="video/mp4" />
-        </video>
-      )}
+        {!shouldUseShader && (
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/videos/hero-video-hq.mp4" type="video/mp4" />
+          </video>
+        )}
+      </motion.div>
 
-      {/* Content Overlay - Nascondi fino al calcolo completato */}
-      <div
-        className="absolute inset-0 z-20 pointer-events-none transition-opacity duration-200"
-        style={{ opacity: isCalculated ? 1 : 0 }}
+      {/* Content Overlay - Nascondi fino al calcolo completato + Parallax + Fade out */}
+      <motion.div
+        className="absolute inset-0 z-20 pointer-events-none transition-opacity duration-200 origin-center"
+        style={{
+          opacity: isCalculated ? contentOpacity : 0,
+          transform: shouldUseShader ? transform : undefined,
+        }}
       >
         <div
           className="h-full w-full pointer-events-auto grid"
@@ -134,11 +176,11 @@ export default function HeroVideoBanner() {
             rowGap: 0,
           }}
         >
-          <div style={{ paddingBottom: `${buttonOffset}px` }}></div>
+          <div style={{ paddingBottom: `${buttonOffset + scrollOffset}px` }}></div>
 
           <div
             className="text-center self-center w-full"
-            style={{ marginTop: `-${buttonOffset}px` }}
+            style={{ marginTop: `-${buttonOffset + scrollOffset}px` }}
           >
             <ShaderText className="w-full" fontSize="clamp(78px, 12vw, 180px)">
               SwaggerZ
@@ -151,28 +193,13 @@ export default function HeroVideoBanner() {
           </div>
 
           <div
-            className="flex items-center justify-center max-lg:items-start max-lg:mt-16"
-            style={{ paddingTop: `${buttonOffset}px` }}
+            className="flex flex-col items-center justify-center gap-8 max-lg:items-center max-lg:mt-16"
+            style={{ paddingTop: `${buttonOffset + scrollOffset}px` }}
           >
-            <a
-              ref={buttonRef}
+            <HeroVideoButton
               href="#collection"
-              className="group inline-flex items-center gap-2 md:gap-3
-                  text-white text-sm md:text-base lg:text-lg
-                  uppercase tracking-[0.3em]
-                  px-10 py-5 md:px-12 md:py-6
-                  rounded-full
-                  border-2 border-white/50
-                  hover:border-white
-                  hover:bg-white/10
-                  hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]
-                  hover:scale-105
-                  backdrop-blur-sm
-                  transition-all duration-300
-                  font-semibold"
-              style={{
-                transform: `translateY(${-buttonOffset}px)`,
-              }}
+              buttonRef={buttonRef}
+              className="transition-transform"
             >
               <span className="hidden md:flex">Scopri la Collezione</span>
               <span className="flex md:hidden flex-col text-center leading-tight gap-1">
@@ -192,37 +219,37 @@ export default function HeroVideoBanner() {
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </svg>
-            </a>
+            </HeroVideoButton>
+
+            {/* Scroll Indicator - Integrato nel layout */}
+            <div
+              ref={scrollIndicatorRef}
+              className={`transition-opacity duration-500 ${
+                showScrollIndicator && isCalculated ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="flex flex-col items-center gap-2 animate-bounce">
+                <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
+                  Scroll
+                </span>
+                <svg
+                  className="w-6 h-6 text-white/70"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Scroll Indicator - Tutte le dimensioni */}
-      <div
-        className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-50
-          transition-opacity duration-500 pointer-events-none ${
-            showScrollIndicator && isCalculated ? "opacity-100" : "opacity-0"
-          }`}
-      >
-        <div className="flex flex-col items-center gap-2 animate-bounce">
-          <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
-            Scroll
-          </span>
-          <svg
-            className="w-6 h-6 text-white/70"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

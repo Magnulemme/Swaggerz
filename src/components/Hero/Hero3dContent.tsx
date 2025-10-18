@@ -1,15 +1,22 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import RectangularButton from "./RectangularButton";
 import ShaderText from "@/components/ShaderText";
 import AvatarCanvas from "@/components/Avatar/AvatarCanvas";
 
 const Hero3dContent: React.FC = () => {
   const titleContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [titleFontSize, setTitleFontSize] = useState("2rem");
   const [shaderFontSize, setShaderFontSize] = useState("2.5rem");
+
+  // Detect when the section enters the viewport
+  const isInView = useInView(containerRef, {
+    once: true, // Animate only once
+    amount: 0.2 // Trigger when 20% of the section is visible
+  });
 
   // Calcola dinamicamente la dimensione del titolo
   useEffect(() => {
@@ -49,37 +56,61 @@ const Hero3dContent: React.FC = () => {
   }, []);
 
   return (
-    <motion.div className="group relative h-full">
+    <motion.div
+      ref={containerRef}
+      className="group relative h-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isInView ? 1 : 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
       {/* Layout responsive: colonna singola su mobile, due colonne su desktop */}
       <div className="relative h-full flex flex-col lg:flex-row p-8 px-6 lg:px-24 lg:p-10">
         {/* Left Column - Text Content */}
         <div className="flex-1 flex flex-col justify-center">
           {/* Title with ShaderText preserved */}
-          <motion.div
+          <div
             ref={titleContainerRef}
             className="flex flex-col justify-center items-center lg:items-start"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
           >
             {/* Main Title - "Colleziona. Stampa." normale, "Indossa." con ShaderText */}
             <div className="w-full flex flex-col items-center lg:items-start lg:text-left font-jost ">
-              <div
+              <motion.div
                 className="text-zinc-100 leading-none"
                 style={{ fontSize: titleFontSize, fontWeight: 900 }}
+                initial={{ opacity: 0, x: -30, rotateX: -10 }}
+                animate={isInView ? { opacity: 1, x: 0, rotateX: 0 } : {}}
+                transition={{
+                  duration: 0.9,
+                  delay: 0.2,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
               >
                 Colleziona.
-              </div>
-              <div
+              </motion.div>
+              <motion.div
                 className="text-zinc-100 leading-none"
                 style={{ fontSize: titleFontSize, fontWeight: 900 }}
+                initial={{ opacity: 0, x: -30, rotateX: -10 }}
+                animate={isInView ? { opacity: 1, x: 0, rotateX: 0 } : {}}
+                transition={{
+                  duration: 0.9,
+                  delay: 0.35,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
               >
                 {" "}
                 Stampa.
-              </div>
-              <div
+              </motion.div>
+              <motion.div
                 style={{ fontSize: titleFontSize, lineHeight: 1 }}
                 className="w-fit mt-2"
+                initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
+                transition={{
+                  duration: 1,
+                  delay: 0.5,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
               >
                 <ShaderText
                   className="block leading-none"
@@ -88,31 +119,53 @@ const Hero3dContent: React.FC = () => {
                 >
                   IndossA.
                 </ShaderText>
-              </div>
+              </motion.div>
             </div>
 
             {/* Brand Description */}
             <motion.p
               className="text-zinc-300 text-base md:text-lg text-center lg:text-left max-w-md px-4 lg:px-0 leading-relaxed mt-8"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.8,
+                delay: 0.7,
+                ease: [0.16, 1, 0.3, 1]
+              }}
             >
               Personalizza i tuoi capi NFT certificati dei migliori artisti
               digitali, o acquista i capi esclusivi delle nostre collezioni.
             </motion.p>
-          </motion.div>
+          </div>
 
           {/* Rectangular Button */}
-          <div className="flex justify-center lg:justify-start mt-6 lg:mt-8">
+          <motion.div
+            className="flex justify-center lg:justify-start mt-6 lg:mt-8"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{
+              duration: 0.7,
+              delay: 0.9,
+              ease: [0.16, 1, 0.3, 1]
+            }}
+          >
             <RectangularButton />
-          </div>
+          </motion.div>
         </div>
 
         {/* Right Column - Avatars */}
         <div className="h-full lg:w-[600px] lg:flex-shrink-0">
           {/* Avatar Preview - mobile (solo uno per spazio limitato) */}
-          <div className="w-full h-full flex justify-center lg:hidden">
+          <motion.div
+            className="w-full h-full flex justify-center lg:hidden"
+            initial={{ opacity: 0, scale: 0.9, y: 30 }}
+            animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
+            transition={{
+              duration: 1,
+              delay: 0.6,
+              ease: [0.16, 1, 0.3, 1]
+            }}
+          >
             <div className="h-full max-w-[600px] w-full">
               <AvatarCanvas
                 avatarType="man"
@@ -122,16 +175,20 @@ const Hero3dContent: React.FC = () => {
                 maxAzimuthAngle={Math.PI / 2}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Due avatar - desktop (lg+) */}
           <div className="h-full w-full hidden lg:flex justify-center gap-4 max-h-[450px]">
             {/* Avatar Man */}
             <motion.div
               className="aspect-[9/16] h-full flex-shrink-0"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              initial={{ opacity: 0, x: 50, rotateY: -15, scale: 0.9 }}
+              animate={isInView ? { opacity: 1, x: 0, rotateY: 0, scale: 1 } : {}}
+              transition={{
+                duration: 1.1,
+                delay: 0.5,
+                ease: [0.16, 1, 0.3, 1]
+              }}
             >
               <AvatarCanvas
                 avatarType="man"
@@ -145,9 +202,13 @@ const Hero3dContent: React.FC = () => {
             {/* Avatar Girl */}
             <motion.div
               className="aspect-[9/16] h-full flex-shrink-0"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
+              initial={{ opacity: 0, x: 50, rotateY: -15, scale: 0.9 }}
+              animate={isInView ? { opacity: 1, x: 0, rotateY: 0, scale: 1 } : {}}
+              transition={{
+                duration: 1.1,
+                delay: 0.7,
+                ease: [0.16, 1, 0.3, 1]
+              }}
             >
               <AvatarCanvas
                 avatarType="girl"
