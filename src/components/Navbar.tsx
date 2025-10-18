@@ -66,11 +66,13 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 w-full z-[60] transition-all duration-500 ${
-        scrolled
-          ? "bg-zinc-950 border-b border-white/10 shadow-lg"
-          : "bg-transparent"
-      }`}
+      className="fixed left-0 right-0 w-full z-[60] transition-all duration-500"
+      style={{
+        top: scrolled ? '0px' : 'var(--announcement-bar-height, 0px)',
+        backgroundColor: scrolled ? 'rgb(9 9 11)' : 'transparent',
+        borderBottom: scrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+        boxShadow: scrolled ? '0 10px 15px -3px rgb(0 0 0 / 0.1)' : 'none'
+      }}
     >
       <nav className="mx-auto w-full max-w-[100vw] px-4 sm:px-6 lg:px-24 flex items-center justify-between h-16 sm:h-20">
         <NavbarLogo />
