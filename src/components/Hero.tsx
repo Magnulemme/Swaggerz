@@ -4,6 +4,7 @@ import React from "react";
 import HeroBackground from "./Hero/HeroBackground";
 import Hero3dContent from "./Hero/Hero3dContent";
 import HeroVideoBanner from "./Hero/HeroVideoBanner";
+import { HeroWaveImages } from "./Hero/HeroWaveImages";
 
 const BentoHero = () => {
   return (
@@ -20,6 +21,11 @@ const BentoHero = () => {
           {/* 3D Content Section */}
           <div className="col-span-2 lg:col-span-4 lg:row-span-2 h-full">
             <Hero3dContent />
+          </div>
+
+          {/* Wave Images Section */}
+          <div className="col-span-2 lg:col-span-4 w-full">
+            <HeroWaveImages />
           </div>
         </div>
       </div>
