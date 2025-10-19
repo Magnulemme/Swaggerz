@@ -17,6 +17,8 @@ export default function HeroVideoBanner() {
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const [isShaderTextVisible, setIsShaderTextVisible] = useState(false);
+  const shaderTextRef = useRef<HTMLDivElement>(null);
   const setComponentReady = useLoadingStore((state) => state.setComponentReady);
 
   // Parallax scroll tracking - solo su desktop
@@ -97,6 +99,28 @@ export default function HeroVideoBanner() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isCalculated]);
+
+  // Intersection Observer per ShaderText
+  useEffect(() => {
+    const shaderTextElement = shaderTextRef.current;
+    if (!shaderTextElement) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsShaderTextVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.1, // Attiva quando almeno il 10% è visibile
+        rootMargin: "50px" // Inizia a renderizzare 50px prima che entri nel viewport
+      }
+    );
+
+    observer.observe(shaderTextElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Traccia quando il video è pronto
   useEffect(() => {
@@ -179,10 +203,16 @@ export default function HeroVideoBanner() {
           <div style={{ paddingBottom: `${buttonOffset + scrollOffset}px` }}></div>
 
           <div
+            ref={shaderTextRef}
             className="text-center self-center w-full"
             style={{ marginTop: `-${buttonOffset + scrollOffset}px` }}
           >
-            <ShaderText className="w-full" fontSize="clamp(78px, 12vw, 180px)">
+            <ShaderText
+              className="w-full"
+              fontSize="clamp(78px, 12vw, 180px)"
+              shouldRender={isShaderTextVisible}
+              shouldAnimate={isShaderTextVisible}
+            >
               SwaggerZ
             </ShaderText>
             <div className="">

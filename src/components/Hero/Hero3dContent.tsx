@@ -58,15 +58,15 @@ const Hero3dContent: React.FC = () => {
   return (
     <motion.div
       ref={containerRef}
-      className="group relative h-full"
+      className="group relative h-full bg-zinc-950"
       initial={{ opacity: 0 }}
       animate={{ opacity: isInView ? 1 : 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Layout responsive: colonna singola su mobile, due colonne su desktop */}
-      <div className="relative h-full flex flex-col lg:flex-row p-8 px-6 lg:px-24 lg:p-10">
+      <div className="relative h-full flex flex-col lg:flex-row container mx-auto px-6 sm:px-8 lg:px-12 py-12 lg:py-16">
         {/* Left Column - Text Content */}
-        <div className="flex-1 flex flex-col justify-center">
+        <div className="flex-1 flex flex-col justify-center z-10">
           {/* Title with ShaderText preserved */}
           <div
             ref={titleContainerRef}
@@ -116,6 +116,8 @@ const Hero3dContent: React.FC = () => {
                   className="block leading-none"
                   fontSize={shaderFontSize}
                   fontWeight="900"
+                  shouldRender={isInView}
+                  shouldAnimate={isInView}
                 >
                   IndossA.
                 </ShaderText>
@@ -154,7 +156,11 @@ const Hero3dContent: React.FC = () => {
         </div>
 
         {/* Right Column - Avatars */}
-        <div className="h-full lg:w-[600px] lg:flex-shrink-0">
+        <div className="relative h-full lg:w-[600px] lg:flex-shrink-0">
+          {/* Background gradient - posizionato relativamente al container degli avatar */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-[400px] h-[400px] bg-gradient-to-r from-orange-500/15 to-red-500/15 rounded-full blur-3xl animate-pulse" />
+          </div>
           {/* Avatar Preview - mobile (solo uno per spazio limitato) */}
           <motion.div
             className="w-full h-full flex justify-center lg:hidden"

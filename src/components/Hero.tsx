@@ -8,9 +8,6 @@ import HeroVideoBanner from "./Hero/HeroVideoBanner";
 const BentoHero = () => {
   return (
     <section className="relative bg-zinc-950 font-jost  min-h-screen">
-      {/* Background with animated gradients */}
-      <HeroBackground />
-
       {/* Main content container */}
       <div className="relative z-50 w-full">
         {/* Simplified Hero Grid - Only Banner and 3D Content */}

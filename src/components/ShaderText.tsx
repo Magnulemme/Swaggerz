@@ -14,6 +14,8 @@ interface ShaderTextProps {
   fontFamily?: string; // Custom font family
   maxFontSize?: number; // Maximum font size in pixels (overrides fontSize max)
   maxHeight?: number; // Maximum height in pixels
+  shouldRender?: boolean; // Se false, skip setup completo
+  shouldAnimate?: boolean; // Se false, render singolo
 }
 
 interface TextDimensions {
@@ -31,6 +33,8 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   fontFamily = "var(--font-pastor-of-muppets), cursive",
   maxFontSize,
   maxHeight,
+  shouldRender = true,
+  shouldAnimate = true,
 }) => {
   const uniqueId = useId();
   const taskId = `shader-text-${uniqueId.replace(/:/g, "-")}`;
@@ -44,6 +48,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const geometryRef = useRef<THREE.PlaneGeometry | null>(null);
+  const stopAnimationRef = useRef<(() => void) | null>(null);
   const [dataUrl, setDataUrl] = useState<string>("");
   const [textDimensions, setTextDimensions] = useState<TextDimensions>({
     width: 0,
@@ -51,6 +56,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     x: 0,
     y: 0,
   });
+  console.log(shouldRender, shouldAnimate);
   const [isReady, setIsReady] = useState<boolean>(false);
   const setComponentReady = useLoadingStore((state) => state.setComponentReady);
   const hasReportedReady = useRef<boolean>(false);
@@ -156,13 +162,20 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   // Setup Three.js con sharedRenderer
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (
-      !canvas ||
-      !isReady ||
-      textDimensions.width === 0 ||
-      textDimensions.height === 0
-    )
+
+    // Skip se non serve renderizzare
+    if (!canvas || !isReady || !shouldRender) {
+      console.log("⏭️ Skipping render:", {
+        canvas: !!canvas,
+        isReady,
+        shouldRender,
+      });
       return;
+    }
+
+    if (textDimensions.width === 0 || textDimensions.height === 0) return;
+
+    console.log("🎬 Setting up Three.js");
 
     // Setup Three.js
     const scene = new THREE.Scene();
@@ -183,36 +196,57 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     materialRef.current = material;
     geometryRef.current = geometry;
 
-    // Registra nel sharedRenderer (priorità 1 = alta, 30fps per testo)
-    sharedRenderer.registerTask(taskId, scene, camera, canvas, {
-      priority: 1,
-      targetFPS: 30,
-    });
+    // Registra nel sharedRenderer
+    sharedRenderer.registerTask(taskId, scene, camera, canvas);
+
+    if (shouldAnimate) {
+      // Avvia animazione continua
+      console.log("🔄 Starting animation");
+      const stop = sharedRenderer.startAnimation(taskId);
+      stopAnimationRef.current = stop;
+    } else {
+      // Render singolo
+      console.log("📸 Single render");
+      sharedRenderer.renderOnce(taskId, performance.now() * 0.001);
+    }
 
     // Update dataUrl periodicamente
-    const updateInterval = setInterval(() => {
-      if (canvas) {
-        try {
-          const newDataUrl = canvas.toDataURL("image/png");
-          setDataUrl(newDataUrl);
-        } catch {
-          // Error
+    const updateInterval = setInterval(
+      () => {
+        if (canvas) {
+          try {
+            const newDataUrl = canvas.toDataURL("image/png");
+            setDataUrl(newDataUrl);
+          } catch {
+            // Error
+          }
         }
-      }
-    }, 66); // ~30fps (2 frames @ 60fps)
+      },
+      shouldAnimate ? 33 : 1000
+    );
 
     return () => {
+      console.log("🧹 Cleaning up");
       clearInterval(updateInterval);
+
+      if (stopAnimationRef.current) {
+        stopAnimationRef.current();
+        stopAnimationRef.current = null;
+      }
+
       sharedRenderer.unregisterTask(taskId);
       shaderTextRenderer.releaseResources();
+
+      sceneRef.current = null;
+      cameraRef.current = null;
     };
-  }, [textDimensions, isReady, taskId]);
+  }, [taskId, textDimensions, isReady, shouldRender, shouldAnimate]);
 
   // Notifica quando lo ShaderText è completamente pronto
   useEffect(() => {
     if (isReady && dataUrl && !hasReportedReady.current) {
-      console.log('✅ ShaderText ready');
-      setComponentReady('shaderText');
+      console.log("✅ ShaderText ready");
+      setComponentReady("shaderText");
       hasReportedReady.current = true;
     }
   }, [isReady, dataUrl, setComponentReady]);

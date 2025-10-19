@@ -98,7 +98,7 @@ export default function AvatarCanvas({
           <OrbitControls
             enableZoom={enableZoom}
             enablePan={false}
-            minPolarAngle={Math.PI / 2.5}
+            minPolarAngle={Math.PI / 2}
             maxPolarAngle={Math.PI / 2}
             minAzimuthAngle={minAzimuthAngle}
             maxAzimuthAngle={maxAzimuthAngle}
