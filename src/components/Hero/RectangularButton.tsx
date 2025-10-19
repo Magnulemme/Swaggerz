@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState, useId } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import * as THREE from 'three';
-import { sharedRenderer } from '@/lib/sharedRenderer';
+import { useSharedRenderer } from '@/hooks/useSharedRenderer';
 import { vertexShader, darkFragmentShader } from '@/constants/shaders';
 
 interface RectangularButtonProps {
@@ -20,30 +20,16 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
   isHovered = false,
   setIsHovered
 }) => {
-  const uniqueId = useId();
-  const taskId = `rectangular-button-${uniqueId.replace(/:/g, '-')}`;
-
   const width = 240;
   const height = 64;
 
-  // Shader background refs
-  const shaderCanvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const [shaderDataUrl, setShaderDataUrl] = useState<string>('');
   const timeRef = useRef<number>(0);
 
-  // Setup Three.js con sharedRenderer
-  useEffect(() => {
-    const canvas = shaderCanvasRef.current;
-    if (!canvas) return;
-
-    // Setup Three.js
+  // Setup Three.js con useSharedRenderer
+  const setup = useCallback(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    canvas.width = width;
-    canvas.height = height;
 
     const material = new THREE.ShaderMaterial({
       vertexShader,
@@ -58,22 +44,23 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    sceneRef.current = scene;
-    materialRef.current = material;
+    return { scene, camera, material, geometry };
+  }, []);
 
-    // Registra nel sharedRenderer (priorità 2 = media, 30fps)
-    sharedRenderer.registerTask(
-      taskId,
-      scene,
-      camera,
-      canvas,
-      {
-        priority: 2,
-        targetFPS: 30
-      }
-    );
+  const { containerRef, canvasRef, materialRef } = useSharedRenderer(setup, {
+    priority: 2, // media (interattivo)
+    targetFPS: 30,
+    enableVisibilityTracking: true,
+  });
 
-    // Update dataUrl e uTime
+  // Update dataUrl e uTime
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.width = width;
+    canvas.height = height;
+
     const updateInterval = setInterval(() => {
       if (canvas) {
         try {
@@ -89,20 +76,12 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
       }
     }, 66); // ~30fps
 
-    return () => {
-      clearInterval(updateInterval);
-      sharedRenderer.unregisterTask(taskId);
-      if (geometry) {
-        geometry.dispose();
-      }
-      if (material) {
-        material.dispose();
-      }
-    };
-  }, [width, height, taskId]);
+    return () => clearInterval(updateInterval);
+  }, [width, height, canvasRef, materialRef]);
 
   return (
     <div
+      ref={containerRef}
       className="relative"
       style={{
         width,
@@ -111,7 +90,7 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
     >
       {/* Canvas nascosto per generare lo shader */}
       <canvas
-        ref={shaderCanvasRef}
+        ref={canvasRef}
         style={{
           display: 'none',
           position: 'absolute'

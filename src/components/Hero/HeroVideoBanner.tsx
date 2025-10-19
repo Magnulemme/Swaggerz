@@ -45,6 +45,20 @@ export default function HeroVideoBanner() {
       `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
   );
 
+  // Preload video con massima priorità
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'video';
+    link.href = '/videos/hero-video-hq.mp4';
+    link.type = 'video/mp4';
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
   useEffect(() => {
     const checkShaderSupport = () => {
       const isLargeScreen = window.innerWidth >= 1024;

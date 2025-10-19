@@ -1,29 +1,18 @@
 "use client";
 
-import { useRef, useEffect, useState, useId } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import * as THREE from 'three';
-import { sharedRenderer } from '@/lib/sharedRenderer';
+import { useSharedRenderer } from '@/hooks/useSharedRenderer';
 import { vertexShader, fragmentShader } from '@/constants/shaders';
 
 export default function ShaderCircle() {
-  const uniqueId = useId();
-  const taskId = `shader-circle-${uniqueId.replace(/:/g, '-')}`;
-
-  const shaderCanvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const [shaderDataUrl, setShaderDataUrl] = useState<string>('');
   const timeRef = useRef<number>(0);
 
-  useEffect(() => {
-    const canvas = shaderCanvasRef.current;
-    if (!canvas) return;
-
+  // Setup Three.js con useSharedRenderer
+  const setup = useCallback(() => {
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
-    canvas.width = 48;
-    canvas.height = 48;
 
     const material = new THREE.ShaderMaterial({
       vertexShader,
@@ -38,22 +27,23 @@ export default function ShaderCircle() {
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    sceneRef.current = scene;
-    materialRef.current = material;
+    return { scene, camera, material, geometry };
+  }, []);
 
-    // Registra nel sharedRenderer (priorità 5 = decorativo, 20fps)
-    sharedRenderer.registerTask(
-      taskId,
-      scene,
-      camera,
-      canvas,
-      {
-        priority: 5,
-        targetFPS: 20
-      }
-    );
+  const { containerRef, canvasRef, materialRef } = useSharedRenderer(setup, {
+    priority: 5, // decorativo
+    targetFPS: 20,
+    enableVisibilityTracking: true,
+  });
 
-    // Update dataUrl e uTime
+  // Update dataUrl e uTime
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.width = 48;
+    canvas.height = 48;
+
     const updateInterval = setInterval(() => {
       if (canvas) {
         try {
@@ -69,22 +59,13 @@ export default function ShaderCircle() {
       }
     }, 100); // ~20fps
 
-    return () => {
-      clearInterval(updateInterval);
-      sharedRenderer.unregisterTask(taskId);
-      if (geometry) {
-        geometry.dispose();
-      }
-      if (material) {
-        material.dispose();
-      }
-    };
-  }, [taskId]);
+    return () => clearInterval(updateInterval);
+  }, [canvasRef, materialRef]);
 
   return (
-    <>
+    <div ref={containerRef}>
       <canvas
-        ref={shaderCanvasRef}
+        ref={canvasRef}
         style={{
           display: 'none',
           position: 'absolute'
@@ -95,7 +76,7 @@ export default function ShaderCircle() {
       {shaderDataUrl && (
         <div className="shader-data" data-shader-url={shaderDataUrl} />
       )}
-    </>
+    </div>
   );
 }
 

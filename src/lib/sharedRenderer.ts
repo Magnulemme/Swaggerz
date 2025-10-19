@@ -20,6 +20,7 @@ interface RenderTask {
   priority: number; // 0 = highest
   lastFrameTime: number;
   targetFPS: number;
+  visible: boolean; // ✅ Track visibility for lazy rendering
 }
 
 class SharedRendererManager {
@@ -83,7 +84,7 @@ class SharedRendererManager {
     scene: THREE.Scene,
     camera: THREE.Camera,
     canvas: HTMLCanvasElement,
-    options: { priority?: number; targetFPS?: number } = {}
+    options: { priority?: number; targetFPS?: number; visible?: boolean } = {}
   ): void {
     const task: RenderTask = {
       id,
@@ -94,6 +95,7 @@ class SharedRendererManager {
       priority: options.priority ?? 10,
       lastFrameTime: 0,
       targetFPS: options.targetFPS ?? 60, // ✅ Default 60fps
+      visible: options.visible ?? true, // ✅ Default visible
     };
 
     this.tasks.set(id, task);
@@ -103,7 +105,7 @@ class SharedRendererManager {
     }
 
     console.log(
-      `📝 Registered task: ${id} (priority: ${task.priority}, fps: ${task.targetFPS})`
+      `📝 Registered task: ${id} (priority: ${task.priority}, fps: ${task.targetFPS}, visible: ${task.visible})`
     );
   }
 
@@ -137,6 +139,21 @@ class SharedRendererManager {
   }
 
   /**
+   * ✅ Imposta la visibilità di un task (per lazy rendering)
+   */
+  setTaskVisible(id: string, visible: boolean): void {
+    const task = this.tasks.get(id);
+    if (task) {
+      task.visible = visible;
+      console.log(
+        `${visible ? "👁️" : "🙈"} Task ${id} ${
+          visible ? "visible" : "hidden"
+        }`
+      );
+    }
+  }
+
+  /**
    * Aggiorna la priorità di un task
    */
   setTaskPriority(id: string, priority: number): void {
@@ -157,7 +174,7 @@ class SharedRendererManager {
   }
 
   /**
-   * ✅ Loop di rendering principale - come versione funzionante
+   * ✅ Loop di rendering principale - con lazy rendering
    */
   private animate = (time: number): void => {
     if (!this.renderer || !this.isRunning) return;
@@ -167,9 +184,9 @@ class SharedRendererManager {
     // Aggiorna uniform uTime per ShaderText
     shaderTextRenderer.updateTime(time * 0.001);
 
-    // Ordina i task per priorità
+    // Ordina i task per priorità, filtrando solo quelli abilitati E visibili
     const sortedTasks = Array.from(this.tasks.values())
-      .filter((task) => task.enabled)
+      .filter((task) => task.enabled && task.visible) // ✅ Render only visible tasks
       .sort((a, b) => a.priority - b.priority);
 
     // Rendi ogni task se è il momento (throttling FPS)
@@ -338,12 +355,18 @@ class SharedRendererManager {
       tasksCount: this.tasks.size,
       enabledTasks: Array.from(this.tasks.values()).filter((t) => t.enabled)
         .length,
+      visibleTasks: Array.from(this.tasks.values()).filter((t) => t.visible)
+        .length,
+      activeTasks: Array.from(this.tasks.values()).filter(
+        (t) => t.enabled && t.visible
+      ).length,
       isRunning: this.isRunning,
       hasRenderer: this.renderer !== null,
       supportsTransferBitmap: this.supportsTransferBitmap,
       tasks: Array.from(this.tasks.values()).map((t) => ({
         id: t.id,
         enabled: t.enabled,
+        visible: t.visible,
         priority: t.priority,
         targetFPS: t.targetFPS,
       })),
