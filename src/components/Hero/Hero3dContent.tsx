@@ -12,11 +12,11 @@ const Hero3dContent: React.FC = () => {
   const [titleFontSize, setTitleFontSize] = useState("2rem");
   const [shaderFontSize, setShaderFontSize] = useState("2.5rem");
 
-  // Detect when the section enters the viewport - trigger più veloce
+  // Detect when the section enters the viewport
   const isInView = useInView(containerRef, {
     once: true, // Animate only once
-    amount: 0.05, // Trigger quando solo 5% è visibile (più veloce!)
-    margin: "0px 0px -100px 0px" // Inizia animazione 100px prima che entri nel viewport
+    amount: 0.1, // Trigger quando 10% è visibile
+    margin: "0px 0px -50px 0px" // Inizia animazione 50px prima che entri nel viewport
   });
 
   // Calcola dinamicamente la dimensione del titolo
@@ -81,8 +81,8 @@ const Hero3dContent: React.FC = () => {
                 initial={{ opacity: 0, x: -30, rotateX: -10 }}
                 animate={isInView ? { opacity: 1, x: 0, rotateX: 0 } : {}}
                 transition={{
-                  duration: 0.7,
-                  delay: 0,
+                  duration: 0.8,
+                  delay: 0.1,
                   ease: [0.16, 1, 0.3, 1]
                 }}
               >
@@ -94,8 +94,8 @@ const Hero3dContent: React.FC = () => {
                 initial={{ opacity: 0, x: -30, rotateX: -10 }}
                 animate={isInView ? { opacity: 1, x: 0, rotateX: 0 } : {}}
                 transition={{
-                  duration: 0.7,
-                  delay: 0.1,
+                  duration: 0.8,
+                  delay: 0.25,
                   ease: [0.16, 1, 0.3, 1]
                 }}
               >
@@ -108,8 +108,8 @@ const Hero3dContent: React.FC = () => {
                 initial={{ opacity: 0, x: -30, scale: 0.95 }}
                 animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
                 transition={{
-                  duration: 0.8,
-                  delay: 0.2,
+                  duration: 0.9,
+                  delay: 0.4,
                   ease: [0.16, 1, 0.3, 1]
                 }}
               >
@@ -131,8 +131,8 @@ const Hero3dContent: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{
-                duration: 0.6,
-                delay: 0.3,
+                duration: 0.7,
+                delay: 0.55,
                 ease: [0.16, 1, 0.3, 1]
               }}
             >
@@ -147,8 +147,8 @@ const Hero3dContent: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
             transition={{
-              duration: 0.6,
-              delay: 0.4,
+              duration: 0.7,
+              delay: 0.7,
               ease: [0.16, 1, 0.3, 1]
             }}
           >
@@ -168,8 +168,8 @@ const Hero3dContent: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={isInView ? { opacity: 1, scale: 1, y: 0 } : {}}
             transition={{
-              duration: 0.8,
-              delay: 0.2,
+              duration: 0.9,
+              delay: 0.4,
               ease: [0.16, 1, 0.3, 1]
             }}
           >
@@ -192,8 +192,8 @@ const Hero3dContent: React.FC = () => {
               initial={{ opacity: 0, x: 50, rotateY: -15, scale: 0.9 }}
               animate={isInView ? { opacity: 1, x: 0, rotateY: 0, scale: 1 } : {}}
               transition={{
-                duration: 0.9,
-                delay: 0.2,
+                duration: 1,
+                delay: 0.4,
                 ease: [0.16, 1, 0.3, 1]
               }}
             >
@@ -212,8 +212,8 @@ const Hero3dContent: React.FC = () => {
               initial={{ opacity: 0, x: 50, rotateY: -15, scale: 0.9 }}
               animate={isInView ? { opacity: 1, x: 0, rotateY: 0, scale: 1 } : {}}
               transition={{
-                duration: 0.9,
-                delay: 0.35,
+                duration: 1,
+                delay: 0.55,
                 ease: [0.16, 1, 0.3, 1]
               }}
             >
