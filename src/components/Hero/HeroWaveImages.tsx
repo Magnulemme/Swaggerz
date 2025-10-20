@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { WaveImageShader } from "./WaveImageShader";
+import { Sparkles, ShoppingBag } from "lucide-react";
 
 interface ImageConfig {
   url: string;
   alt: string;
+  description?: string;
+  price?: string;
+  category?: string;
   waveIntensity?: number;
   waveSpeed?: number;
   foldCount?: number;
+  isExclusive?: boolean;
 }
 
 interface HeroWaveImagesProps {
@@ -19,25 +22,35 @@ interface HeroWaveImagesProps {
 
 const defaultImages: ImageConfig[] = [
   {
-    url: "/VintageDrop.webp",
-    alt: "Vintage Drop Collection",
-    waveIntensity: 0.25,
-    waveSpeed: 1.0,
-    foldCount: 6,
+    url: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=90",
+    alt: "Midnight Velvet Blazer",
+    description: "Sartoria italiana in velluto premium",
+    price: "€1.299",
+    category: "Haute Couture",
+    isExclusive: true,
   },
   {
-    url: "/DigitalArtDrop.webp",
-    alt: "Digital Art Collection",
-    waveIntensity: 0.28,
-    waveSpeed: 1.2,
-    foldCount: 7,
+    url: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=90",
+    alt: "Cashmere Heritage Coat",
+    description: "100% cashmere mongolo, edizione limitata",
+    price: "€2.499",
+    category: "Winter Collection",
+    isExclusive: true,
   },
   {
-    url: "/trending-1.png",
-    alt: "Trending Collection",
-    waveIntensity: 0.26,
-    waveSpeed: 1.1,
-    foldCount: 6,
+    url: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&q=90",
+    alt: "Silk Evening Gown",
+    description: "Seta naturale con ricami a mano",
+    price: "€3.799",
+    category: "Evening Wear",
+    isExclusive: true,
+  },
+  {
+    url: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=90",
+    alt: "Leather Artisan Jacket",
+    description: "Pelle italiana conciata a mano",
+    price: "€1.899",
+    category: "Premium Leather",
   },
 ];
 
@@ -45,110 +58,125 @@ export function HeroWaveImages({
   images = defaultImages,
   className = "",
 }: HeroWaveImagesProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
-
-  // Intersection Observer per lazy loading
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "100px", // Pre-load un po' prima
-      }
-    );
-
-    observer.observe(containerRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <motion.div
-      ref={containerRef}
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      className={`w-full py-20 px-6 lg:px-12 ${className}`}
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Header section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.2,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Esplora la Collezione
+    <div className={`w-full py-24 px-6 lg:px-16 ${className}`}>
+      <div className="max-w-[1600px] mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-16 space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+            <Sparkles size={16} className="text-amber-400" />
+            <span className="text-sm font-medium text-white/90 tracking-wider uppercase">
+              Exclusive Collection
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+            Haute Couture
           </h2>
-          <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-            Ogni pezzo è un&apos;opera d&apos;arte digitale certificata,
-            pronta per essere indossata
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+            Pezzi unici e collezioni limitate, selezionati dai migliori atelier europei
           </p>
-        </motion.div>
+        </div>
 
-        {/* Images grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Grid Layout - Responsive: 2 cols tablet, 3-4 desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 lg:gap-x-10 lg:gap-y-16">
           {images.map((image, index) => (
-            <motion.div
+            <article
               key={image.url}
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={
-                isInView
-                  ? { opacity: 1, scale: 1, y: 0 }
-                  : { opacity: 0, scale: 0.9, y: 30 }
-              }
-              transition={{
-                duration: 0.7,
-                delay: 0.3 + index * 0.15, // Stagger effect
-                ease: [0.16, 1, 0.3, 1],
+              className="group relative flex flex-col cursor-pointer"
+              style={{
+                animationDelay: `${index * 100}ms`,
               }}
-              className="relative group"
             >
-              {/* Card wrapper con hover effect */}
-              <div className="relative rounded-2xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm border border-zinc-800/50 hover:border-zinc-700/50 transition-all duration-500 shadow-2xl hover:shadow-blue-500/10">
-                {/* Wave shader image */}
-                {isInView && (
-                  <WaveImageShader
-                    imageUrl={image.url}
-                    waveIntensity={image.waveIntensity}
-                    waveSpeed={image.waveSpeed}
-                    foldCount={image.foldCount}
-                    className="w-full aspect-[4/5]"
-                  />
+              {/* Image Container */}
+              <div className="relative">
+                {/* Exclusive Badge */}
+                {image.isExclusive && (
+                  <div className="absolute left-4 top-4 z-20">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 shadow-lg shadow-amber-500/50 backdrop-blur-sm">
+                      <Sparkles size={12} className="text-white" />
+                      <span className="text-xs font-bold text-white uppercase tracking-wide">
+                        Exclusive
+                      </span>
+                    </div>
+                  </div>
                 )}
 
-                {/* Overlay gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Image with Wave Shader */}
+                <WaveImageShader
+                  imageUrl={image.url}
+                  waveIntensity={image.waveIntensity ?? 0.25}
+                  waveSpeed={image.waveSpeed ?? 0.6}
+                  foldCount={image.foldCount ?? 5}
+                  className="w-full aspect-[3/4] rounded-2xl"
+                />
 
-                {/* Info overlay (appears on hover) */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                  <h3 className="text-white font-bold text-xl mb-2">
-                    {image.alt}
-                  </h3>
-                  <p className="text-zinc-300 text-sm">
-                    NFT Certificato • Limited Edition
-                  </p>
-                </div>
+                {/* Gradient Overlay on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl pointer-events-none" />
+
+                {/* Quick Action Button - Visible on Hover */}
+                <button className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-black font-semibold text-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-amber-400 hover:scale-105 shadow-lg">
+                  <ShoppingBag size={16} />
+                  <span>Acquista</span>
+                </button>
               </div>
-            </motion.div>
+
+              {/* Content Section - Below Image */}
+              <div className="mt-4 space-y-2">
+                {/* Category */}
+                {image.category && (
+                  <span className="inline-block text-xs font-medium text-amber-400 uppercase tracking-widest">
+                    {image.category}
+                  </span>
+                )}
+
+                {/* Title */}
+                <h3 className="text-xl font-bold text-white leading-tight group-hover:text-amber-400 transition-colors duration-300">
+                  {image.alt}
+                </h3>
+
+                {/* Description */}
+                {image.description && (
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    {image.description}
+                  </p>
+                )}
+
+                {/* Price with Premium Styling */}
+                {image.price && (
+                  <div className="flex items-baseline gap-2 pt-1">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-white to-amber-200 bg-clip-text text-transparent">
+                      {image.price}
+                    </span>
+                    <span className="text-xs text-zinc-500 uppercase tracking-wider">
+                      IVA incl.
+                    </span>
+                  </div>
+                )}
+              </div>
+            </article>
           ))}
         </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center mt-16">
+          <button className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-semibold text-base shadow-lg shadow-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105">
+            <span>Esplora l&apos;intera collezione</span>
+            <svg
+              className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

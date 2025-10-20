@@ -28,7 +28,7 @@ const nextConfig = {
             value: `
               script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://www.gstatic.com https://cdn.jsdelivr.net;
               connect-src 'self' https://challenges.cloudflare.com https://www.gstatic.com blob:;
-              img-src 'self' data: blob:;
+              img-src 'self' data: blob: https://images.unsplash.com;
               worker-src 'self' blob:;
             `.replace(/\s{2,}/g, ' ').trim()
           }

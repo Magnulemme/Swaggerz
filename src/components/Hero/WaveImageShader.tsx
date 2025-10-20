@@ -2,191 +2,186 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { sharedRenderer } from "@/lib/sharedRenderer";
 
 interface WaveImageShaderProps {
   imageUrl: string;
-  waveIntensity?: number; // Intensità dell'effetto 3D (default: 0.03 per effetto leggero)
-  waveSpeed?: number; // Velocità animazione (default: 0.5)
-  foldCount?: number; // Numero di pieghe verticali (default: 12)
+  waveIntensity?: number;
+  waveSpeed?: number;
+  foldCount?: number;
   className?: string;
 }
 
 export function WaveImageShader({
   imageUrl,
-  waveIntensity = 0.25, // ✅ Intensità alta per effetto visibile
-  waveSpeed = 1.0,
-  foldCount = 6,
+  waveIntensity = 0.25, // Amplitude più visibile
+  waveSpeed = 0.6, // Velocità lenta e fluida
+  foldCount = 5, // Numero onde
   className = "",
 }: WaveImageShaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const meshRef = useRef<THREE.Mesh | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+  const animationIdRef = useRef<number | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
+  // Main setup effect
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
-    const taskId = `wave-image-${imageUrl}`;
+    const container = containerRef.current;
 
-    // Setup Three.js scene
+    // Create WebGL renderer with maximum quality
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: true,
+      powerPreference: "high-performance",
+      precision: "highp",
+      stencil: false,
+      depth: false,
+    });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setClearColor(0x000000, 0);
+    rendererRef.current = renderer;
+
+    // Setup scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // ✅ Perspective camera per vedere il displacement 3D
+    // Setup perspective camera for 3D wave effect visibility
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 3;
+    camera.position.set(0, 0.5, 5); // Camera più lontana per vista migliore
+    camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
+
+    // Resize logic
+    const updateSize = () => {
+      const rect = container.getBoundingClientRect();
+      renderer.setSize(rect.width, rect.height, false);
+
+      // Update perspective camera aspect ratio
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
+    };
+    updateSize();
 
     // Load texture
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(
       imageUrl,
       (texture) => {
-        texture.minFilter = THREE.LinearFilter;
+        // Maximum texture quality settings
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
         texture.magFilter = THREE.LinearFilter;
+        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        texture.generateMipmaps = true;
+        texture.needsUpdate = true;
 
-        // ✅ Shader stile curtains.js - CORRETTO con UV displacement
+        // Calculate aspect ratio from image texture
+        const imageAspect = texture.image.width / texture.image.height;
+
+        // Calculate aspect ratio for UV scaling (Olivier Larose approach)
+        const aspectRatio = imageAspect;
+
+        // Create shader material - Inflated canvas effect (balloon-like)
         const material = new THREE.ShaderMaterial({
           uniforms: {
             uTexture: { value: texture },
             uTime: { value: 0 },
-            uIntensity: { value: waveIntensity },
-            uSpeed: { value: waveSpeed },
-            uFolds: { value: foldCount },
+            uAmplitude: { value: waveIntensity },
+            uWaveLength: { value: foldCount },
+            vUvScale: { value: new THREE.Vector2(1, aspectRatio) },
           },
           vertexShader: `
             varying vec2 vUv;
-
             uniform float uTime;
-            uniform float uIntensity;
-            uniform float uSpeed;
-            uniform float uFolds;
-
-            #define PI 3.14159265359
+            uniform float uAmplitude;
+            uniform float uWaveLength;
 
             void main() {
               vUv = uv;
               vec3 newPosition = position;
 
-              // ✅ Wave che viaggia da sinistra a destra
-              float waveCoords = ((uTime * uSpeed / 45.0) * 3.5) - 1.75;
-              float distanceToWave = distance(vec2(position.x, 0.0), vec2(waveCoords, 0.0));
+              // Calcola la distanza dal centro (effetto radiale)
+              vec2 center = vec2(0.0, 0.0);
+              float distanceFromCenter = length(position.xy - center);
 
-              // Wave principale
-              float wave = (cos(clamp(distanceToWave, 0.0, 0.75) * PI) - cos(0.75 * PI)) * uIntensity;
+              // Effetto gonfiato: più forte al centro, si attenua ai bordi
+              // Usa una curva più morbida per mantenere l'effetto visibile
+              float inflate = 1.0 - distanceFromCenter * 0.3;
+              inflate = max(0.2, inflate); // minimo 0.2 invece di 0 per mantenere movimento ai bordi
 
-              // ✅ Oscillazioni multiple per movimento organico
-              wave += sin(PI * uTime * uSpeed / 90.0) * uIntensity * 0.5;
-              wave += cos(PI * uTime * uSpeed / 60.0) * uIntensity * 0.3;
+              // Animazione circolare lenta tipo respiro
+              float breathe = sin(uTime * 0.4) * 0.5 + 0.5; // oscillazione tra 0 e 1
 
-              // ✅ Pieghe verticali DINAMICHE (cambiano nel tempo)
-              float foldFrequency = uFolds + sin(uTime * uSpeed * 0.1) * 2.0; // Frequenza variabile
-              float foldPhase = uTime * uSpeed * 0.2; // Fase che cambia
+              // Movimento organico con noise-like pattern
+              float wave1 = sin(position.x * uWaveLength * 0.5 + uTime * 0.3);
+              float wave2 = sin(position.y * uWaveLength * 0.4 + uTime * 0.4);
+              float organicWave = (wave1 + wave2) * 0.3;
 
-              float foldPattern = sin(position.x * foldFrequency * PI * 0.5 + foldPhase);
+              // Combina: gonfiaggio radiale + movimento organico + respiro
+              // Aumentato il moltiplicatore per rendere l'effetto più visibile
+              float displacement = inflate * uAmplitude * 3.0 * (1.0 + organicWave * 0.3) * (0.6 + breathe * 0.4);
 
-              // ✅ Aggiungi variazione verticale alle pieghe
-              foldPattern += cos(position.y * 3.0 + uTime * uSpeed * 0.15) * 0.3;
-
-              float curtainEffect = foldPattern * uIntensity * 0.4;
-
-              // ✅ Wave secondaria più veloce per dettaglio
-              float detailWave = sin(position.x * 15.0 + uTime * uSpeed * 2.0) *
-                                 cos(position.y * 10.0 + uTime * uSpeed * 1.5) *
-                                 uIntensity * 0.15;
-
-              // ✅ DISPLACEMENT Z per effetto 3D reale
-              newPosition.z += wave + curtainEffect + detailWave;
+              newPosition.z = position.z + displacement;
 
               gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
             }
           `,
           fragmentShader: `
             uniform sampler2D uTexture;
-            uniform float uTime;
-            uniform float uIntensity;
-            uniform float uSpeed;
-            uniform float uFolds;
+            uniform vec2 vUvScale;
             varying vec2 vUv;
 
-            #define PI 3.14159265359
-
             void main() {
-              vec2 distortedUV = vUv;
-
-              // ✅ WAVE TRAVELING che distorce le UV
-              float waveCoords = ((uTime * uSpeed / 45.0) * 3.5) - 1.75;
-              float distanceToWave = distance(vec2(vUv.x * 2.0 - 1.0, 0.0), vec2(waveCoords, 0.0));
-
-              float wave = (cos(clamp(distanceToWave, 0.0, 0.75) * PI) - cos(0.75 * PI)) * uIntensity;
-              wave += sin(PI * uTime * uSpeed / 90.0) * uIntensity * 0.5;
-              wave += cos(PI * uTime * uSpeed / 60.0) * uIntensity * 0.3;
-
-              // ✅ CURTAIN FOLDS DINAMICHE - cambiano nel tempo
-              float foldFrequency = uFolds + sin(uTime * uSpeed * 0.1) * 2.0;
-              float foldPhase = uTime * uSpeed * 0.2;
-              float foldPattern = sin(vUv.x * foldFrequency * PI + foldPhase);
-
-              // ✅ Aggiungi movimento verticale
-              foldPattern += cos(vUv.y * 3.0 + uTime * uSpeed * 0.15) * 0.3;
-
-              // ✅ Distorsione UV DINAMICA
-              distortedUV.x += wave * 0.05 + foldPattern * wave * 0.03;
-              distortedUV.y += foldPattern * 0.02 * sin(uTime * uSpeed * 0.3);
-
-              // ✅ Aggiungi distorsione secondaria per più dettaglio
-              distortedUV.x += sin(vUv.y * 10.0 + uTime * uSpeed * 1.5) * 0.01;
-              distortedUV.y += cos(vUv.x * 8.0 + uTime * uSpeed * 1.2) * 0.01;
-
-              // Sample texture con UV distorte
-              vec4 texColor = texture2D(uTexture, distortedUV);
-
-              // ✅ Shading DINAMICO basato sulle pieghe
-              float shading = 1.0 - abs(foldPattern * wave) * 0.4;
-              shading = clamp(shading, 0.6, 1.0);
-
-              gl_FragColor = vec4(texColor.rgb * shading, texColor.a);
+              vec2 uv = (vUv - 0.5) * vUvScale + 0.5;
+              vec4 color = texture2D(uTexture, uv);
+              gl_FragColor = color;
             }
           `,
           transparent: true,
           side: THREE.DoubleSide,
         });
 
-        // Geometry con alta risoluzione per pieghe smooth
-        const geometry = new THREE.PlaneGeometry(2, 2, 64, 64);
+        // Create geometry - Olivier Larose uses 15x15 segments
+        const planeWidth = 1;
+        const planeHeight = 1;
+        const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 15, 15);
+
         const mesh = new THREE.Mesh(geometry, material);
+
+        // Fixed scale for all images - same size
+        const fixedScale = 3.5; // Tutte le immagini hanno la stessa dimensione
+        mesh.scale.set(fixedScale, fixedScale, 1);
+
         meshRef.current = mesh;
         materialRef.current = material;
         scene.add(mesh);
 
-        // Registra task nel shared renderer
-        sharedRenderer.registerTask(taskId, scene, camera, canvas, {
-          priority: 5,
-          targetFPS: 30, // 30fps sufficiente per effetto smooth
-          visible: true,
-        });
-
-        setIsReady(true);
-
-        // Animation loop per aggiornare uTime
-        let animationId: number;
-        const animate = (time: number) => {
-          if (material.uniforms.uTime) {
-            material.uniforms.uTime.value = time * 0.001;
+        // Animation loop - Olivier Larose style
+        const animate = () => {
+          if (!isVisible) {
+            animationIdRef.current = requestAnimationFrame(animate);
+            return;
           }
-          animationId = requestAnimationFrame(animate);
-        };
-        animationId = requestAnimationFrame(animate);
 
-        // Cleanup
-        return () => {
-          cancelAnimationFrame(animationId);
+          // Update uTime uniform (increment by 0.04 like original)
+          material.uniforms.uTime.value += 0.04;
+
+          // Render scene
+          renderer.render(scene, camera);
+
+          animationIdRef.current = requestAnimationFrame(animate);
         };
+
+        animationIdRef.current = requestAnimationFrame(animate);
+        setIsReady(true);
       },
       undefined,
       (error) => {
@@ -194,9 +189,17 @@ export function WaveImageShader({
       }
     );
 
-    // Cleanup on unmount
+    // Resize handler
+    const resizeObserver = new ResizeObserver(updateSize);
+    resizeObserver.observe(container);
+
+    // Cleanup
     return () => {
-      sharedRenderer.unregisterTask(taskId);
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
+
+      resizeObserver.disconnect();
 
       if (meshRef.current) {
         meshRef.current.geometry.dispose();
@@ -204,53 +207,45 @@ export function WaveImageShader({
           meshRef.current.material.dispose();
         }
       }
-    };
-  }, [imageUrl, waveIntensity, waveSpeed, foldCount]);
 
-  // Handle resize
+      if (rendererRef.current) {
+        rendererRef.current.dispose();
+      }
+    };
+  }, [imageUrl, waveIntensity, waveSpeed, foldCount, isVisible]);
+
+  // Handle visibility changes for performance optimization
   useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) return;
+    if (!containerRef.current) return;
 
-    const updateSize = () => {
-      const container = containerRef.current;
-      const canvas = canvasRef.current;
-      const camera = cameraRef.current;
-      if (!container || !canvas || !camera) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
 
-      const rect = container.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio, 2);
-
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-
-      // ✅ Update camera aspect ratio
-      camera.aspect = rect.width / rect.height;
-      camera.updateProjectionMatrix();
-
-      const taskId = `wave-image-${imageUrl}`;
-      sharedRenderer.resize(taskId, canvas.width, canvas.height);
-    };
-
-    updateSize();
-
-    const resizeObserver = new ResizeObserver(updateSize);
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
-  }, [imageUrl]);
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
       ref={containerRef}
       className={`relative overflow-hidden ${className}`}
+      style={{
+        imageRendering: "auto",
+      }}
     >
       <canvas
         ref={canvasRef}
         className={`w-full h-full transition-opacity duration-500 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
+        style={{
+          display: "block",
+          imageRendering: "auto",
+        }}
       />
       {!isReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20 rounded-lg">
