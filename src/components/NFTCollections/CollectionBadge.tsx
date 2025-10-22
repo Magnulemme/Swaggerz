@@ -1,25 +1,32 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface CollectionBadgeProps {
   badge: string;
   badgeColor: string;
 }
 
-export default function CollectionBadge({ badge, badgeColor }: CollectionBadgeProps) {
+export default function CollectionBadge({
+  badge,
+  badgeColor,
+}: CollectionBadgeProps) {
   // Usa sempre verde per "Novità"
   const isNew = badge.toLowerCase() === "novità";
 
   const colorMap: Record<string, { bg: string; border: string }> = {
-    emerald: { bg: 'bg-emerald-500/20', border: 'border-emerald-500/50' },
-    cyan: { bg: 'bg-cyan-500/20', border: 'border-cyan-500/50' },
-    orange: { bg: 'bg-orange-500/20', border: 'border-orange-500/50' },
-    purple: { bg: 'bg-purple-500/20', border: 'border-purple-500/50' }
+    emerald: { bg: "bg-emerald-500/20", border: "border-emerald-500/50" },
+    cyan: { bg: "bg-cyan-500/20", border: "border-cyan-500/50" },
+    orange: { bg: "bg-orange-500/20", border: "border-orange-500/50" },
+    purple: { bg: "bg-purple-500/20", border: "border-purple-500/50" },
   };
 
   // Se è "Novità", usa sempre verde brillante
-  const bgClass = isNew ? 'bg-emerald-500' : (colorMap[badgeColor]?.bg || 'bg-emerald-500/20');
-  const borderClass = isNew ? 'border-emerald-400' : (colorMap[badgeColor]?.border || 'border-emerald-500/50');
-  const textClass = isNew ? 'text-white' : 'text-white';
+  const bgClass = isNew
+    ? "bg-emerald-500"
+    : colorMap[badgeColor]?.bg || "bg-emerald-500/20";
+  const borderClass = isNew
+    ? "border-emerald-400"
+    : colorMap[badgeColor]?.border || "border-emerald-500/50";
+  const textClass = isNew ? "text-white" : "text-white";
 
   return (
     <motion.div
@@ -29,8 +36,10 @@ export default function CollectionBadge({ badge, badgeColor }: CollectionBadgePr
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: 0.2 }}
     >
-      <span className={`${textClass} text-sm font-bold uppercase tracking-wider`}>
-        {badge}
+      <span
+        className={`${textClass} text-sm font-bold uppercase tracking-wider`}
+      >
+        Nuova Collezione
       </span>
     </motion.div>
   );

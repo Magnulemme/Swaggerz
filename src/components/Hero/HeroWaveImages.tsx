@@ -11,7 +11,6 @@ interface ImageConfig {
   category?: string;
   waveIntensity?: number;
   waveSpeed?: number;
-  foldCount?: number;
   isExclusive?: boolean;
 }
 
@@ -28,6 +27,8 @@ const defaultImages: ImageConfig[] = [
     price: "€1.299",
     category: "Haute Couture",
     isExclusive: true,
+    waveIntensity: 0.2,
+    waveSpeed: 0.8,
   },
   {
     url: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=90",
@@ -36,6 +37,8 @@ const defaultImages: ImageConfig[] = [
     price: "€2.499",
     category: "Winter Collection",
     isExclusive: true,
+    waveIntensity: 0.2,
+    waveSpeed: 0.8,
   },
   {
     url: "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&q=90",
@@ -44,6 +47,8 @@ const defaultImages: ImageConfig[] = [
     price: "€3.799",
     category: "Evening Wear",
     isExclusive: true,
+    waveIntensity: 0.2,
+    waveSpeed: 0.8,
   },
   {
     url: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&q=90",
@@ -51,6 +56,8 @@ const defaultImages: ImageConfig[] = [
     description: "Pelle italiana conciata a mano",
     price: "€1.899",
     category: "Premium Leather",
+    waveIntensity: 0.2,
+    waveSpeed: 0.8,
   },
 ];
 
@@ -73,22 +80,23 @@ export function HeroWaveImages({
             Haute Couture
           </h2>
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-            Pezzi unici e collezioni limitate, selezionati dai migliori atelier europei
+            Pezzi unici e collezioni limitate, selezionati dai migliori atelier
+            europei
           </p>
         </div>
 
         {/* Grid Layout - Responsive: 2 cols tablet, 3-4 desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 lg:gap-x-10 lg:gap-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 lg:gap-x-10 lg:gap-y-16 h-[200px] md:h-[300px] lg:h-[350px] xl:h-[400px]">
           {images.map((image, index) => (
             <article
               key={image.url}
-              className="group relative flex flex-col cursor-pointer"
+              className="group relative flex flex-col cursor-pointer h-full"
               style={{
                 animationDelay: `${index * 100}ms`,
               }}
             >
               {/* Image Container */}
-              <div className="relative">
+              <div className="relative h-full">
                 {/* Exclusive Badge */}
                 {image.isExclusive && (
                   <div className="absolute left-4 top-4 z-20">
@@ -104,10 +112,9 @@ export function HeroWaveImages({
                 {/* Image with Wave Shader */}
                 <WaveImageShader
                   imageUrl={image.url}
-                  waveIntensity={image.waveIntensity ?? 0.25}
-                  waveSpeed={image.waveSpeed ?? 0.6}
-                  foldCount={image.foldCount ?? 5}
-                  className="w-full aspect-[3/4] rounded-2xl"
+                  waveIntensity={image.waveIntensity ?? 0.2}
+                  waveSpeed={image.waveSpeed ?? 0.8}
+                  className="w-full h-full"
                 />
 
                 {/* Gradient Overlay on Hover */}

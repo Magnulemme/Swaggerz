@@ -5,17 +5,15 @@ import * as THREE from "three";
 
 interface WaveImageShaderProps {
   imageUrl: string;
-  waveIntensity?: number;
-  waveSpeed?: number;
-  foldCount?: number;
+  waveIntensity?: number; // Intensità onde (default: 0.2)
+  waveSpeed?: number; // Velocità animazione (default: 0.8)
   className?: string;
 }
 
 export function WaveImageShader({
   imageUrl,
-  waveIntensity = 0.25, // Amplitude più visibile
-  waveSpeed = 0.6, // Velocità lenta e fluida
-  foldCount = 5, // Numero onde
+  waveIntensity = 0.2,
+  waveSpeed = 0.8,
   className = "",
 }: WaveImageShaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -27,45 +25,54 @@ export function WaveImageShader({
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const animationIdRef = useRef<number | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
 
-  // Main setup effect
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
 
-    // Create WebGL renderer with maximum quality
+    // WebGL Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
       antialias: true,
       powerPreference: "high-performance",
-      precision: "highp",
-      stencil: false,
-      depth: false,
     });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     rendererRef.current = renderer;
 
-    // Setup scene
+    // Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // Setup perspective camera for 3D wave effect visibility
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.set(0, 0.5, 5); // Camera più lontana per vista migliore
+    // ✅ Calcolo matematico per riempire il viewport con padding
+    // Padding per compensare l'espansione delle onde (10% = 0.9 scale)
+    const viewportScale = 0.9; // Il plane occupa il 90% del viewport (10% padding)
+
+    // Plane size ridotto per lasciare margine
+    const planeHeight = 2 * viewportScale;
+    const planeWidth = 2 * viewportScale;
+
+    // Distanza camera fissa
+    const cameraDistance = 2.5;
+
+    // Calcolo FOV verticale per il plane ridotto
+    // tan(fov/2) = (planeHeight/2) / cameraDistance
+    // fov = 2 * atan((planeHeight/2) / cameraDistance)
+    const vFov =
+      2 * Math.atan(planeHeight / 2 / cameraDistance) * (180 / Math.PI);
+
+    const camera = new THREE.PerspectiveCamera(vFov, 1, 0.1, 100);
+    camera.position.set(0, 0, cameraDistance);
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
 
-    // Resize logic
+    // Resize handler
     const updateSize = () => {
       const rect = container.getBoundingClientRect();
       renderer.setSize(rect.width, rect.height, false);
-
-      // Update perspective camera aspect ratio
       camera.aspect = rect.width / rect.height;
       camera.updateProjectionMatrix();
     };
@@ -76,112 +83,110 @@ export function WaveImageShader({
     textureLoader.load(
       imageUrl,
       (texture) => {
-        // Maximum texture quality settings
-        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.minFilter = THREE.LinearFilter;
         texture.magFilter = THREE.LinearFilter;
-        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        texture.generateMipmaps = true;
-        texture.needsUpdate = true;
 
-        // Calculate aspect ratio from image texture
-        const imageAspect = texture.image.width / texture.image.height;
-
-        // Calculate aspect ratio for UV scaling (Olivier Larose approach)
-        const aspectRatio = imageAspect;
-
-        // Create shader material - Inflated canvas effect (balloon-like)
+        // ✅ SHADER: Tela tesa con onde fluide tipo vento
         const material = new THREE.ShaderMaterial({
           uniforms: {
             uTexture: { value: texture },
             uTime: { value: 0 },
-            uAmplitude: { value: waveIntensity },
-            uWaveLength: { value: foldCount },
-            vUvScale: { value: new THREE.Vector2(1, aspectRatio) },
+            uIntensity: { value: waveIntensity },
+            uSpeed: { value: waveSpeed },
           },
           vertexShader: `
             varying vec2 vUv;
             uniform float uTime;
-            uniform float uAmplitude;
-            uniform float uWaveLength;
+            uniform float uIntensity;
+            uniform float uSpeed;
+
+            // Noise function per movimento organico
+            float noise(vec2 p) {
+              return sin(p.x * 10.0 + uTime * uSpeed) *
+                     cos(p.y * 10.0 + uTime * uSpeed * 0.7) * 0.5 + 0.5;
+            }
 
             void main() {
               vUv = uv;
-              vec3 newPosition = position;
+              vec3 pos = position;
 
-              // Calcola la distanza dal centro (effetto radiale)
-              vec2 center = vec2(0.0, 0.0);
-              float distanceFromCenter = length(position.xy - center);
+              // ✅ ONDA 1: Traveling wave da sinistra a destra
+              float wave1 = sin(position.x * 3.0 - uTime * uSpeed * 2.0) *
+                           cos(position.y * 2.0 + uTime * uSpeed * 1.5);
 
-              // Effetto gonfiato: più forte al centro, si attenua ai bordi
-              // Usa una curva più morbida per mantenere l'effetto visibile
-              float inflate = 1.0 - distanceFromCenter * 0.3;
-              inflate = max(0.2, inflate); // minimo 0.2 invece di 0 per mantenere movimento ai bordi
+              // ✅ ONDA 2: Circular bubbles che appaiono e scompaiono
+              vec2 center1 = vec2(sin(uTime * uSpeed * 0.5) * 0.5, cos(uTime * uSpeed * 0.3) * 0.5);
+              vec2 center2 = vec2(cos(uTime * uSpeed * 0.4) * 0.5, sin(uTime * uSpeed * 0.6) * 0.5);
 
-              // Animazione circolare lenta tipo respiro
-              float breathe = sin(uTime * 0.4) * 0.5 + 0.5; // oscillazione tra 0 e 1
+              float dist1 = length(position.xy - center1);
+              float dist2 = length(position.xy - center2);
 
-              // Movimento organico con noise-like pattern
-              float wave1 = sin(position.x * uWaveLength * 0.5 + uTime * 0.3);
-              float wave2 = sin(position.y * uWaveLength * 0.4 + uTime * 0.4);
-              float organicWave = (wave1 + wave2) * 0.3;
+              float bubble1 = exp(-dist1 * 3.0) * sin(uTime * uSpeed * 2.0);
+              float bubble2 = exp(-dist2 * 3.0) * cos(uTime * uSpeed * 1.7);
 
-              // Combina: gonfiaggio radiale + movimento organico + respiro
-              // Aumentato il moltiplicatore per rendere l'effetto più visibile
-              float displacement = inflate * uAmplitude * 3.0 * (1.0 + organicWave * 0.3) * (0.6 + breathe * 0.4);
+              // ✅ ONDA 3: Smooth organic noise
+              float organicWave = noise(position.xy + uTime * uSpeed * 0.1) * 0.5;
 
-              newPosition.z = position.z + displacement;
+              // ✅ Combina tutte le onde
+              float totalDisplacement = (wave1 * 0.3 + bubble1 * 0.4 + bubble2 * 0.4 + organicWave * 0.3) * uIntensity;
 
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+              pos.z += totalDisplacement;
+
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
             }
           `,
           fragmentShader: `
             uniform sampler2D uTexture;
-            uniform vec2 vUvScale;
+            uniform float uTime;
+            uniform float uIntensity;
+            uniform float uSpeed;
             varying vec2 vUv;
 
             void main() {
-              vec2 uv = (vUv - 0.5) * vUvScale + 0.5;
-              vec4 color = texture2D(uTexture, uv);
-              gl_FragColor = color;
+              vec2 uv = vUv;
+
+              // ✅ Leggera distorsione UV per seguire le onde
+              float wave = sin(uv.x * 5.0 - uTime * uSpeed * 2.0) *
+                          cos(uv.y * 4.0 + uTime * uSpeed * 1.5);
+
+              uv.x += wave * uIntensity * 0.02;
+              uv.y += wave * uIntensity * 0.015;
+
+              // Sample texture
+              vec4 texColor = texture2D(uTexture, uv);
+
+              gl_FragColor = texColor;
             }
           `,
           transparent: true,
-          side: THREE.DoubleSide,
         });
 
-        // Create geometry - Olivier Larose uses 15x15 segments
-        const planeWidth = 1;
-        const planeHeight = 1;
-        const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, 15, 15);
-
+        // Geometry con segments per smooth deformation
+        // Size ridotto del 10% per lasciare padding (90% del viewport)
+        const viewportScale = 0.9;
+        const geometry = new THREE.PlaneGeometry(
+          2 * viewportScale,
+          2 * viewportScale,
+          32,
+          32
+        );
         const mesh = new THREE.Mesh(geometry, material);
-
-        // Fixed scale for all images - same size
-        const fixedScale = 3.5; // Tutte le immagini hanno la stessa dimensione
-        mesh.scale.set(fixedScale, fixedScale, 1);
 
         meshRef.current = mesh;
         materialRef.current = material;
         scene.add(mesh);
 
-        // Animation loop - Olivier Larose style
+        setIsReady(true);
+
+        // Animation loop
         const animate = () => {
-          if (!isVisible) {
-            animationIdRef.current = requestAnimationFrame(animate);
-            return;
+          if (material.uniforms.uTime) {
+            material.uniforms.uTime.value += 0.016; // ~60fps
           }
-
-          // Update uTime uniform (increment by 0.04 like original)
-          material.uniforms.uTime.value += 0.04;
-
-          // Render scene
           renderer.render(scene, camera);
-
           animationIdRef.current = requestAnimationFrame(animate);
         };
-
-        animationIdRef.current = requestAnimationFrame(animate);
-        setIsReady(true);
+        animate();
       },
       undefined,
       (error) => {
@@ -189,7 +194,7 @@ export function WaveImageShader({
       }
     );
 
-    // Resize handler
+    // Resize observer
     const resizeObserver = new ResizeObserver(updateSize);
     resizeObserver.observe(container);
 
@@ -198,57 +203,30 @@ export function WaveImageShader({
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
-
       resizeObserver.disconnect();
-
+      renderer.dispose();
       if (meshRef.current) {
         meshRef.current.geometry.dispose();
         if (meshRef.current.material instanceof THREE.Material) {
           meshRef.current.material.dispose();
         }
       }
-
-      if (rendererRef.current) {
-        rendererRef.current.dispose();
-      }
     };
-  }, [imageUrl, waveIntensity, waveSpeed, foldCount, isVisible]);
-
-  // Handle visibility changes for performance optimization
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
+  }, [imageUrl, waveIntensity, waveSpeed]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        imageRendering: "auto",
-      }}
+      className={`relative block overflow-hidden ${className}`}
     >
       <canvas
         ref={canvasRef}
-        className={`w-full h-full transition-opacity duration-500 ${
+        className={`block w-full h-full transition-opacity duration-500 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
-        style={{
-          display: "block",
-          imageRendering: "auto",
-        }}
       />
       {!isReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20 rounded-lg">
+        <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20">
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
             <div className="text-white/50 text-sm">Caricamento...</div>

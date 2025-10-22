@@ -18,6 +18,7 @@ export const collections: Collection[] = [
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
       "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80"
     ],
+    video: "/videos/streetwear.mp4",
     gradientFrom: "emerald-500/25",
     gradientVia: "green-500/15",
     accentGradient: "from-green-400/10 via-emerald-500/12 to-teal-500/10",
@@ -41,6 +42,7 @@ export const collections: Collection[] = [
       "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=800&q=80",
       "https://images.unsplash.com/photo-1614252368990-2d97cd0eb60c?w=800&q=80"
     ],
+    video: "/videos/collezionabili.mp4",
     gradientFrom: "cyan-500/25",
     gradientVia: "blue-500/15",
     accentGradient: "from-cyan-400/10 via-blue-500/12 to-sky-500/10",
@@ -64,6 +66,7 @@ export const collections: Collection[] = [
       "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80",
       "https://images.unsplash.com/photo-1564584217132-2271feaeb3c5?w=800&q=80"
     ],
+    video: "/videos/art.mp4",
     gradientFrom: "orange-500/25",
     gradientVia: "amber-500/15",
     accentGradient: "from-orange-400/10 via-amber-500/12 to-yellow-500/10",
@@ -87,6 +90,7 @@ export const collections: Collection[] = [
       "https://images.unsplash.com/photo-1622519407650-3df9883f76e5?w=800&q=80",
       "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&q=80"
     ],
+    video: "/videos/streetwear.mp4",
     gradientFrom: "purple-500/25",
     gradientVia: "violet-500/15",
     accentGradient: "from-purple-400/10 via-violet-500/12 to-fuchsia-500/10",

@@ -10,6 +10,7 @@ export interface Collection {
   nftLabel: string;
   href: string;
   images: string[];
+  video?: string; // Optional video URL for featured content
   gradientFrom: string;
   gradientVia: string;
   accentGradient: string;

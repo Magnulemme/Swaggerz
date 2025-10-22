@@ -1,19 +1,21 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { collections } from './collectionsData';
-import CarouselSlide from './CarouselSlide';
-import LeftSection from './LeftSection';
-import RightSection from './RightSection';
-import NavigationButton from './NavigationButton';
-import DotsIndicator from './DotsIndicator';
+import React, { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { collections } from "./collectionsData";
+import CarouselSlide from "./CarouselSlide";
+import LeftSection from "./LeftSection";
+import RightSection from "./RightSection";
+import NavigationButton from "./NavigationButton";
+import DotsIndicator from "./DotsIndicator";
 
 interface FeaturedCollectionBannerProps {
-  section?: 'full' | 'left' | 'right';
+  section?: "full" | "left" | "right";
 }
 
-export default function FeaturedCollectionBanner({ section = 'full' }: FeaturedCollectionBannerProps) {
+export default function FeaturedCollectionBanner({
+  section = "full",
+}: FeaturedCollectionBannerProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -33,21 +35,21 @@ export default function FeaturedCollectionBanner({ section = 'full' }: FeaturedC
   useEffect(() => {
     if (!emblaApi) return;
     onSelect();
-    emblaApi.on('select', onSelect);
+    emblaApi.on("select", onSelect);
     return () => {
-      emblaApi.off('select', onSelect);
+      emblaApi.off("select", onSelect);
     };
   }, [emblaApi, onSelect]);
 
   const collection = collections[selectedIndex];
 
   // Render Left Section (Titolo + Immagini)
-  if (section === 'left') {
+  if (section === "left") {
     return <LeftSection collection={collection} />;
   }
 
   // Render Right Section (Descrizione + CTA)
-  if (section === 'right') {
+  if (section === "right") {
     return (
       <RightSection
         collection={collection}
@@ -60,7 +62,7 @@ export default function FeaturedCollectionBanner({ section = 'full' }: FeaturedC
   // Render Full Section (Original Layout)
   return (
     <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="overflow-visible" ref={emblaRef}>
         <div className="flex">
           {collections.map((collection) => (
             <div key={collection.id} className="flex-[0_0_100%] min-w-0">
