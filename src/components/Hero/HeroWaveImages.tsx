@@ -10,10 +10,13 @@ interface ImageConfig {
   description?: string;
   price?: string;
   nickname?: string;
+  emoji?: string;
   waveIntensity?: number;
   waveSpeed?: number;
   badge?: "hot" | "sale" | "new" | "exclusive";
   aspectRatio?: number;
+  soldCount?: number;
+  popularityLabel?: string;
 }
 
 interface HeroWaveImagesProps {
@@ -25,8 +28,10 @@ const defaultImages: ImageConfig[] = [
   {
     url: "/felpa.jpg",
     alt: "Felpe",
-    description: "Design unici e comfort streetwear per il tuo stile urban",
+    description:
+      "Quando il comfort incontra l'attitudine. Perfette per chi non scende a compromessi",
     nickname: "Le Swag",
+    emoji: "✨",
     badge: "hot",
     waveIntensity: 0.1,
     waveSpeed: 0.35,
@@ -35,8 +40,10 @@ const defaultImages: ImageConfig[] = [
   {
     url: "/pants.jpg",
     alt: "Pantaloni",
-    description: "Comfort e stile per le tue giornate in movimento",
+    description:
+      "L'energia della strada in ogni movimento. Progettati per chi vive al massimo",
     nickname: "Gli Hype",
+    emoji: "⚡",
     waveIntensity: 0.08,
     waveSpeed: 0.3,
     aspectRatio: 5 / 6,
@@ -44,8 +51,10 @@ const defaultImages: ImageConfig[] = [
   {
     url: "/tshirt.jpg",
     alt: "T-shirt",
-    description: "Grafiche esclusive e tessuti premium per il tuo look",
+    description:
+      "Essenziali ma mai banali. L'equilibrio perfetto tra semplicità e carattere",
     nickname: "Le Cool",
+    emoji: "🌟",
     badge: "new",
     waveIntensity: 0.12,
     waveSpeed: 0.4,
@@ -54,8 +63,10 @@ const defaultImages: ImageConfig[] = [
   {
     url: "/giubbotto.jpg",
     alt: "Giubbotti",
-    description: "Layer perfetti per ogni stagione e occasione",
+    description:
+      "L'eleganza incontra la strada. Statement piece che completa ogni outfit",
     nickname: "I Glamour",
+    emoji: "👑",
     waveIntensity: 0.07,
     waveSpeed: 0.3,
     aspectRatio: 5 / 6,
@@ -96,14 +107,28 @@ export function HeroWaveImages({
       <div className="relative max-w-[1600px] mx-auto z-10">
         {/* Header Section */}
         <motion.div
-          className="text-center mb-16 space-y-6"
+          className="text-center mb-20 lg:mb-24 space-y-8"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <div className="flex flex-wrap items-start justify-center gap-4">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-none">
+          {/* Eyebrow text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-block"
+          >
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-700/60 bg-zinc-900/50 text-zinc-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+              Collezione 2025
+            </span>
+          </motion.div>
+
+          {/* Main Title */}
+          <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tight font-jost">
               Streetwear
             </h2>
             <ShaderText
@@ -115,7 +140,9 @@ export function HeroWaveImages({
               Essentials
             </ShaderText>
           </div>
-          <p className="text-lg md:text-xl text-zinc-200/95 max-w-3xl mx-auto">
+
+          {/* Subtitle */}
+          <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed">
             Esplora le nostre categorie e scopri i pezzi essenziali per il tuo
             guardaroba street
           </p>
@@ -137,7 +164,7 @@ export function HeroWaveImages({
               }}
             >
               {/* Container esterno con bordo e glow */}
-              <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-black/95 backdrop-blur-sm">
+              <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-zinc-950 backdrop-blur-sm">
                 {/* Padding container per separare immagine dal bordo */}
                 <div className="pb-2">
                   {/* Image Container con overflow hidden */}
@@ -171,39 +198,43 @@ export function HeroWaveImages({
                 </div>
 
                 {/* Content Section */}
-                <div className="relative px-5 pb-5 pt-2">
+                <div className="relative px-6 pb-6 pt-3">
                   {/* Nickname Tag - Above title */}
                   {image.nickname && (
-                    <span className="absolute -top-8 left-0 z-10 inline-block px-3 py-1 text-sm italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-amber-400 group-hover:border-amber-500/50 group-hover:bg-zinc-900/90 transition-all duration-300">
+                    <span className="absolute -top-8 left-0 z-10 inline-block px-3 py-1 text-sm italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-amber-400 transition-all duration-300">
+                      {image.emoji && (
+                        <span className="mr-1">{image.emoji}</span>
+                      )}
                       &ldquo;{image.nickname}&rdquo;
                     </span>
                   )}
+
                   {/* Title */}
-                  <h3 className="text-3xl font-jost font-black leading-tight w-fit bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent pb-4">
+                  <h3 className="text-2xl lg:text-3xl font-jost font-black leading-tight tracking-tight text-white mb-3">
                     {image.alt}
                   </h3>
 
                   {/* Description */}
                   {image.description && (
-                    <p className="text-sm text-zinc-300/80 leading-relaxed line-clamp-2">
+                    <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 mb-5">
                       {image.description}
                     </p>
                   )}
 
                   {/* CTA Link */}
-                  <div className="pt-2">
-                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-500 group-hover:text-amber-400 group-hover:gap-2.5 transition-all duration-300">
-                      Vedi tutti i prodotti
+                  <div className="mt-auto">
+                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 group-hover:text-amber-300 group-hover:gap-2.5 transition-all duration-300">
+                      Scopri di più
                       <svg
-                        className="w-4 h-4"
+                        className="w-4 h-4 transition-transform group-hover:translate-x-1"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
+                        strokeWidth={2}
                       >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={2}
                           d="M17 8l4 4m0 0l-4 4m4-4H3"
                         />
                       </svg>

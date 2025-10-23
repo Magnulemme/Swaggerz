@@ -147,47 +147,25 @@ export default function FeaturedProduct() {
 
                 {/* Right: Product Info with Title */}
                 <div className="relative w-full lg:w-[45%] flex flex-col justify-center gap-4 lg:gap-5">
-                  {/* Title Section with Quote Line */}
+                  {/* Eyebrow */}
                   <motion.div
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.1 }}
-                    className="flex items-center gap-3 pb-3 border-b border-zinc-800/50"
                   >
-                    {/* Accent Line */}
-                    <motion.div
-                      className="w-1 h-8 lg:h-10 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full flex-shrink-0"
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    />
-
-                    {/* Title */}
-                    <h2 className="text-lg lg:text-xl font-black text-white font-jost tracking-tight">
+                    <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                      <span className="w-1 h-4 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></span>
                       Scelti da Swaggerz
-                    </h2>
+                    </span>
                   </motion.div>
 
-                  {/* Price */}
+                  {/* Product Title - LA STAR */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.15 }}
                   >
-                    <div className="inline-flex items-baseline gap-2">
-                      <span className="text-4xl lg:text-5xl font-black text-white font-jost">
-                        €{product.price}
-                      </span>
-                    </div>
-                  </motion.div>
-
-                  {/* Product Title */}
-                  <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <h3 className="text-2xl lg:text-3xl font-black text-white font-jost leading-tight">
+                    <h3 className="text-3xl lg:text-4xl font-black text-white font-jost leading-tight tracking-tight">
                       {product.name}
                     </h3>
                   </motion.div>
@@ -196,19 +174,28 @@ export default function FeaturedProduct() {
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.25 }}
+                    transition={{ delay: 0.2 }}
                   >
-                    <p className="text-sm lg:text-base text-zinc-400 leading-relaxed">
+                    <p className="text-sm text-zinc-400 leading-relaxed">
                       {product.description}
                     </p>
                   </motion.div>
 
-                  {/* Rating */}
+                  {/* Price & Rating Row */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.28 }}
+                    transition={{ delay: 0.25 }}
+                    className="flex items-center justify-between gap-4 pt-2 border-t border-zinc-800/50"
                   >
+                    {/* Price */}
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-2xl lg:text-3xl font-black text-white font-jost">
+                        €{product.price}
+                      </span>
+                    </div>
+
+                    {/* Rating */}
                     <StarRating
                       rating={product.rating}
                       reviewCount={product.reviewCount}

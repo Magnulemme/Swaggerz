@@ -52,70 +52,50 @@ export default function LeftSection({ collection }: LeftSectionProps) {
       </div>
 
       <div className="relative flex flex-col h-full px-6 lg:px-10 py-8 lg:py-10 gap-6 lg:gap-8 z-50">
-        {/* Badge "Nuova Collezione" con bordo luminoso animato */}
+        {/* Top Row: Limited Edition Badge + Pieces Count */}
         <motion.div
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="relative z-50 flex-shrink-0"
+          className="relative z-50 flex-shrink-0 flex items-center justify-between"
         >
-          <div className="relative inline-flex overflow-hidden rounded-full p-[1px]">
+          {/* Limited Edition Badge with Rotating Border */}
+          <div className="relative inline-flex h-10 overflow-hidden rounded-full p-[1px]">
             {/* Animated rotating gradient border */}
-            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#f59e0b_0%,#111111_50%,#f59e0b_100%)]" />
+            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#d37918_0%,#111111_50%,#d37918_100%)]" />
 
             {/* Badge content */}
-            <span className="relative inline-flex h-full w-full items-center gap-2.5 px-5 py-2.5 bg-zinc-900/95 rounded-full backdrop-blur-sm">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shadow-lg shadow-amber-500/50"></span>
-              <span className="text-sm lg:text-base font-black text-amber-400 uppercase tracking-widest">
-                Nuova Collezione
+            <span className="inline-flex h-full w-full items-center justify-center rounded-full px-4 py-1 bg-zinc-950 backdrop-blur-sm">
+              <span className="text-xs lg:text-sm font-bold uppercase tracking-widest text-amber-400">
+                Limited Edition
               </span>
             </span>
           </div>
+
+          {/* Pieces Counter - Discrete */}
+          <span className="text-xs text-zinc-500 font-medium">
+            247/500 pieces
+          </span>
         </motion.div>
 
-        {/* Title - More prominent */}
+        {/* Title - UPPERCASE for statement */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative z-50 flex-shrink-0"
         >
-          <h2 className="relative z-50 flex flex-wrap items-baseline gap-2.5 text-3xl lg:text-5xl xl:text-6xl font-black leading-[0.95] tracking-tighter font-jost">
-            {(() => {
-              const words = collection.title.split(" ");
-              const lastWord = words[words.length - 1];
-              const firstWords = words.slice(0, -1).join(" ");
-
-              return (
-                <>
-                  {firstWords && (
-                    <span className="text-white drop-shadow-2xl">
-                      {firstWords}
-                    </span>
-                  )}
-                  <span
-                    className="bg-clip-text text-transparent drop-shadow-2xl"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(90deg, #fbbf24, #fb923c, #f59e0b, #ea580c, #dc2626, #ea580c, #f59e0b, #fb923c, #fbbf24)",
-                      backgroundSize: "200% 100%",
-                      animation: "gradient 4s ease-in-out infinite",
-                    }}
-                  >
-                    {lastWord}
-                  </span>
-                </>
-              );
-            })()}
+          <h2 className="relative z-50 text-3xl lg:text-4xl font-black leading-tight tracking-tight text-white font-jost uppercase">
+            {collection.title}
           </h2>
         </motion.div>
 
-        {/* Description - More readable */}
+        {/* Description */}
         <motion.p
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="relative z-50 flex-shrink-0 text-base lg:text-lg text-zinc-200 leading-relaxed max-w-md"
+          className="relative z-50 flex-shrink-0 text-base lg:text-lg text-zinc-300 leading-relaxed max-w-lg"
         >
           {collection.description}
         </motion.p>
@@ -195,24 +175,57 @@ export default function LeftSection({ collection }: LeftSectionProps) {
               <p className="relative z-50 text-xs text-zinc-500">
                 Limited Collaboration
               </p>
+              {collection.endDate && (
+                <p className="relative z-50 text-xs text-zinc-400 mt-1">
+                  Ends {collection.endDate}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Button con effetto MovingBorder */}
+        {/* CTA Button - Secondary Style with Shimmer Effect */}
         <div className="relative z-50 flex-shrink-0 flex justify-center w-full">
           <motion.button
-            className="group relative overflow-hidden bg-transparent p-[2px] w-fit rounded-full"
+            className="group overflow-hidden relative bg-transparent p-[2px] inline-flex rounded-full"
             whileTap={{ scale: 0.98 }}
           >
-            <div className="absolute -inset-10 rounded-full z-0">
-              <MovingBorder duration={3000}>
-                <div className="h-32 w-32 bg-[radial-gradient(#f97316_50%,transparent_70%)] opacity-[0.6] -z-10" />
-              </MovingBorder>
-            </div>
+            {/* Shimmer Effect */}
+            <motion.div
+              className="absolute inset-0 z-0 rounded-full"
+              animate={{
+                backgroundPosition: ["200% 0", "-200% 0"],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%, transparent 100%)",
+                backgroundSize: "200% 100%",
+              }}
+            />
 
-            <div className="relative z-10 flex h-full w-full items-center justify-center rounded-full px-20 py-5 text-white text-base uppercase tracking-[0.2em] font-bold backdrop-blur-sm bg-transparent border border-orange-500/40 transition-all duration-300">
+            <div
+              className="relative z-10 flex h-full w-full items-center justify-center gap-2 rounded-full px-10 py-6 md:px-12 md:py-8 text-white text-sm uppercase tracking-[0.3em] font-semibold backdrop-blur-lg bg-white/5 border border-orange-500/40
+transition-all duration-300"
+            >
               Esplora la Collezione
+              <svg
+                className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
             </div>
           </motion.button>
         </div>
@@ -220,95 +233,3 @@ export default function LeftSection({ collection }: LeftSectionProps) {
     </div>
   );
 }
-
-// MovingBorder component
-const MovingBorder = ({
-  children,
-  duration = 3000,
-}: {
-  children: React.ReactNode;
-  duration?: number;
-}) => {
-  const pathRef = useRef<SVGRectElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const progress = useMotionValue<number>(0);
-  const [borderRadius, setBorderRadius] = React.useState({
-    rx: "50%",
-    ry: "50%",
-  });
-
-  React.useEffect(() => {
-    const updateBorderRadius = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-
-        // Per rounded-full, il border-radius CSS è min(width, height) / 2
-        const radiusPx = Math.min(width, height) / 2;
-        const rxPercent = (radiusPx / width) * 100;
-        const ryPercent = (radiusPx / height) * 100;
-
-        setBorderRadius({
-          rx: `${rxPercent}%`,
-          ry: `${ryPercent}%`,
-        });
-      }
-    };
-
-    updateBorderRadius();
-    window.addEventListener("resize", updateBorderRadius);
-    return () => window.removeEventListener("resize", updateBorderRadius);
-  }, []);
-
-  useAnimationFrame((time) => {
-    const length = pathRef.current?.getTotalLength();
-    if (length) {
-      const pxPerMillisecond = length / duration;
-      progress.set((time * pxPerMillisecond) % length);
-    }
-  });
-
-  const x = useTransform(
-    progress,
-    (val) => pathRef.current?.getPointAtLength(val).x
-  );
-  const y = useTransform(
-    progress,
-    (val) => pathRef.current?.getPointAtLength(val).y
-  );
-
-  const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
-
-  return (
-    <div ref={containerRef} className="absolute inset-0">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        className="absolute h-full w-full"
-        width="100%"
-        height="100%"
-      >
-        <rect
-          fill="none"
-          width="100%"
-          height="100%"
-          rx={borderRadius.rx}
-          ry={borderRadius.ry}
-          ref={pathRef}
-        />
-      </svg>
-      <motion.div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          display: "inline-block",
-          transform,
-        }}
-      >
-        {children}
-      </motion.div>
-    </div>
-  );
-};

@@ -23,7 +23,8 @@ export const collections: Collection[] = [
     gradientVia: "green-500/15",
     accentGradient: "from-green-400/10 via-emerald-500/12 to-teal-500/10",
     buttonGradient: "bg-[conic-gradient(from_90deg_at_50%_50%,#10b981_0%,#111111_50%,#10b981_100%)]",
-    buttonHoverColor: "#10b981"
+    buttonHoverColor: "#10b981",
+    endDate: "March 15, 2026"
   },
   {
     id: 2,
@@ -47,7 +48,8 @@ export const collections: Collection[] = [
     gradientVia: "blue-500/15",
     accentGradient: "from-cyan-400/10 via-blue-500/12 to-sky-500/10",
     buttonGradient: "bg-[conic-gradient(from_90deg_at_50%_50%,#06b6d4_0%,#111111_50%,#06b6d4_100%)]",
-    buttonHoverColor: "#06b6d4"
+    buttonHoverColor: "#06b6d4",
+    endDate: "June 30, 2026"
   },
   {
     id: 3,
@@ -71,7 +73,8 @@ export const collections: Collection[] = [
     gradientVia: "amber-500/15",
     accentGradient: "from-orange-400/10 via-amber-500/12 to-yellow-500/10",
     buttonGradient: "bg-[conic-gradient(from_90deg_at_50%_50%,#f97316_0%,#111111_50%,#f97316_100%)]",
-    buttonHoverColor: "#f97316"
+    buttonHoverColor: "#f97316",
+    endDate: "October 31, 2025"
   },
   {
     id: 4,
@@ -95,6 +98,7 @@ export const collections: Collection[] = [
     gradientVia: "violet-500/15",
     accentGradient: "from-purple-400/10 via-violet-500/12 to-fuchsia-500/10",
     buttonGradient: "bg-[conic-gradient(from_90deg_at_50%_50%,#a855f7_0%,#111111_50%,#a855f7_100%)]",
-    buttonHoverColor: "#a855f7"
+    buttonHoverColor: "#a855f7",
+    endDate: "December 25, 2025"
   }
 ];

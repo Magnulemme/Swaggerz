@@ -16,4 +16,5 @@ export interface Collection {
   accentGradient: string;
   buttonGradient: string;
   buttonHoverColor: string;
+  endDate?: string; // Optional end date for collaboration (e.g., "December 31, 2025")
 }
