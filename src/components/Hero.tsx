@@ -1,12 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import HeroBackground from "./Hero/HeroBackground";
 import Hero3dContent from "./Hero/Hero3dContent";
 import HeroVideoBanner from "./Hero/HeroVideoBanner";
 import { HeroWaveImages } from "./Hero/HeroWaveImages";
+import { HeroWaveImagesMobile } from "./Hero/HeroWaveImagesMobile";
+import GridContent from "./GridContent";
 
 const BentoHero = () => {
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    // Check if screen is desktop (>= 1280px for shader performance)
+    const checkDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1280);
+    };
+
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
+
   return (
     <section className="relative bg-zinc-950 font-jost  min-h-screen">
       {/* Main content container */}
@@ -18,14 +33,19 @@ const BentoHero = () => {
             <HeroVideoBanner />
           </div>
 
+          {/* Wave Images Section - Desktop: Shader, Mobile/Tablet: No Shader */}
+          <div className="col-span-2 lg:col-span-4 w-full">
+            {isDesktop ? <HeroWaveImages /> : <HeroWaveImagesMobile />}
+          </div>
+
+          {/* Grid Content Section - Banners and Collections */}
+          <div className="col-span-2 lg:col-span-4 w-full">
+            <GridContent />
+          </div>
+
           {/* 3D Content Section */}
           <div className="col-span-2 lg:col-span-4 lg:row-span-2 h-full">
             <Hero3dContent />
-          </div>
-
-          {/* Wave Images Section */}
-          <div className="col-span-2 lg:col-span-4 w-full">
-            <HeroWaveImages />
           </div>
         </div>
       </div>

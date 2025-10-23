@@ -146,6 +146,7 @@
 
   /* Font family */
   --font-jost: "Jost", sans-serif;
+  --font-pastor: var(--font-pastor-of-muppets), sans-serif;
 
   /* Heading sizes */
   --text-heading-1: 72px;

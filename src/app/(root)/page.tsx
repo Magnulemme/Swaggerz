@@ -1,7 +1,6 @@
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/Hero";
-import GridContentWrapper from "@/components/GridContentWrapper";
 
 export default function Home() {
   return (
@@ -10,7 +9,6 @@ export default function Home() {
       <Navbar />
       <main className="">
         <HeroSection />
-        <GridContentWrapper />
       </main>
     </div>
   );

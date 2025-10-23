@@ -2,19 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import {
+  waveVertexShader,
+  waveFragmentShader,
+  SHADER_CONSTANTS,
+  createShaderUniforms,
+} from "./shaders";
 
 interface WaveImageShaderProps {
   imageUrl: string;
-  waveIntensity?: number; // Intensità onde (default: 0.2)
-  waveSpeed?: number; // Velocità animazione (default: 0.8)
   className?: string;
+  aspectRatio?: number;
+  amplitude?: number;
+  waveSpeed?: number;
 }
 
 export function WaveImageShader({
   imageUrl,
-  waveIntensity = 0.2,
-  waveSpeed = 0.8,
   className = "",
+  aspectRatio = 2 / 3,
+  amplitude = 0.12,
+  waveSpeed = 0.4,
 }: WaveImageShaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +32,12 @@ export function WaveImageShader({
   const meshRef = useRef<THREE.Mesh | null>(null);
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const animationIdRef = useRef<number | null>(null);
+  const geometryDimensionsRef = useRef({ width: 1, height: 1 });
+  const mouseRef = useRef({ x: 0, y: 0 });
   const [isReady, setIsReady] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const targetAmplitudeRef = useRef(0); // Amplitude target (0 quando non hover, amplitude quando hover)
+  const currentAmplitudeRef = useRef(0); // Amplitude corrente (interpolata)
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -32,12 +45,11 @@ export function WaveImageShader({
     const canvas = canvasRef.current;
     const container = containerRef.current;
 
-    // WebGL Renderer
+    // Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
       antialias: true,
-      powerPreference: "high-performance",
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
@@ -47,26 +59,9 @@ export function WaveImageShader({
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
-    // ✅ Calcolo matematico per riempire il viewport con padding
-    // Padding per compensare l'espansione delle onde (10% = 0.9 scale)
-    const viewportScale = 0.9; // Il plane occupa il 90% del viewport (10% padding)
-
-    // Plane size ridotto per lasciare margine
-    const planeHeight = 2 * viewportScale;
-    const planeWidth = 2 * viewportScale;
-
-    // Distanza camera fissa
-    const cameraDistance = 2.5;
-
-    // Calcolo FOV verticale per il plane ridotto
-    // tan(fov/2) = (planeHeight/2) / cameraDistance
-    // fov = 2 * atan((planeHeight/2) / cameraDistance)
-    const vFov =
-      2 * Math.atan(planeHeight / 2 / cameraDistance) * (180 / Math.PI);
-
-    const camera = new THREE.PerspectiveCamera(vFov, 1, 0.1, 100);
-    camera.position.set(0, 0, cameraDistance);
-    camera.lookAt(0, 0, 0);
+    // Camera: FOV ridotto per vedere più contenuto (effetto zoom-out)
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.z = 2.0;
     cameraRef.current = camera;
 
     // Resize handler
@@ -75,6 +70,28 @@ export function WaveImageShader({
       renderer.setSize(rect.width, rect.height, false);
       camera.aspect = rect.width / rect.height;
       camera.updateProjectionMatrix();
+
+      // Update material resolution uniform
+      if (materialRef.current) {
+        materialRef.current.uniforms.uResolution.value.set(
+          rect.width,
+          rect.height
+        );
+      }
+
+      // Update mesh dimensions to fill viewport with perspective compensation
+      if (meshRef.current && geometryDimensionsRef.current) {
+        const distance = camera.position.z;
+        const vFov = (camera.fov * Math.PI) / 180;
+        const planeHeight = 2 * Math.tan(vFov / 2) * distance;
+        const planeWidth = planeHeight * camera.aspect;
+
+        meshRef.current.scale.set(
+          (planeWidth / geometryDimensionsRef.current.width) * 1,
+          (planeHeight / geometryDimensionsRef.current.height) * 1,
+          1
+        );
+      }
     };
     updateSize();
 
@@ -86,91 +103,61 @@ export function WaveImageShader({
         texture.minFilter = THREE.LinearFilter;
         texture.magFilter = THREE.LinearFilter;
 
-        // ✅ SHADER: Tela tesa con onde fluide tipo vento
+        // Shader con onde - inizia con amplitude 0 (attivato solo al hover)
+        const uniforms = createShaderUniforms(
+          texture,
+          0, // amplitude: parte da 0, viene animata al hover
+          2.5, // waveLength: onde più ampie e sicure
+          waveSpeed, // speed: personalizzabile per ogni card
+          aspectRatio
+        );
+
         const material = new THREE.ShaderMaterial({
-          uniforms: {
-            uTexture: { value: texture },
-            uTime: { value: 0 },
-            uIntensity: { value: waveIntensity },
-            uSpeed: { value: waveSpeed },
-          },
-          vertexShader: `
-            varying vec2 vUv;
-            uniform float uTime;
-            uniform float uIntensity;
-            uniform float uSpeed;
-
-            // Noise function per movimento organico
-            float noise(vec2 p) {
-              return sin(p.x * 10.0 + uTime * uSpeed) *
-                     cos(p.y * 10.0 + uTime * uSpeed * 0.7) * 0.5 + 0.5;
-            }
-
-            void main() {
-              vUv = uv;
-              vec3 pos = position;
-
-              // ✅ ONDA 1: Traveling wave da sinistra a destra
-              float wave1 = sin(position.x * 3.0 - uTime * uSpeed * 2.0) *
-                           cos(position.y * 2.0 + uTime * uSpeed * 1.5);
-
-              // ✅ ONDA 2: Circular bubbles che appaiono e scompaiono
-              vec2 center1 = vec2(sin(uTime * uSpeed * 0.5) * 0.5, cos(uTime * uSpeed * 0.3) * 0.5);
-              vec2 center2 = vec2(cos(uTime * uSpeed * 0.4) * 0.5, sin(uTime * uSpeed * 0.6) * 0.5);
-
-              float dist1 = length(position.xy - center1);
-              float dist2 = length(position.xy - center2);
-
-              float bubble1 = exp(-dist1 * 3.0) * sin(uTime * uSpeed * 2.0);
-              float bubble2 = exp(-dist2 * 3.0) * cos(uTime * uSpeed * 1.7);
-
-              // ✅ ONDA 3: Smooth organic noise
-              float organicWave = noise(position.xy + uTime * uSpeed * 0.1) * 0.5;
-
-              // ✅ Combina tutte le onde
-              float totalDisplacement = (wave1 * 0.3 + bubble1 * 0.4 + bubble2 * 0.4 + organicWave * 0.3) * uIntensity;
-
-              pos.z += totalDisplacement;
-
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-            }
-          `,
-          fragmentShader: `
-            uniform sampler2D uTexture;
-            uniform float uTime;
-            uniform float uIntensity;
-            uniform float uSpeed;
-            varying vec2 vUv;
-
-            void main() {
-              vec2 uv = vUv;
-
-              // ✅ Leggera distorsione UV per seguire le onde
-              float wave = sin(uv.x * 5.0 - uTime * uSpeed * 2.0) *
-                          cos(uv.y * 4.0 + uTime * uSpeed * 1.5);
-
-              uv.x += wave * uIntensity * 0.02;
-              uv.y += wave * uIntensity * 0.015;
-
-              // Sample texture
-              vec4 texColor = texture2D(uTexture, uv);
-
-              gl_FragColor = texColor;
-            }
-          `,
+          uniforms,
+          vertexShader: waveVertexShader,
+          fragmentShader: waveFragmentShader,
           transparent: true,
         });
 
-        // Geometry con segments per smooth deformation
-        // Size ridotto del 10% per lasciare padding (90% del viewport)
-        const viewportScale = 0.9;
+        // Geometry: plane che riempie il viewport
+        const distance = camera.position.z;
+        const vFov = (camera.fov * Math.PI) / 180;
+        const planeHeight = 2 * Math.tan(vFov / 2) * distance;
+        const planeWidth = planeHeight * camera.aspect;
+
+        // Salva le dimensioni per il resize
+        geometryDimensionsRef.current = {
+          width: planeWidth,
+          height: planeHeight,
+        };
+
+        // Geometria semplice - gli angoli arrotondati sono gestiti nel fragment shader
         const geometry = new THREE.PlaneGeometry(
-          2 * viewportScale,
-          2 * viewportScale,
+          planeWidth,
+          planeHeight,
           32,
           32
         );
+
         const mesh = new THREE.Mesh(geometry, material);
+
+        // Apply perspective scale factor to prevent clipping
+        const scaleFactor = SHADER_CONSTANTS.PERSPECTIVE_SCALE_FACTOR;
+        mesh.scale.set(1, 1, 1);
+
+        // Trasla il mesh verso il basso per eliminare il gap inferiore
+        const bottomGap = (1 - scaleFactor) * planeHeight;
+        mesh.position.y = -bottomGap;
+
+        // Nessuna rotazione - camera perfettamente frontale per allineamento preciso
+        // mesh.rotation.y = 0.02; // Rimossa per evitare disallineamento
+        // mesh.rotation.x = 0.01; // Rimossa per evitare disallineamento
+
+        // Update resolution uniform
+        material.uniforms.uResolution.value.set(
+          container.getBoundingClientRect().width,
+          container.getBoundingClientRect().height
+        );
 
         meshRef.current = mesh;
         materialRef.current = material;
@@ -178,11 +165,26 @@ export function WaveImageShader({
 
         setIsReady(true);
 
-        // Animation loop
+        // Animation loop con smooth amplitude transition
         const animate = () => {
-          if (material.uniforms.uTime) {
-            material.uniforms.uTime.value += 0.016; // ~60fps
+          // Usa materialRef per accesso consistente
+          const mat = materialRef.current;
+          if (!mat) return;
+
+          if (mat.uniforms.uTime) {
+            mat.uniforms.uTime.value += 0.016;
           }
+
+          // Smooth lerp per amplitude - fade in/out elegante
+          const lerpSpeed = 0.08; // Velocità transizione (più basso = più smooth)
+          currentAmplitudeRef.current +=
+            (targetAmplitudeRef.current - currentAmplitudeRef.current) * lerpSpeed;
+
+          // Aggiorna amplitude nello shader
+          if (mat.uniforms.uAmplitude) {
+            mat.uniforms.uAmplitude.value = currentAmplitudeRef.current;
+          }
+
           renderer.render(scene, camera);
           animationIdRef.current = requestAnimationFrame(animate);
         };
@@ -194,6 +196,45 @@ export function WaveImageShader({
       }
     );
 
+    // Mouse move handler per interattività
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      // Normalizza coordinate mouse da -1 a 1
+      mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      if (materialRef.current) {
+        materialRef.current.uniforms.uMouse.value.set(
+          mouseRef.current.x,
+          mouseRef.current.y
+        );
+      }
+    };
+
+    // Mouse enter handler - attiva effetto
+    const handleMouseEnter = () => {
+      setIsHovered(true);
+      targetAmplitudeRef.current = amplitude; // Attiva effetto
+    };
+
+    // Mouse leave handler - disattiva effetto
+    const handleMouseLeave = () => {
+      setIsHovered(false);
+      targetAmplitudeRef.current = 0; // Disattiva effetto
+
+      if (materialRef.current) {
+        // Reset mouse position
+        materialRef.current.uniforms.uMouse.value.lerp(
+          new THREE.Vector2(0, 0),
+          0.1
+        );
+      }
+    };
+
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseenter", handleMouseEnter);
+    container.addEventListener("mouseleave", handleMouseLeave);
+
     // Resize observer
     const resizeObserver = new ResizeObserver(updateSize);
     resizeObserver.observe(container);
@@ -203,6 +244,9 @@ export function WaveImageShader({
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseenter", handleMouseEnter);
+      container.removeEventListener("mouseleave", handleMouseLeave);
       resizeObserver.disconnect();
       renderer.dispose();
       if (meshRef.current) {
@@ -212,12 +256,12 @@ export function WaveImageShader({
         }
       }
     };
-  }, [imageUrl, waveIntensity, waveSpeed]);
+  }, [imageUrl, aspectRatio, amplitude, waveSpeed]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative block overflow-hidden ${className}`}
+      className={`relative block w-full h-full ${className}`}
     >
       <canvas
         ref={canvasRef}

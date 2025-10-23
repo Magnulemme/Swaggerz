@@ -1,12 +1,13 @@
-import React from 'react';
-import FeaturedCollectionBanner from '../NFTCollections/FeaturedCollectionBanner';
+import React from "react";
+import FeaturedCollectionBanner from "../NFTCollections/FeaturedCollectionBanner";
 
 /**
  * Left banner section with gradient backgrounds and L-shaped border
  */
 export default function BannerSectionLeft() {
   return (
-    <div className="relative col-span-2 lg:col-span-2 lg:row-span-3
+    <div
+      className="relative col-span-2 lg:col-span-2 lg:row-span-3
       lg:border-l lg:border-b lg:border-zinc-700/50
       lg:rounded-l-3xl rounded-tr-3xl lg:overflow-visible
 
@@ -16,7 +17,7 @@ export default function BannerSectionLeft() {
       before:lg:z-10
       "
     >
-      <div className="lg:overflow-hidden lg:rounded-t-3xl lg:rounded-bl-3xl h-full relative">
+      <div className="lg:overflow-visible lg:rounded-t-3xl lg:rounded-bl-3xl h-full relative">
         <FeaturedCollectionBanner section="left" />
       </div>
     </div>

@@ -30,13 +30,13 @@ export default function HeroVideoBanner() {
   // Trasformazioni 2.5D per vero effetto parallax:
   // - scale: rimpicciolisce da 1 a 0.85 (effetto zoom out)
   // - rotateX: rotazione 3D lungo l'asse X da 0 a 15deg (testa indietro, piedi avanti)
-  // - opacity: fade out progressivo per transizione fluida
+  // - opacity: fade out progressivo per transizione fluida verso la sezione successiva
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
   const rotateX = useTransform(scrollYProgress, [0, 1], [0, 15]);
-  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 0.8, 0]);
+  const opacity = useTransform(scrollYProgress, [0.2, 0.6, 0.85], [1, 0.5, 0]);
 
   // Fade out separato per il contenuto (testo e button) - inizia prima per effetto elegante
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.5, 0.8], [1, 0.7, 0]);
+  const contentOpacity = useTransform(scrollYProgress, [0.15, 0.4, 0.7], [1, 0.5, 0]);
 
   // Transform CSS completa con perspective per evitare stacking context issues
   const transform = useTransform(
