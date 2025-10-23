@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import StarRating from "@/components/ui/StarRating";
 
 interface Product {
   id: number;
@@ -9,6 +10,8 @@ interface Product {
   title: string;
   category: string;
   price: string;
+  rating: number;
+  reviewCount: number;
 }
 
 const products: Product[] = [
@@ -17,42 +20,54 @@ const products: Product[] = [
     image: "https://images.unsplash.com/photo-1617922001439-4a2e6562f328?w=800&h=1000&fit=crop&q=80",
     title: "Luxury Sneakers",
     category: "Footwear",
-    price: "€450"
+    price: "€450",
+    rating: 4.9,
+    reviewCount: 156
   },
   {
     id: 2,
     image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&h=1000&fit=crop&q=80",
     title: "Designer Watch",
     category: "Accessories",
-    price: "€1,200"
+    price: "€1,200",
+    rating: 4.7,
+    reviewCount: 82
   },
   {
     id: 3,
     image: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=800&h=1000&fit=crop&q=80",
     title: "Leather Jacket",
     category: "Outerwear",
-    price: "€890"
+    price: "€890",
+    rating: 4.8,
+    reviewCount: 134
   },
   {
     id: 4,
     image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&h=1000&fit=crop&q=80",
     title: "Premium Sunglasses",
     category: "Accessories",
-    price: "€320"
+    price: "€320",
+    rating: 4.6,
+    reviewCount: 93
   },
   {
     id: 5,
     image: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=800&h=1000&fit=crop&q=80",
     title: "Minimalist Bag",
     category: "Bags",
-    price: "€650"
+    price: "€650",
+    rating: 4.9,
+    reviewCount: 201
   },
   {
     id: 6,
     image: "https://images.unsplash.com/photo-1523398002811-999ca8dec234?w=800&h=1000&fit=crop&q=80",
     title: "Statement Ring",
     category: "Jewelry",
-    price: "€280"
+    price: "€280",
+    rating: 4.7,
+    reviewCount: 67
   }
 ];
 
@@ -103,7 +118,16 @@ const ProductShowcase = () => {
                 <div className="text-white">
                   <p className="text-[10px] lg:text-xs text-zinc-300 mb-0.5 lg:mb-1 uppercase tracking-wide">{product.category}</p>
                   <h3 className="font-semibold text-xs lg:text-sm mb-0.5 lg:mb-1 line-clamp-1">{product.title}</h3>
-                  <p className="text-yellow-500 font-bold text-xs lg:text-sm">{product.price}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-yellow-500 font-bold text-xs lg:text-sm">{product.price}</p>
+                    <StarRating
+                      rating={product.rating}
+                      reviewCount={product.reviewCount}
+                      size="sm"
+                      showValue={false}
+                      starClassName="w-2.5 h-2.5 lg:w-3 lg:h-3"
+                    />
+                  </div>
                 </div>
               </div>
 

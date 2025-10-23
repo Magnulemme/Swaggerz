@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Heart, Share2, ArrowRight } from "lucide-react";
+import StarRating from "@/components/ui/StarRating";
 
 export interface CardProps {
   title: string;
@@ -15,6 +16,9 @@ export interface CardProps {
   badgeText?: string;
   originalPrice?: string | number;
   isNew?: boolean;
+  rating?: number;
+  reviewCount?: number;
+  isBestseller?: boolean;
 }
 
 export default function Card({
@@ -27,6 +31,9 @@ export default function Card({
   badgeText,
   originalPrice,
   isNew = false,
+  rating,
+  reviewCount,
+  isBestseller = false,
 }: CardProps) {
   const [liked, setLiked] = useState(false);
 
@@ -35,11 +42,16 @@ export default function Card({
       
       {/* Immagine */}
       <div className="relative w-full aspect-square overflow-hidden">
-        {(badgeText || isNew) && (
+        {(badgeText || isNew || isBestseller) && (
           <div className="absolute left-4 top-4 z-20 flex gap-2">
             {isNew && (
               <span className="px-3 py-1 text-xs font-semibold text-white uppercase bg-gradient-to-r from-red-500 to-orange-500 rounded-md shadow-sm">
                 Nuovo
+              </span>
+            )}
+            {isBestseller && (
+              <span className="px-3 py-1 text-xs font-semibold text-white uppercase bg-gradient-to-r from-amber-500 to-yellow-500 rounded-md shadow-sm">
+                Bestseller
               </span>
             )}
             {badgeText && (
@@ -91,6 +103,17 @@ export default function Card({
           <p className="text-zinc-600 text-sm font-jost line-clamp-2 leading-relaxed mt-1 mb-2">
             {description}
           </p>
+        )}
+
+        {/* Rating */}
+        {rating !== undefined && (
+          <div className="mb-3">
+            <StarRating
+              rating={rating}
+              reviewCount={reviewCount}
+              size="sm"
+            />
+          </div>
         )}
 
         {/* Spacer per far spingere il prezzo in basso */}

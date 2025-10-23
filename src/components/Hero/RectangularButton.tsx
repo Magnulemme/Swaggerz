@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import * as THREE from 'three';
-import { useSharedRenderer } from '@/hooks/useSharedRenderer';
-import { vertexShader, darkFragmentShader } from '@/constants/shaders';
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import * as THREE from "three";
+import { useSharedRenderer } from "@/hooks/useSharedRenderer";
+import { vertexShader, darkFragmentShader } from "@/constants/shaders";
 
 interface RectangularButtonProps {
   text?: string;
@@ -11,6 +11,9 @@ interface RectangularButtonProps {
   buttonRef?: React.RefObject<HTMLButtonElement>;
   isHovered?: boolean;
   setIsHovered?: (hovered: boolean) => void;
+  width?: number;
+  height?: number;
+  arrowYes?: boolean;
 }
 
 const RectangularButton: React.FC<RectangularButtonProps> = ({
@@ -18,12 +21,12 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
   onClick,
   buttonRef,
   isHovered = false,
-  setIsHovered
+  setIsHovered,
+  width = 240,
+  height = 64,
+  arrowYes = true,
 }) => {
-  const width = 240;
-  const height = 64;
-
-  const [shaderDataUrl, setShaderDataUrl] = useState<string>('');
+  const [shaderDataUrl, setShaderDataUrl] = useState<string>("");
   const timeRef = useRef<number>(0);
 
   // Setup Three.js con useSharedRenderer
@@ -35,9 +38,9 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
       vertexShader,
       fragmentShader: darkFragmentShader,
       uniforms: {
-        uTime: { value: 0.0 }
+        uTime: { value: 0.0 },
       },
-      transparent: true
+      transparent: true,
     });
 
     const geometry = new THREE.PlaneGeometry(2, 2);
@@ -92,8 +95,8 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
       <canvas
         ref={canvasRef}
         style={{
-          display: 'none',
-          position: 'absolute'
+          display: "none",
+          position: "absolute",
         }}
         width={width}
         height={height}
@@ -113,8 +116,8 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
             rgba(234, 179, 8, 0.1) 60%,
             transparent 80%
           )`,
-          filter: 'blur(12px)',
-          opacity: isHovered ? 0.8 : 0.5
+          filter: "blur(12px)",
+          opacity: isHovered ? 0.8 : 0.5,
         }}
         transition={{ opacity: { duration: 0.3 } }}
       />
@@ -132,14 +135,14 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
           top: 0,
           backgroundImage: shaderDataUrl
             ? `url(${shaderDataUrl})`
-            : 'linear-gradient(to bottom right, rgb(239, 68, 68), rgb(249, 115, 22), rgb(234, 179, 8))',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+            : "linear-gradient(to bottom right, rgb(239, 68, 68), rgb(249, 115, 22), rgb(234, 179, 8))",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           boxShadow: `
             0 0 20px rgba(249, 115, 22, 0.4),
             0 0 40px rgba(239, 68, 68, 0.3),
             0 8px 32px rgba(0, 0, 0, 0.3)
-          `
+          `,
         }}
         whileHover={{
           scale: 1.05,
@@ -147,7 +150,7 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
             0 0 30px rgba(249, 115, 22, 0.6),
             0 0 60px rgba(239, 68, 68, 0.4),
             0 12px 48px rgba(0, 0, 0, 0.4)
-          `
+          `,
         }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
@@ -158,7 +161,7 @@ const RectangularButton: React.FC<RectangularButtonProps> = ({
         </span>
 
         {/* Freccia */}
-        <ArrowRight className="size-5 text-white" />
+        {arrowYes && <ArrowRight className="size-5 text-white" />}
       </motion.button>
     </div>
   );

@@ -7,7 +7,7 @@ import FeaturedCollectionBanner from "../NFTCollections/FeaturedCollectionBanner
 export default function BannerSectionLeft() {
   return (
     <div
-      className="relative col-span-2 lg:col-span-2 lg:row-span-3
+      className="relative col-span-2 lg:col-span-2 lg:row-span-3 h-full
       lg:border-l lg:border-b lg:border-zinc-700/50
       lg:rounded-l-3xl rounded-tr-3xl lg:overflow-visible
 

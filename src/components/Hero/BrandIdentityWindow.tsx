@@ -136,20 +136,17 @@ export default function BrandIdentityWindow() {
           >
             <div className="w-full flex flex-col items-start space-y-3">
               <h3
-                className="text-white leading-[1.1] tracking-tight"
+                className="text-white leading-[1.1] tracking-tight font-jost"
                 style={{ fontSize: titleFontSize, fontWeight: 900 }}
               >
                 Non un brand, una
               </h3>
-              <div className="w-fit">
-                <ShaderText
-                  className="block leading-none"
-                  fontSize={shaderFontSize}
-                  fontWeight="900"
-                >
-                  Community
-                </ShaderText>
-              </div>
+              <span
+                style={{ fontSize: titleFontSize, fontWeight: 900 }}
+                className="text-orange-500 pb-4"
+              >
+                Community
+              </span>
             </div>
           </motion.div>
 

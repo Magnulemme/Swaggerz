@@ -4,7 +4,7 @@ import React from "react";
 import { collections } from "@/constants/heroCollections";
 import BannerSectionLeft from "./Hero/BannerSectionLeft";
 import BannerSectionRight from "./Hero/BannerSectionRight";
-import BrandIdentityWindow from "./Hero/BrandIdentityWindow";
+import FeaturedProduct from "./Hero/FeaturedProduct";
 import TopCollections from "./Hero/TopCollections";
 import ProductShowcase from "./Hero/ProductShowcase";
 import FeaturedArtist from "./FeaturedArtist";
@@ -70,7 +70,7 @@ const GridContent = () => {
           </div>
 
           {/* Banner Section Left - col 1-2, row 1-3 */}
-          <div className="col-span-2 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-4 z-30">
+          <div className="col-span-2 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-4 z-30 h-full">
             <BannerSectionLeft />
           </div>
           <div className="col-span-2 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-4 z-10 bg-black w-full h-full rounded-3xl"></div>
@@ -85,13 +85,13 @@ const GridContent = () => {
           "
           ></div>
 
-          {/* Brand Identity Window - col 3-4, row 1 */}
+          {/* Featured Product - col 3-4, row 1 */}
           <div className="col-span-2 lg:col-start-3 lg:col-end-5 lg:row-start-1 lg:row-end-2 min-h-[200px] z-30">
-            <BrandIdentityWindow />
+            <FeaturedProduct />
           </div>
 
           {/* Banner Section Right - col 3-4, row 2-3 */}
-          <div className="col-span-2 lg:col-start-3 lg:col-end-5 lg:row-start-2 lg:row-end-4 z-20">
+          <div className="col-span-2 lg:col-start-3 lg:col-end-5 lg:row-start-2 lg:row-end-4 z-20 h-full">
             <BannerSectionRight />
           </div>
 
