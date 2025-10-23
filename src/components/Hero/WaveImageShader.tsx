@@ -262,12 +262,14 @@ export function WaveImageShader({
     <div
       ref={containerRef}
       className={`relative block w-full h-full ${className}`}
+      style={{ touchAction: 'auto' }}
     >
       <canvas
         ref={canvasRef}
         className={`block w-full h-full transition-opacity duration-500 ${
           isReady ? "opacity-100" : "opacity-0"
         }`}
+        style={{ touchAction: 'auto' }}
       />
       {!isReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-zinc-900/20">

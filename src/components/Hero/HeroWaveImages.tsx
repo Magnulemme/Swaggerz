@@ -23,7 +23,7 @@ interface HeroWaveImagesProps {
 
 const defaultImages: ImageConfig[] = [
   {
-    url: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=90",
+    url: "/felpa.jpg",
     alt: "Felpe",
     description: "Design unici e comfort streetwear per il tuo stile urban",
     nickname: "Le Swag",
@@ -33,8 +33,8 @@ const defaultImages: ImageConfig[] = [
     aspectRatio: 5 / 6,
   },
   {
-    url: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800&q=90",
-    alt: "Pants",
+    url: "/pants.jpg",
+    alt: "Pantaloni",
     description: "Comfort e stile per le tue giornate in movimento",
     nickname: "Gli Hype",
     waveIntensity: 0.08,
@@ -42,7 +42,7 @@ const defaultImages: ImageConfig[] = [
     aspectRatio: 5 / 6,
   },
   {
-    url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=90",
+    url: "/tshirt.jpg",
     alt: "T-shirt",
     description: "Grafiche esclusive e tessuti premium per il tuo look",
     nickname: "Le Cool",
@@ -52,7 +52,7 @@ const defaultImages: ImageConfig[] = [
     aspectRatio: 5 / 6,
   },
   {
-    url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=90",
+    url: "/giubbotto.jpg",
     alt: "Giubbotti",
     description: "Layer perfetti per ogni stagione e occasione",
     nickname: "I Glamour",
@@ -137,7 +137,7 @@ export function HeroWaveImages({
               }}
             >
               {/* Container esterno con bordo e glow */}
-              <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden scale-x-[0.92] hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-black/95 backdrop-blur-sm">
+              <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-black/95 backdrop-blur-sm">
                 {/* Padding container per separare immagine dal bordo */}
                 <div className="pb-2">
                   {/* Image Container con overflow hidden */}
@@ -150,11 +150,12 @@ export function HeroWaveImages({
                     >
                       {/* Canvas con margine extra per l'effetto wave */}
                       <div
-                        className="absolute top-1/2 left-1/2"
+                        className="absolute inset-0"
                         style={{
                           width: "calc(100% + 64px)",
-                          aspectRatio: `${image.aspectRatio ?? 4 / 5}`,
-                          transform: "translate(-50%, -50%)",
+                          height: "calc(100% + 64px)",
+                          left: "-32px",
+                          top: "-32px",
                         }}
                       >
                         <WaveImageShader
@@ -170,22 +171,21 @@ export function HeroWaveImages({
                 </div>
 
                 {/* Content Section */}
-                <div className="px-5 pb-5 pt-2">
-                  {/* Nickname - Tarantino style */}
-                  {image.category && (
-                    <span className="inline-block text-sm italic font-bold uppercase tracking-wider text-zinc-200/90 pb-2">
-                      &ldquo;{image.category}&rdquo;
+                <div className="relative px-5 pb-5 pt-2">
+                  {/* Nickname Tag - Above title */}
+                  {image.nickname && (
+                    <span className="absolute -top-8 left-0 z-10 inline-block px-3 py-1 text-sm italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-amber-400 group-hover:border-amber-500/50 group-hover:bg-zinc-900/90 transition-all duration-300">
+                      &ldquo;{image.nickname}&rdquo;
                     </span>
                   )}
-
                   {/* Title */}
-                  <h3 className="text-5xl font-[family-name:var(--font-pastor-of-muppets)] font-black leading-tight w-fit bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent pl-4">
+                  <h3 className="text-3xl font-jost font-black leading-tight w-fit bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent pb-4">
                     {image.alt}
                   </h3>
 
                   {/* Description */}
                   {image.description && (
-                    <p className="text-sm text-zinc-300/80 leading-relaxed line-clamp-2 mt-1">
+                    <p className="text-sm text-zinc-300/80 leading-relaxed line-clamp-2">
                       {image.description}
                     </p>
                   )}

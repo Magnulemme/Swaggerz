@@ -2,7 +2,6 @@
 
 import { ShoppingBag } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import ShaderText from "@/components/ShaderText";
 
@@ -11,7 +10,7 @@ interface ImageConfig {
   alt: string;
   description?: string;
   price?: string;
-  category?: string;
+  nickname?: string;
   badge?: "hot" | "sale" | "new" | "exclusive";
   aspectRatio?: number;
 }
@@ -23,33 +22,33 @@ interface HeroWaveImagesMobileProps {
 
 const defaultImages: ImageConfig[] = [
   {
-    url: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=90",
+    url: "/felpa.jpg",
     alt: "Felpe",
     description: "Design unici e comfort streetwear per il tuo stile urban",
-    category: "Le Swag",
+    nickname: "Le Swag",
     badge: "hot",
     aspectRatio: 4 / 5,
   },
   {
-    url: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=800&q=90",
-    alt: "Pants",
+    url: "/pants.jpg",
+    alt: "Pantaloni",
     description: "Comfort e stile per le tue giornate in movimento",
-    category: "Gli Hype",
+    nickname: "Gli Hype",
     aspectRatio: 4 / 5,
   },
   {
-    url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=90",
+    url: "/tshirt.jpg",
     alt: "T-shirt",
     description: "Grafiche esclusive e tessuti premium per il tuo look",
-    category: "Le Cool",
+    nickname: "Le Cool",
     badge: "new",
     aspectRatio: 4 / 5,
   },
   {
-    url: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=90",
+    url: "/giubbotto.jpg",
     alt: "Giubbotti",
     description: "Layer perfetti per ogni stagione e occasione",
-    category: "I Glamour",
+    nickname: "I Glamour",
     aspectRatio: 4 / 5,
   },
 ];
@@ -60,26 +59,6 @@ function CategoryCard({ image }: { image: ImageConfig }) {
     <article className="group relative flex flex-col cursor-pointer h-full">
       {/* Container esterno con bordo e glow */}
       <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-black/95 backdrop-blur-sm h-full">
-        {/* Badge */}
-        {image.badge && (
-          <div className="absolute top-3 right-3 z-10">
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-sm text-[10px] font-bold shadow-lg ${
-                image.badge === "hot"
-                  ? "bg-red-500/95 text-white"
-                  : image.badge === "sale"
-                  ? "bg-yellow-500/95 text-black"
-                  : image.badge === "new"
-                  ? "bg-green-500/95 text-white"
-                  : "bg-white/95 text-black"
-              }`}
-            >
-              <ShoppingBag className="w-2.5 h-2.5" />
-              {image.badge.toUpperCase()}
-            </span>
-          </div>
-        )}
-
         {/* Image Container */}
         <div className="relative w-full overflow-hidden rounded-t-2xl">
           <div
@@ -93,36 +72,35 @@ function CategoryCard({ image }: { image: ImageConfig }) {
               alt={image.alt}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
-              sizes="(max-width: 640px) 85vw, (max-width: 768px) 50vw, 25vw"
+              loading="eager"
+              unoptimized
             />
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="px-4 pb-4 pt-3 space-y-2">
-          {/* Category Badge */}
-          {image.category && (
-            <span className="inline-block text-sm font-semibold text-white">
-              {image.category}
+        <div className="relative px-4 pb-4 pt-3 space-y-2">
+          {/* Nickname Tag - Above title */}
+          {image.nickname && (
+            <span className="absolute -top-5 left-0 z-10 inline-block px-3 py-2 text-xs italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-lg  group-hover:text-amber-400 group-hover:border-amber-500/50 group-hover:bg-zinc-900/90 transition-all duration-300">
+              &ldquo;{image.nickname}&rdquo;
             </span>
           )}
 
           {/* Title */}
-          <h3 className="font-bold leading-tight w-fit">
-            <ShaderText fontSize="50px" fontWeight="900">
-              {image.alt}
-            </ShaderText>
+          <h3 className="text-4xl font-jost font-black leading-tight w-fit bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
+            {image.alt}
           </h3>
 
           {/* Description */}
           {image.description && (
-            <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2">
+            <p className="text-sm text-zinc-300/80 leading-relaxed line-clamp-2">
               {image.description}
             </p>
           )}
 
           {/* CTA Link */}
-          <div className="pt-1.5">
+          <div className="pt-2">
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-500 group-hover:text-amber-400 group-hover:gap-2.5 transition-all duration-300">
               Vedi tutti i prodotti
               <svg

@@ -66,13 +66,16 @@ export const waveFragmentShader = `
       aberrationStrength * cos(uTime * 1.2)
     );
 
-    // Calcola aspect ratio scaling
+    // Calcola aspect ratio scaling per object-fit: contain
+    // Mantiene l'intera immagine visibile nel container
     float containerAspect = uResolution.x / uResolution.y;
     vec2 scale;
     if (containerAspect > uImageAspect) {
-      scale = vec2(uImageAspect / containerAspect, 1.0);
+      // Container più largo: scala in base all'altezza
+      scale = vec2(containerAspect / uImageAspect, 1.0);
     } else {
-      scale = vec2(1.0, containerAspect / uImageAspect);
+      // Container più alto: scala in base alla larghezza
+      scale = vec2(1.0, uImageAspect / containerAspect);
     }
 
     // Sample texture con chromatic aberration

@@ -7,20 +7,29 @@ import HeroVideoBanner from "./Hero/HeroVideoBanner";
 import { HeroWaveImages } from "./Hero/HeroWaveImages";
 import { HeroWaveImagesMobile } from "./Hero/HeroWaveImagesMobile";
 import GridContent from "./GridContent";
+import { useLoadingStore } from "@/store/useLoadingStore";
 
 const BentoHero = () => {
   const [isDesktop, setIsDesktop] = useState(false);
+  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
 
   useEffect(() => {
     // Check if screen is desktop (>= 1280px for shader performance)
     const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1280);
+      const desktop = window.innerWidth >= 1280;
+      setIsDesktop(desktop);
+
+      // Se non siamo su desktop, marca models3d come ready subito
+      // perché Hero3dContent non verrà renderizzato
+      if (!desktop) {
+        setComponentReady('models3d');
+      }
     };
 
     checkDesktop();
     window.addEventListener("resize", checkDesktop);
     return () => window.removeEventListener("resize", checkDesktop);
-  }, []);
+  }, [setComponentReady]);
 
   return (
     <section className="relative bg-zinc-950 font-jost  min-h-screen">
@@ -43,10 +52,12 @@ const BentoHero = () => {
             <GridContent />
           </div>
 
-          {/* 3D Content Section */}
-          <div className="col-span-2 lg:col-span-4 lg:row-span-2 h-full">
-            <Hero3dContent />
-          </div>
+          {/* 3D Content Section - Disabled on mobile for performance */}
+          {isDesktop && (
+            <div className="col-span-2 lg:col-span-4 lg:row-span-2 h-full">
+              <Hero3dContent />
+            </div>
+          )}
         </div>
       </div>
     </section>
