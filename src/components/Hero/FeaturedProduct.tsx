@@ -88,7 +88,7 @@ export default function FeaturedProduct() {
   const currentProduct = featuredProducts[selectedIndex];
 
   return (
-    <div className="relative w-full h-full min-h-[300px] rounded-3xl border border-zinc-700/50 bg-black overflow-hidden group/slider">
+    <div className="hidden lg:block relative w-full h-full min-h-[300px] rounded-3xl border border-zinc-700/50 bg-black overflow-hidden group/slider">
       {/* Animated gradient background */}
       <div className="absolute inset-0">
         <motion.div
@@ -110,10 +110,10 @@ export default function FeaturedProduct() {
         <div className="flex h-full">
           {featuredProducts.map((product) => (
             <div key={product.id} className="flex-[0_0_100%] min-w-0 h-full">
-              {/* Split Layout: Image Left | Info Right */}
-              <div className="relative h-full flex flex-col lg:flex-row p-4 lg:p-6 gap-4 lg:gap-6">
-                {/* Left: Product Image - Full Height */}
-                <div className="relative w-full lg:w-[55%] h-64 lg:h-full">
+              {/* Responsive Layout: Vertical on lg, Horizontal on xl+ */}
+              <div className="relative h-full flex flex-col xl:flex-row p-6 gap-4 xl:gap-6">
+                {/* Product Image */}
+                <div className="relative w-full xl:w-[55%] flex-1 xl:flex-none xl:h-full">
                   <motion.div
                     className="relative w-full h-full rounded-2xl overflow-hidden cursor-pointer group"
                     onMouseEnter={() => setIsHovered(true)}
@@ -145,27 +145,27 @@ export default function FeaturedProduct() {
                   </motion.div>
                 </div>
 
-                {/* Right: Product Info with Title */}
-                <div className="relative w-full lg:w-[45%] flex flex-col justify-center gap-4 lg:gap-5">
+                {/* Product Info */}
+                <div className="relative w-full xl:w-[45%] flex flex-col justify-center gap-3 xl:gap-5">
                   {/* Eyebrow */}
                   <motion.div
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.1 }}
                   >
-                    <span className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
-                      <span className="w-1 h-4 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></span>
-                      Scelti da Swaggerz
+                    <span className="inline-flex items-center gap-2 text-xs xl:text-sm font-bold uppercase tracking-wider bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                      <span className="w-1 h-3 xl:h-4 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></span>
+                      Scelti per Te da Swaggerz
                     </span>
                   </motion.div>
 
-                  {/* Product Title - LA STAR */}
+                  {/* Product Title */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.15 }}
                   >
-                    <h3 className="text-3xl lg:text-4xl font-black text-white font-jost leading-tight tracking-tight">
+                    <h3 className="text-2xl xl:text-4xl font-black text-white font-jost leading-tight tracking-tight">
                       {product.name}
                     </h3>
                   </motion.div>
@@ -176,21 +176,21 @@ export default function FeaturedProduct() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <p className="text-sm text-zinc-400 leading-relaxed">
+                    <p className="text-xs xl:text-sm text-zinc-400 leading-relaxed">
                       {product.description}
                     </p>
                   </motion.div>
 
-                  {/* Price & Rating Row */}
+                  {/* Price, Rating & CTA Row - Wrapped on lg, separate on xl */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.25 }}
-                    className="flex items-center justify-between gap-4 pt-2 border-t border-zinc-800/50"
+                    className="flex flex-wrap xl:flex-nowrap items-center justify-between gap-3 xl:gap-4 pt-2 border-t border-zinc-800/50"
                   >
                     {/* Price */}
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl lg:text-3xl font-black text-white font-jost">
+                      <span className="text-2xl xl:text-3xl font-black text-white font-jost">
                         €{product.price}
                       </span>
                     </div>
@@ -203,13 +203,28 @@ export default function FeaturedProduct() {
                       textClassName="text-zinc-300"
                       starClassName="fill-amber-500 text-amber-500"
                     />
+
+                    {/* CTA Button - Same row on lg, separate on xl */}
+                    <motion.button
+                      className="xl:hidden group/btn inline-flex items-center gap-1.5 text-orange-400 hover:text-orange-300 font-semibold text-xs transition-colors"
+                      whileHover={{ x: 3 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Aggiungi</span>
+                    </motion.button>
                   </motion.div>
 
-                  {/* CTA Button */}
+                  {/* CTA Button - Separate row for xl+ */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
+                    className="hidden xl:block"
                   >
                     <motion.button
                       className="group/btn inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 font-semibold text-sm transition-colors"

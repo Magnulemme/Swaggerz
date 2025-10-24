@@ -14,6 +14,8 @@ interface RightSectionProps {
 }
 
 export default function RightSection({ collection }: RightSectionProps) {
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
     <div className="relative w-full h-full overflow-hidden z-0 rounded-r-3xl">
       <div className="relative z-50 flex flex-col h-full py-8 lg:py-10 gap-6 lg:gap-7 px-6 lg:pr-10">
@@ -29,8 +31,10 @@ export default function RightSection({ collection }: RightSectionProps) {
             {/* Avatar with subtle glow */}
             <div className="relative flex-shrink-0">
               <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-md" />
-              <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border border-orange-400/30 flex items-center justify-center font-black text-white text-sm shadow-lg">
-                R
+              <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border border-orange-400/30 flex items-center justify-center text-white text-sm shadow-lg">
+                <span className="font-[family-name:var(--font-pastor-of-muppets)] text-base">
+                  R
+                </span>
               </div>
               {/* Verified badge */}
               <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center border-2 border-zinc-900 shadow-md">
@@ -57,62 +61,55 @@ export default function RightSection({ collection }: RightSectionProps) {
           </p>
         </motion.div>
 
-        {/* Gallery Grid - Clean & Focused */}
-        <div className="relative z-50 flex-1 min-h-[280px] grid grid-cols-2 grid-rows-2 gap-3 lg:gap-4">
-          {/* Main Image - Large, spans 2 rows */}
+        {/* Featured Video - Artist Showcase */}
+        {collection.video && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="relative row-span-2 min-h-[280px] rounded-xl lg:rounded-2xl overflow-hidden border border-zinc-800/60 group cursor-pointer"
-            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative z-50 flex-shrink-0 bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-xl lg:rounded-2xl overflow-hidden"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            whileHover={{ y: -4 }}
           >
-            <Image
-              src={collection.images[0]}
-              alt={`${collection.title} by Rebkon`}
-              fill
-              className="object-cover transition-all duration-500 group-hover:scale-110"
+            {/* Glow effect */}
+            <motion.div
+              className="absolute -inset-1 rounded-2xl blur-xl"
+              style={{
+                background: `radial-gradient(circle at 50% 30%, rgba(249, 115, 22, 0.6), transparent 65%)`,
+              }}
+              animate={{
+                opacity: isHovered ? 0.7 : 0,
+              }}
+              transition={{ duration: 0.3 }}
             />
 
-            {/* Subtle artist signature - bottom right */}
-            <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-md border border-zinc-700/50">
-              <span className="text-white text-[10px] font-bold tracking-wide">
-                Rebkon
-              </span>
-            </div>
-
-            {/* Subtle gradient overlay on hover */}
-            <div className="absolute inset-0 bg-gradient-to-t from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-            {/* Glow effect on hover */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/30 to-amber-500/30 rounded-xl lg:rounded-2xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500 -z-10" />
-          </motion.div>
-
-          {/* Secondary Images - Clean */}
-          {collection.images.slice(1, 3).map((img, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 + idx * 0.1 }}
-              className="relative min-h-[135px] rounded-lg lg:rounded-xl overflow-hidden border border-zinc-800/60 group cursor-pointer"
-              whileHover={{ scale: 1.05, zIndex: 10 }}
-            >
-              <Image
-                src={img}
-                alt={`${collection.title} ${idx + 2}`}
-                fill
-                className="object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
+            {/* Video container */}
+            <div className="relative w-full h-64 lg:h-72 xl:h-80 overflow-hidden group cursor-pointer">
+              <video
+                src={collection.video}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
               />
 
-              {/* Subtle gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/15 to-transparent opacity-0 group-hover:opacity-80 transition-opacity duration-500" />
+              {/* Subtle gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
-              {/* Border glow on hover */}
-              <div className="absolute inset-0 border-2 border-transparent group-hover:border-orange-500/40 transition-colors duration-300 rounded-lg lg:rounded-xl" />
-            </motion.div>
-          ))}
-        </div>
+              {/* Artist signature overlay */}
+              <div className="absolute bottom-4 right-4 z-20 px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-lg border border-orange-500/30">
+                <span className="text-white text-xs font-bold tracking-wide">
+                  Rebkon • Artist Showcase
+                </span>
+              </div>
+
+              {/* Overlay scuro on hover */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
