@@ -50,13 +50,13 @@ export default function LeftSection({ collection }: LeftSectionProps) {
             name: "Swaggerz",
             letter: "S",
             bgColor: "#ffffff",
-            textColor: "#000000",
+            textColor: "#f59e0b",
           }}
           brand2={{
             name: "Rebkon",
             letter: "R",
-            bgColor: "linear-gradient(to bottom right, #f59e0b, #ea580c)",
-            textColor: "#fb923c",
+            bgColor: "#f59e0b",
+            textColor: "#ffffff",
             verified: true,
           }}
         />
@@ -96,10 +96,7 @@ export default function LeftSection({ collection }: LeftSectionProps) {
             </motion.div>
           )}
 
-          <AnimatedButton
-            as="button"
-            size="sm"
-          >
+          <AnimatedButton as="button" size="md">
             Explore Collection
             <svg
               className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110"

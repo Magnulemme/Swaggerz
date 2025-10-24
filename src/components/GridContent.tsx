@@ -49,9 +49,9 @@ const GridContent = () => {
               style={{
                 background: `
                   radial-gradient(ellipse 90% 60% at 30% 40%, rgba(234, 179, 8, 0.11), transparent 65%),
-                  radial-gradient(ellipse 80% 65% at 60% 55%, rgba(250, 204, 21, 0.09), transparent 70%),
-                  radial-gradient(ellipse 70% 55% at 48% 70%, rgba(202, 138, 4, 0.08), transparent 68%),
-                  radial-gradient(ellipse 95% 50% at 70% 45%, rgba(250, 204, 21, 0.06), transparent 72%)
+                  radial-gradient(ellipse 80% 65% at 25% 55%, rgba(250, 204, 21, 0.09), transparent 70%),
+                  radial-gradient(ellipse 70% 55% at 35% 70%, rgba(202, 138, 4, 0.08), transparent 68%),
+                  radial-gradient(ellipse 95% 50% at 75% 45%, rgba(239, 68, 68, 0.12), transparent 72%)
                 `,
               }}
             />
@@ -59,9 +59,9 @@ const GridContent = () => {
               className="absolute inset-0"
               style={{
                 background: `
-                  radial-gradient(ellipse 85% 55% at 35% 42%, rgba(234, 179, 8, 0.13), transparent 68%),
-                  radial-gradient(ellipse 88% 58% at 62% 58%, rgba(250, 204, 21, 0.1), transparent 72%),
-                  radial-gradient(ellipse 75% 48% at 50% 68%, rgba(202, 138, 4, 0.09), transparent 70%)
+                  radial-gradient(ellipse 85% 55% at 30% 42%, rgba(234, 179, 8, 0.13), transparent 68%),
+                  radial-gradient(ellipse 88% 58% at 78% 58%, rgba(220, 38, 38, 0.15), transparent 72%),
+                  radial-gradient(ellipse 75% 48% at 25% 68%, rgba(250, 204, 21, 0.09), transparent 70%)
                 `,
                 filter: "blur(65px)",
                 opacity: 0.28,

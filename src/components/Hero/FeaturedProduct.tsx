@@ -113,7 +113,7 @@ export default function FeaturedProduct() {
               {/* Responsive Layout: Vertical on lg, Horizontal on xl+ */}
               <div className="relative h-full flex flex-col xl:flex-row p-6 gap-4 xl:gap-6">
                 {/* Product Image */}
-                <div className="relative w-full xl:w-[55%] flex-1 xl:flex-none xl:h-full">
+                <div className="relative w-full xl:w-[55%] flex-1 xl:flex-none xl:h-full min-h-[150px]">
                   <motion.div
                     className="relative w-full h-full rounded-2xl overflow-hidden cursor-pointer group"
                     onMouseEnter={() => setIsHovered(true)}
@@ -159,42 +159,57 @@ export default function FeaturedProduct() {
                     </span>
                   </motion.div>
 
-                  {/* Product Title */}
-                  <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.15 }}
-                  >
-                    <h3 className="text-2xl xl:text-4xl font-black text-white font-jost leading-tight tracking-tight">
-                      {product.name}
-                    </h3>
-                  </motion.div>
+                  {/* Title, Description & Price - Horizontal on lg only */}
+                  <div className="flex flex-col xl:flex-col gap-3">
+                    <div className="flex flex-row xl:flex-col items-start justify-between gap-4 xl:gap-3">
+                      {/* Title & Description */}
+                      <div className="flex flex-col gap-3 flex-1">
+                        {/* Product Title */}
+                        <motion.div
+                          initial={{ y: 10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.15 }}
+                        >
+                          <h3 className="text-2xl xl:text-4xl font-black text-white font-jost leading-tight tracking-tight">
+                            {product.name}
+                          </h3>
+                        </motion.div>
 
-                  {/* Description */}
-                  <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <p className="text-xs xl:text-sm text-zinc-400 leading-relaxed">
-                      {product.description}
-                    </p>
-                  </motion.div>
+                        {/* Description */}
+                        <motion.div
+                          initial={{ y: 10, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          <p className="text-xs xl:text-sm text-zinc-400 leading-relaxed">
+                            {product.description}
+                          </p>
+                        </motion.div>
+                      </div>
 
-                  {/* Price, Rating & CTA Row - Wrapped on lg, separate on xl */}
+                      {/* Price - Right side on lg, top on xl */}
+                      <motion.div
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.25 }}
+                        className="flex-shrink-0"
+                      >
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-2xl xl:text-3xl font-black text-white font-jost">
+                            €{product.price}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Rating & CTA Row */}
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.25 }}
+                    transition={{ delay: 0.3 }}
                     className="flex flex-wrap xl:flex-nowrap items-center justify-between gap-3 xl:gap-4 pt-2 border-t border-zinc-800/50"
                   >
-                    {/* Price */}
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl xl:text-3xl font-black text-white font-jost">
-                        €{product.price}
-                      </span>
-                    </div>
-
                     {/* Rating */}
                     <StarRating
                       rating={product.rating}
@@ -223,7 +238,7 @@ export default function FeaturedProduct() {
                   <motion.div
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.35 }}
                     className="hidden xl:block"
                   >
                     <motion.button

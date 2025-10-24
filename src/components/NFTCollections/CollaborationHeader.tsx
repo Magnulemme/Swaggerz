@@ -40,7 +40,7 @@ export default function CollaborationHeader({
             {brand1.letter}
           </span>
         </div>
-        <span className="text-xl lg:text-2xl font-black text-white">
+        <span className="text-xl font-black text-white">
           {brand1.name}
         </span>
       </div>
@@ -52,7 +52,7 @@ export default function CollaborationHeader({
       <div className="flex items-center gap-2.5">
         <div
           className="relative w-11 h-11 lg:w-12 lg:h-12 rounded-full flex items-center justify-center shadow-lg"
-          style={{ backgroundColor: brand2.bgColor, color: brand2.textColor }}
+          style={{ background: brand2.bgColor, color: brand2.textColor }}
         >
           <span className="font-[family-name:var(--font-pastor-of-muppets)] text-xl lg:text-2xl">
             {brand2.letter}
@@ -65,7 +65,7 @@ export default function CollaborationHeader({
           )}
         </div>
         <span
-          className="text-xl lg:text-2xl font-black"
+          className="text-xl font-black"
           style={{ color: brand2.textColor }}
         >
           {brand2.name}
