@@ -1,16 +1,11 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import {
-  motion,
-  useAnimationFrame,
-  useMotionTemplate,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { Collection } from "./types";
 import { Check } from "lucide-react";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
 interface LeftSectionProps {
   collection: Collection;
@@ -59,18 +54,35 @@ export default function LeftSection({ collection }: LeftSectionProps) {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="relative z-50 flex-shrink-0 flex items-center justify-between"
         >
-          {/* Limited Edition Badge with Rotating Border */}
-          <div className="relative inline-flex h-10 overflow-hidden rounded-full p-[1px]">
-            {/* Animated rotating gradient border */}
-            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#d37918_0%,#111111_50%,#d37918_100%)]" />
+          {/* Limited Edition Badge with Shimmer Effect */}
+          <motion.div
+            className="relative inline-flex h-10 overflow-hidden rounded-full p-[1px] bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800"
+          >
+            {/* Shimmer Effect */}
+            <motion.div
+              className="absolute inset-0 z-0 rounded-full"
+              animate={{
+                backgroundPosition: ["200% 0", "-200% 0"],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(255, 180, 70, 0.4) 50%, transparent 70%, transparent 100%)",
+                backgroundSize: "200% 100%",
+              }}
+            />
 
             {/* Badge content */}
-            <span className="inline-flex h-full w-full items-center justify-center rounded-full px-4 py-1 bg-zinc-950 backdrop-blur-sm">
+            <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-4 py-1 bg-zinc-950 backdrop-blur-sm">
               <span className="text-xs lg:text-sm font-bold uppercase tracking-widest text-amber-400">
                 Limited Edition
               </span>
             </span>
-          </div>
+          </motion.div>
 
           {/* Pieces Counter - Discrete */}
           <span className="text-xs text-zinc-500 font-medium">
@@ -184,50 +196,24 @@ export default function LeftSection({ collection }: LeftSectionProps) {
           </div>
         </div>
 
-        {/* CTA Button - Secondary Style with Shimmer Effect */}
+        {/* CTA Button - Primary Style with Rotating Border */}
         <div className="relative z-50 flex-shrink-0 flex justify-center w-full">
-          <motion.button
-            className="group overflow-hidden relative bg-transparent p-[2px] inline-flex rounded-full"
-            whileTap={{ scale: 0.98 }}
-          >
-            {/* Shimmer Effect */}
-            <motion.div
-              className="absolute inset-0 z-0 rounded-full"
-              animate={{
-                backgroundPosition: ["200% 0", "-200% 0"],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(255, 255, 255, 0.15) 50%, transparent 70%, transparent 100%)",
-                backgroundSize: "200% 100%",
-              }}
-            />
-
-            <div
-              className="relative z-10 flex h-full w-full items-center justify-center gap-2 rounded-full px-10 py-6 md:px-12 md:py-8 text-white text-sm uppercase tracking-[0.3em] font-semibold backdrop-blur-lg bg-white/5 border border-orange-500/40
-transition-all duration-300"
+          <AnimatedButton as="button" size="md">
+            Esplora la Collezione
+            <svg
+              className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
             >
-              Esplora la Collezione
-              <svg
-                className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </div>
-          </motion.button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </AnimatedButton>
         </div>
       </div>
     </div>

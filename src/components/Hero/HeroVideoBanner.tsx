@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import LiquidVideoShader from "./LiquidVideoShader";
 import { useLoadingStore } from "@/store/useLoadingStore";
-import { HeroVideoButton } from "./HeroVideoButton";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
 export default function HeroVideoBanner() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -240,10 +240,11 @@ export default function HeroVideoBanner() {
             className="flex flex-col items-center justify-center gap-8 max-lg:items-center max-lg:mt-16"
             style={{ paddingTop: `${buttonOffset + scrollOffset}px` }}
           >
-            <HeroVideoButton
+            <AnimatedButton
               href="#collection"
               buttonRef={buttonRef}
               className="transition-transform"
+              size="md"
             >
               <span className="hidden md:flex">Scopri la Collezione</span>
               <span className="flex md:hidden flex-col text-center leading-tight gap-1">
@@ -263,7 +264,7 @@ export default function HeroVideoBanner() {
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </svg>
-            </HeroVideoButton>
+            </AnimatedButton>
 
             {/* Scroll Indicator - Integrato nel layout */}
             <div
