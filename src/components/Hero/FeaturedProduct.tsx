@@ -88,7 +88,7 @@ export default function FeaturedProduct() {
   const currentProduct = featuredProducts[selectedIndex];
 
   return (
-    <div className="hidden lg:block relative w-full h-full min-h-[300px] rounded-3xl border border-zinc-700/50 bg-black overflow-hidden group/slider">
+    <div className="relative w-full h-full min-h-[300px] rounded-3xl border border-zinc-700/50 bg-black overflow-hidden group/slider">
       {/* Animated gradient background */}
       <div className="absolute inset-0">
         <motion.div
@@ -110,10 +110,10 @@ export default function FeaturedProduct() {
         <div className="flex h-full">
           {featuredProducts.map((product) => (
             <div key={product.id} className="flex-[0_0_100%] min-w-0 h-full">
-              {/* Responsive Layout: Vertical on lg, Horizontal on xl+ */}
-              <div className="relative h-full flex flex-col xl:flex-row p-6 gap-4 xl:gap-6">
+              {/* Responsive Layout: Vertical on mobile, Horizontal on md+ */}
+              <div className="relative h-full flex flex-col md:flex-row p-6 gap-4 md:gap-6">
                 {/* Product Image */}
-                <div className="relative w-full xl:w-[55%] flex-1 xl:flex-none xl:h-full min-h-[150px]">
+                <div className="relative w-full md:w-[50%] xl:w-[55%] flex-1 md:flex-none md:h-full min-h-[150px]">
                   <motion.div
                     className="relative w-full h-full rounded-2xl overflow-hidden cursor-pointer group"
                     onMouseEnter={() => setIsHovered(true)}
@@ -146,7 +146,7 @@ export default function FeaturedProduct() {
                 </div>
 
                 {/* Product Info */}
-                <div className="relative w-full xl:w-[45%] flex flex-col justify-center gap-3 xl:gap-5">
+                <div className="relative w-full md:w-[50%] xl:w-[45%] flex flex-col justify-center gap-3 md:gap-4 xl:gap-5">
                   {/* Eyebrow */}
                   <motion.div
                     initial={{ x: -20, opacity: 0 }}
@@ -159,46 +159,42 @@ export default function FeaturedProduct() {
                     </span>
                   </motion.div>
 
-                  {/* Title, Description & Price - Horizontal on lg only */}
-                  <div className="flex flex-col xl:flex-col gap-3">
-                    <div className="flex flex-row xl:flex-col items-start justify-between gap-4 xl:gap-3">
-                      {/* Title & Description */}
-                      <div className="flex flex-col gap-3 flex-1">
-                        {/* Product Title */}
-                        <motion.div
-                          initial={{ y: 10, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.15 }}
-                        >
-                          <h3 className="text-2xl xl:text-4xl font-black text-white font-jost leading-tight tracking-tight">
-                            {product.name}
-                          </h3>
-                        </motion.div>
+                  {/* Title, Description & Price */}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col items-start gap-3">
+                      {/* Product Title */}
+                      <motion.div
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.15 }}
+                      >
+                        <h3 className="text-2xl md:text-3xl xl:text-4xl font-black text-white font-jost leading-tight tracking-tight">
+                          {product.name}
+                        </h3>
+                      </motion.div>
 
-                        {/* Description */}
-                        <motion.div
-                          initial={{ y: 10, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.2 }}
-                        >
-                          <p className="text-xs xl:text-sm text-zinc-400 leading-relaxed">
-                            {product.description}
-                          </p>
-                        </motion.div>
-                      </div>
+                      {/* Price */}
+                      <motion.div
+                        initial={{ y: 10, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-2xl md:text-2xl xl:text-3xl font-black text-white font-jost">
+                            €{product.price}
+                          </span>
+                        </div>
+                      </motion.div>
 
-                      {/* Price - Right side on lg, top on xl */}
+                      {/* Description */}
                       <motion.div
                         initial={{ y: 10, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.25 }}
-                        className="flex-shrink-0"
                       >
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-2xl xl:text-3xl font-black text-white font-jost">
-                            €{product.price}
-                          </span>
-                        </div>
+                        <p className="text-xs md:text-sm text-zinc-400 leading-relaxed">
+                          {product.description}
+                        </p>
                       </motion.div>
                     </div>
                   </div>
@@ -208,7 +204,7 @@ export default function FeaturedProduct() {
                     initial={{ y: 10, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="flex flex-wrap xl:flex-nowrap items-center justify-between gap-3 xl:gap-4 pt-2 border-t border-zinc-800/50"
+                    className="flex flex-col gap-4 pt-2 border-t border-zinc-800/50"
                   >
                     {/* Rating */}
                     <StarRating
@@ -219,28 +215,7 @@ export default function FeaturedProduct() {
                       starClassName="fill-amber-500 text-amber-500"
                     />
 
-                    {/* CTA Button - Same row on lg, separate on xl */}
-                    <motion.button
-                      className="xl:hidden group/btn inline-flex items-center gap-1.5 text-orange-400 hover:text-orange-300 font-semibold text-xs transition-colors"
-                      whileHover={{ x: 3 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      <ShoppingBag className="w-3.5 h-3.5" />
-                      <span>Aggiungi</span>
-                    </motion.button>
-                  </motion.div>
-
-                  {/* CTA Button - Separate row for xl+ */}
-                  <motion.div
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.35 }}
-                    className="hidden xl:block"
-                  >
+                    {/* CTA Button */}
                     <motion.button
                       className="group/btn inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 font-semibold text-sm transition-colors"
                       whileHover={{ x: 5 }}

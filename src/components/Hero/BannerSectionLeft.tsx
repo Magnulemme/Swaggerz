@@ -9,7 +9,7 @@ export default function BannerSectionLeft() {
     <div
       className="relative col-span-2 lg:col-span-2 lg:row-span-3 h-full
       lg:border-l lg:border-b lg:border-zinc-700/50
-      lg:rounded-l-3xl rounded-tr-3xl lg:overflow-visible
+      lg:rounded-l-3xl rounded-tr-3xl overflow-visible
 
       before:lg:content-[''] before:lg:absolute before:lg:w-[calc(100%-1px)] before:lg:h-[32px]
       before:lg:border-r before:lg:border-t before:lg:border-zinc-700/50
@@ -17,7 +17,7 @@ export default function BannerSectionLeft() {
       before:lg:z-10
       "
     >
-      <div className="lg:overflow-visible lg:rounded-t-3xl lg:rounded-bl-3xl h-full relative">
+      <div className="overflow-visible lg:rounded-t-3xl lg:rounded-bl-3xl h-full relative">
         <FeaturedCollectionBanner section="left" />
       </div>
     </div>
