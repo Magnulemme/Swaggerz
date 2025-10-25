@@ -14,52 +14,52 @@ interface LeftSectionProps {
 export default function LeftSection({ collection }: LeftSectionProps) {
   return (
     <div className="relative w-full h-full flex flex-col">
-      {/* Limited Edition Tag with Shimmer */}
-      <div className="flex w-full justify-end flex-shrink-0">
-        <div className="m-8 relative self-end inline-flex h-9 overflow-hidden rounded-full p-[1px] bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800">
-          {/* Shimmer Effect */}
-          <motion.div
-            className="absolute inset-0 z-0 rounded-full"
-            animate={{
-              backgroundPosition: ["200% 0", "-200% 0"],
+      {/* Main Content Grid */}
+      <div className="relative flex-1 grid grid-rows-[auto_auto_1fr] lg:grid-rows-[auto_auto_1fr_auto] px-4 md:px-6 lg:px-10 pt-6 md:pt-8 pb-6 lg:pb-8 gap-3 md:gap-4 lg:gap-5 z-50 min-h-0">
+        {/* 1. Collaboration Header + Limited Edition Tag */}
+        <div className="flex items-start justify-between gap-2 md:gap-3 lg:gap-4 pb-3 md:pb-5">
+          <CollaborationHeader
+            brand1={{
+              name: "Swaggerz",
+              letter: "S",
+              bgColor: "#ffffff",
+              textColor: "#f59e0b",
             }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(251, 191, 36, 0.6) 50%, transparent 70%, transparent 100%)",
-              backgroundSize: "200% 100%",
+            brand2={{
+              name: "Rebkon",
+              letter: "R",
+              bgColor: "#f59e0b",
+              textColor: "#ffffff",
+              verified: true,
             }}
           />
-          <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-4 py-1 bg-zinc-950 backdrop-blur-sm">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">
-              Limited Edition
-            </span>
-          </span>
-        </div>
-      </div>
 
-      {/* Main Content Grid */}
-      <div className="relative flex-1 grid grid-rows-[auto_auto_1fr_auto] px-6 lg:px-10 pb-6 lg:pb-8 gap-4 lg:gap-5 z-50 min-h-0">
-        {/* 1. Collaboration Header */}
-        <CollaborationHeader
-          brand1={{
-            name: "Swaggerz",
-            letter: "S",
-            bgColor: "#ffffff",
-            textColor: "#f59e0b",
-          }}
-          brand2={{
-            name: "Rebkon",
-            letter: "R",
-            bgColor: "#f59e0b",
-            textColor: "#ffffff",
-            verified: true,
-          }}
-        />
+          {/* Limited Edition Tag with Shimmer */}
+          <div className="relative inline-flex h-9 overflow-hidden rounded-full p-[1px] bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 flex-shrink-0">
+            {/* Shimmer Effect */}
+            <motion.div
+              className="absolute inset-0 z-0 rounded-full"
+              animate={{
+                backgroundPosition: ["200% 0", "-200% 0"],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(251, 191, 36, 0.6) 50%, transparent 70%, transparent 100%)",
+                backgroundSize: "200% 100%",
+              }}
+            />
+            <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-3 md:px-4 py-1 bg-zinc-950 backdrop-blur-sm">
+              <span className="text-[10px] md:text-xs font-bold uppercase tracking-wider md:tracking-widest text-amber-400">
+                Limited
+              </span>
+            </span>
+          </div>
+        </div>
 
         {/* 2. Collection Info */}
         <CollectionInfo
@@ -68,7 +68,7 @@ export default function LeftSection({ collection }: LeftSectionProps) {
         />
 
         {/* 3. Gallery Grid - Takes remaining space */}
-        <div className="min-h-0 overflow-hidden">
+        <div className="min-h-0">
           <CollectionGallery
             images={collection.images}
             title={collection.title}
@@ -77,8 +77,8 @@ export default function LeftSection({ collection }: LeftSectionProps) {
           />
         </div>
 
-        {/* 4. Footer - CTA and End Date */}
-        <div className="flex flex-col items-center gap-5 lg:gap-6 pt-2 lg:pt-4">
+        {/* 4. Footer - CTA and End Date - Solo da lg+ */}
+        <div className="hidden lg:flex flex-col items-center gap-5 lg:gap-6 pt-2 lg:pt-4">
           {/* End Date - Typography Style */}
           {collection.endDate && (
             <motion.div

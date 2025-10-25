@@ -58,61 +58,64 @@ function CategoryCard({ image }: { image: ImageConfig }) {
   return (
     <article className="group relative flex flex-col cursor-pointer h-full">
       {/* Container esterno con bordo e glow */}
-      <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-gradient-to-b from-zinc-900/95 via-zinc-900/90 to-black/95 backdrop-blur-sm h-full">
-        {/* Image Container */}
-        <div className="relative w-full overflow-hidden rounded-t-2xl">
-          <div
-            className="relative w-full"
-            style={{
-              aspectRatio: `${image.aspectRatio ?? 4 / 5}`,
-            }}
-          >
-            <Image
-              src={image.url}
-              alt={image.alt}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
-              loading="eager"
-              unoptimized
-            />
+      <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-zinc-950 backdrop-blur-sm h-full">
+        {/* Padding container per separare immagine dal bordo */}
+        <div className="pb-2">
+          {/* Image Container */}
+          <div className="relative w-full overflow-hidden rounded-t-lg">
+            <div
+              className="relative w-full"
+              style={{
+                aspectRatio: `${image.aspectRatio ?? 4 / 5}`,
+              }}
+            >
+              <Image
+                src={image.url}
+                alt={image.alt}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                loading="eager"
+                unoptimized
+              />
+            </div>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="relative px-4 pb-4 pt-3 space-y-2">
+        <div className="relative px-6 pb-6 pt-3">
           {/* Nickname Tag - Above title */}
           {image.nickname && (
-            <span className="absolute -top-5 left-0 z-10 inline-block px-3 py-2 text-xs italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-lg  group-hover:text-amber-400 group-hover:border-amber-500/50 group-hover:bg-zinc-900/90 transition-all duration-300">
+            <span className="absolute -top-8 left-0 z-10 inline-block px-3 py-1 text-sm italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-amber-400 transition-all duration-300">
               &ldquo;{image.nickname}&rdquo;
             </span>
           )}
 
           {/* Title */}
-          <h3 className="text-4xl font-jost font-black leading-tight w-fit bg-gradient-to-br from-red-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
+          <h3 className="text-2xl lg:text-3xl font-jost font-black leading-tight tracking-tight text-white mb-3">
             {image.alt}
           </h3>
 
           {/* Description */}
           {image.description && (
-            <p className="text-sm text-zinc-300/80 leading-relaxed line-clamp-2">
+            <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 mb-5">
               {image.description}
             </p>
           )}
 
           {/* CTA Link */}
-          <div className="pt-2">
-            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-500 group-hover:text-amber-400 group-hover:gap-2.5 transition-all duration-300">
-              Vedi tutti i prodotti
+          <div className="mt-auto">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 group-hover:text-amber-300 group-hover:gap-2.5 transition-all duration-300">
+              Scopri {image.alt === "Felpe" ? "le nostre" : image.alt === "T-shirt" ? "le nostre" : "i nostri"} {image.alt}
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 transition-transform group-hover:translate-x-1"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                strokeWidth={2}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </svg>
@@ -135,13 +138,21 @@ export function HeroWaveImagesMobile({
   });
 
   return (
-    <div className={`w-full py-16 ${className}`}>
+    <div className={`w-full pt-16 pb-8 ${className}`}>
       <div className="max-w-[1600px] mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12 space-y-4 px-4">
+        <div className="text-center mb-12 space-y-6 px-4">
+          {/* Eyebrow text */}
+          <div className="inline-block">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-700/60 bg-zinc-900/50 text-zinc-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+              Collezione 2025
+            </span>
+          </div>
+
+          {/* Main Title */}
           <div className="flex flex-wrap items-start justify-center gap-3">
-            <h2 className="text-4xl md:text-5xl lg:text-5xl font-bold text-white leading-none">
-              Street
+            <h2 className="text-4xl md:text-5xl lg:text-5xl font-black text-white leading-none tracking-tight font-jost">
+              Streetwear
             </h2>
             <ShaderText
               fontSize="clamp(60px, 12vw, 90px)"
@@ -152,14 +163,16 @@ export function HeroWaveImagesMobile({
               Essentials
             </ShaderText>
           </div>
-          <p className="text-base text-zinc-400 max-w-2xl mx-auto">
-            Scegli il tuo stile tra le nostre categorie di capi esclusivi
+
+          {/* Subtitle */}
+          <p className="text-base text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+            Crea il tuo outfit dei sogni, o completa il tuo guardaroba con i nostri esclusivi capi streetwear
           </p>
         </div>
 
         {/* Mobile: Slider */}
         <div className="md:hidden overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-4 px-4">
+          <div className="flex gap-4 pl-4">
             {images.map((image, index) => (
               <div
                 key={image.url}
@@ -171,11 +184,13 @@ export function HeroWaveImagesMobile({
                 <CategoryCard image={image} />
               </div>
             ))}
+            {/* Spacer per padding finale */}
+            <div className="w-4 flex-shrink-0" aria-hidden="true" />
           </div>
         </div>
 
         {/* Tablet/Desktop: Grid Layout */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 px-6 md:px-8">
           {images.map((image, index) => (
             <div
               key={image.url}
@@ -186,26 +201,6 @@ export function HeroWaveImagesMobile({
               <CategoryCard image={image} />
             </div>
           ))}
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="text-center mt-12">
-          <button className="group relative inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 text-white font-semibold text-sm shadow-lg shadow-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105">
-            <span>Esplora l&apos;intero catalogo</span>
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </button>
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ export default function CollectionGallery({
   const [isMainHovered, setIsMainHovered] = useState(false);
 
   return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-3 lg:gap-4 h-full">
+    <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-3 lg:gap-4 h-full min-h-[250px] md:min-h-[300px] lg:min-h-[350px]">
       {/* All Images - 4 equal sized on lg, 1 large + 2 small on xl+ */}
       {images.slice(0, 4).map((img, idx) => (
         <motion.div

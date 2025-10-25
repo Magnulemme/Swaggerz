@@ -12,17 +12,17 @@ export default function CollectionInfo({
   description,
 }: CollectionInfoProps) {
   return (
-    <div className="space-y-3 lg:space-y-4">
+    <div className="space-y-2 md:space-y-3 lg:space-y-4">
       {/* Collection Title */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
       >
-        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">
+        <p className="text-sm text-zinc-500 uppercase tracking-widest mb-1.5 md:mb-2">
           Collection
         </p>
-        <h2 className="text-3xl lg:text-4xl xl:text-5xl font-black leading-[0.95] tracking-tight text-white font-jost uppercase">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black leading-[0.95] tracking-tight text-white font-jost uppercase">
           {title}
         </h2>
       </motion.div>

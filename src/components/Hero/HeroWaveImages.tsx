@@ -78,7 +78,7 @@ export function HeroWaveImages({
   className = "",
 }: HeroWaveImagesProps) {
   return (
-    <div className={`relative w-full py-24 px-6 lg:px-16 ${className}`}>
+    <div className={`relative w-full py-16 md:py-20 lg:py-24 px-6 md:px-8 lg:px-12 xl:px-16 ${className}`}>
       {/* Gradient Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -107,7 +107,7 @@ export function HeroWaveImages({
       <div className="relative max-w-[1600px] mx-auto z-10">
         {/* Header Section */}
         <motion.div
-          className="text-center mb-20 lg:mb-24 space-y-8"
+          className="text-center mb-12 md:mb-16 lg:mb-20 space-y-6 md:space-y-7"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -143,13 +143,12 @@ export function HeroWaveImages({
 
           {/* Subtitle */}
           <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Esplora le nostre categorie e scopri i pezzi essenziali per il tuo
-            guardaroba street
+            Crea il tuo outfit dei sogni, o completa il tuo guardaroba con i nostri esclusivi capi streetwear
           </p>
         </motion.div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 lg:gap-x-10 lg:gap-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-7 lg:gap-8 xl:gap-9">
           {images.map((image, index) => (
             <motion.article
               key={image.url}
@@ -224,7 +223,7 @@ export function HeroWaveImages({
                   {/* CTA Link */}
                   <div className="mt-auto">
                     <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 group-hover:text-amber-300 group-hover:gap-2.5 transition-all duration-300">
-                      Scopri di più
+                      Scopri {image.alt === "Felpe" ? "le nostre" : image.alt === "T-shirt" ? "le nostre" : "i nostri"} {image.alt}
                       <svg
                         className="w-4 h-4 transition-transform group-hover:translate-x-1"
                         fill="none"
