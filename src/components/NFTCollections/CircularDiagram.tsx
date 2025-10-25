@@ -1,37 +1,39 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { Wallet, Shirt, ArrowLeftRight } from 'lucide-react';
-import CentralLock from './CentralLock';
-import StepCard from './StepCard';
+import { motion } from "framer-motion";
+import { Wallet, Shirt, ArrowLeftRight } from "lucide-react";
+import CentralLock from "./CentralLock";
+import StepCard from "./StepCard";
 
 interface CircularDiagramProps {
   shaderDataUrls: string[];
 }
 
-export default function CircularDiagram({ shaderDataUrls }: CircularDiagramProps) {
+export default function CircularDiagram({
+  shaderDataUrls,
+}: CircularDiagramProps) {
   const steps = [
     {
       icon: Wallet,
       number: "1",
       title: "Acquista NFT",
       description: "Possiedi l'arte digitale esclusiva",
-      color: "from-purple-500 to-violet-500"
+      color: "from-purple-500 to-violet-500",
     },
     {
       icon: Shirt,
       number: "2",
-      title: "Stampa su Capo",
+      title: "Stampa",
       description: "Trasforma l'NFT in streetwear unico",
-      color: "from-pink-500 to-rose-500"
+      color: "from-pink-500 to-rose-500",
     },
     {
       icon: ArrowLeftRight,
       number: "3",
       title: "Rivendi Licenza",
       description: "Trasferisci i diritti di stampa ad altri",
-      color: "from-blue-500 to-cyan-500"
-    }
+      color: "from-blue-500 to-cyan-500",
+    },
   ];
 
   return (
@@ -44,7 +46,7 @@ export default function CircularDiagram({ shaderDataUrls }: CircularDiagramProps
         transition={{
           duration: 20,
           repeat: Infinity,
-          ease: "linear"
+          ease: "linear",
         }}
       >
         {/* Cerchio principale rotante con trattini */}
@@ -82,7 +84,7 @@ export default function CircularDiagram({ shaderDataUrls }: CircularDiagramProps
           description={step.description}
           color={step.color}
           index={index}
-          shaderDataUrl={shaderDataUrls[index] || ''}
+          shaderDataUrl={shaderDataUrls[index] || ""}
         />
       ))}
     </div>

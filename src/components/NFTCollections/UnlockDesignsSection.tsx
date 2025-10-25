@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useId, useMemo } from 'react';
-import ShaderText from '@/components/ShaderText';
-import CircularDiagram from './CircularDiagram';
-import * as THREE from 'three';
-import { sharedRenderer } from '@/lib/sharedRenderer';
-import { vertexShader, fragmentShader } from '@/constants/shaders';
+import React, { useRef, useEffect, useState, useId, useMemo } from "react";
+import Image from "next/image";
+import ShaderText from "@/components/ShaderText";
+import CircularDiagram from "./CircularDiagram";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { exclusiveNFTs } from "@/constants/nftCollections";
+import * as THREE from "three";
+import { sharedRenderer } from "@/lib/sharedRenderer";
+import { vertexShader, fragmentShader } from "@/constants/shaders";
 
 export default function UnlockDesignsSection() {
   const uniqueId = useId();
 
-  const [shaderDataUrls, setShaderDataUrls] = useState<string[]>(['', '', '']);
+  const [shaderDataUrls, setShaderDataUrls] = useState<string[]>(["", "", ""]);
   const canvasRef0 = useRef<HTMLCanvasElement>(null);
   const canvasRef1 = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
@@ -29,7 +32,7 @@ export default function UnlockDesignsSection() {
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const taskId = `unlock-circle-${uniqueId.replace(/:/g, '-')}-${index}`;
+      const taskId = `unlock-circle-${uniqueId.replace(/:/g, "-")}-${index}`;
       taskIds.push(taskId);
 
       const scene = new THREE.Scene();
@@ -42,9 +45,9 @@ export default function UnlockDesignsSection() {
         vertexShader,
         fragmentShader,
         uniforms: {
-          uTime: { value: timeRefs.current[index] }
+          uTime: { value: timeRefs.current[index] },
         },
-        transparent: true
+        transparent: true,
       });
 
       const geometry = new THREE.PlaneGeometry(2, 2);
@@ -56,16 +59,10 @@ export default function UnlockDesignsSection() {
       materials.push(material);
 
       // Registra nel sharedRenderer (priorità 5 = decorativo, 20fps)
-      sharedRenderer.registerTask(
-        taskId,
-        scene,
-        camera,
-        canvas,
-        {
-          priority: 5,
-          targetFPS: 20
-        }
-      );
+      sharedRenderer.registerTask(taskId, scene, camera, canvas, {
+        priority: 5,
+        targetFPS: 20,
+      });
     });
 
     // Update dataUrls e uTime per tutti i canvas
@@ -82,10 +79,10 @@ export default function UnlockDesignsSection() {
             timeRefs.current[index] += 0.05; // ~20fps
             material.uniforms.uTime.value = timeRefs.current[index];
           } catch {
-            newDataUrls[index] = '';
+            newDataUrls[index] = "";
           }
         } else {
-          newDataUrls[index] = '';
+          newDataUrls[index] = "";
         }
       });
 
@@ -94,22 +91,22 @@ export default function UnlockDesignsSection() {
 
     return () => {
       clearInterval(updateInterval);
-      taskIds.forEach(id => sharedRenderer.unregisterTask(id));
-      geometries.forEach(geometry => geometry?.dispose());
-      materials.forEach(material => material?.dispose());
+      taskIds.forEach((id) => sharedRenderer.unregisterTask(id));
+      geometries.forEach((geometry) => geometry?.dispose());
+      materials.forEach((material) => material?.dispose());
     };
   }, [uniqueId, canvasRefs]);
 
   return (
-    <section className="w-full min-h-screen py-20">
+    <section className="w-full py-16 lg:py-24">
       {/* Canvas nascosti per generare gli shader */}
       {canvasRefs.map((ref, index) => (
         <canvas
           key={index}
           ref={ref}
           style={{
-            display: 'none',
-            position: 'absolute'
+            display: "none",
+            position: "absolute",
           }}
           width={48}
           height={48}
@@ -117,24 +114,73 @@ export default function UnlockDesignsSection() {
       ))}
 
       {/* Layout a schermo intero */}
-      <div className="relative grid xl:grid-cols-2 gap-12 xl:gap-16 items-center max-w-7xl mx-auto px-4">
+      <div className="relative grid xl:grid-cols-2 gap-12 xl:gap-16 items-center max-w-7xl mx-auto md:px-4">
         {/* Colonna 1: Header */}
-        <div className="xl:order-2">
-          <div className="mb-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">
+        <div className="order-2 xl:order-2 text-center">
+          <div className="mb-6 flex flex-col items-center">
+            <h2 className="text-3xl md:text-4xl lg:text-6xl font-black text-white mb-2 font-jost tracking-tight leading-none">
               Sblocca Design
             </h2>
-            <ShaderText fontSize="48px" fontWeight="900">
-              Esclusivi
-            </ShaderText>
+            <div className="w-fit">
+              <ShaderText fontSize="90" fontWeight="900">
+                Esclusivi
+              </ShaderText>
+            </div>
           </div>
-          <p className="text-zinc-400 text-lg">
-            Possiedi l&apos;NFT, stampa il design. Solo tu puoi indossarlo finché non decidi di rivenderlo.
+          <p className="text-zinc-400 text-lg max-w-prose mx-auto mb-8">
+            Possiedi l&apos;NFT, stampa il design. Solo tu puoi indossarlo
+            finché non decidi di rivenderlo.
           </p>
+
+          {/* NFT Preview Card Stack */}
+          <div className="flex justify-center mb-8">
+            <div className="relative w-24 h-32 md:w-28 md:h-36 lg:w-32 lg:h-40">
+              {exclusiveNFTs.slice(0, 3).map((nft, index) => (
+                <div
+                  key={nft.id}
+                  className="absolute group rounded-xl overflow-hidden border-2 border-zinc-800 hover:border-purple-500/50 transition-all duration-300 shadow-2xl"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    transform: `rotate(${(index - 1) * 6}deg) translateY(${
+                      index * 3
+                    }px)`,
+                    zIndex: 3 - index,
+                    left: `${index * 20}px`,
+                  }}
+                >
+                  <Image
+                    src={nft.image}
+                    alt={nft.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 128px, (max-width: 1024px) 160px, 192px"
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="flex justify-center">
+            <AnimatedButton
+              href="/nft-collections"
+              size="md"
+              className="bg-black/40"
+            >
+              Esplora la galleria
+            </AnimatedButton>
+          </div>
         </div>
 
         {/* Colonna 2: Diagramma Circolare */}
-        <CircularDiagram shaderDataUrls={shaderDataUrls} />
+        <div className="order-1">
+          <CircularDiagram shaderDataUrls={shaderDataUrls} />
+        </div>
       </div>
     </section>
   );

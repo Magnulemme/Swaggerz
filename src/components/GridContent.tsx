@@ -1,13 +1,12 @@
 "use client";
 
 import React from "react";
-import { collections } from "@/constants/heroCollections";
-import TopCollections from "./Hero/TopCollections";
 import ProductShowcase from "./Hero/ProductShowcase";
-import FeaturedArtist from "./FeaturedArtist";
 import BannerAndFeaturedProductLg from "./Hero/BannerAndFeaturedProductLg";
 import BannerAndFeaturedProductMobile from "./Hero/BannerAndFeaturedProductMobile";
 import FeaturedProduct from "./Hero/FeaturedProduct";
+import UnlockDesignsSection from "./NFTCollections/UnlockDesignsSection";
+import TransitionBanner from "./Hero/TransitionBanner";
 
 const GridContent = () => {
   return (
@@ -36,25 +35,14 @@ const GridContent = () => {
             <ProductShowcase />
           </div>
 
-          {/* Top Collections Sidebar - row 6-7 */}
-          <div className="col-span-2 lg:col-span-1 lg:row-span-2 min-h-[300px] lg:min-h-0 z-20">
-            <TopCollections />
+          {/* Transition Text - full width */}
+          <div className="col-span-2 lg:col-span-4 z-20">
+            <TransitionBanner />
           </div>
 
-          {/* Featured Artist - row 5-6 */}
-          <div className="col-span-2 lg:col-span-3 lg:row-span-2 min-h-[400px] lg:min-h-0 z-20">
-            <FeaturedArtist
-              name="Beeple"
-              avatar="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
-              backgroundImage="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=400&fit=crop"
-              verified={true}
-              followers="2.1M"
-              galleryCards={collections.map((col, idx) => ({
-                id: idx + 1,
-                image: col.image,
-                title: col.name,
-              }))}
-            />
+          {/* Unlock Designs Section - full width */}
+          <div className="col-span-2 lg:col-span-4 z-20">
+            <UnlockDesignsSection />
           </div>
         </div>
       </div>

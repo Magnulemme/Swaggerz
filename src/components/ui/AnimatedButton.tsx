@@ -52,7 +52,7 @@ export function AnimatedButton({
     <Component
       ref={buttonRef as any}
       className={cn(
-        "group relative inline-flex rounded-full p-[3px]",
+        "group relative inline-flex rounded-full p-[3px] overflow-hidden",
         className
       )}
       style={style}
@@ -63,7 +63,7 @@ export function AnimatedButton({
     >
       {/* Gradient border with CSS mask to show only ring */}
       <div
-        className="absolute inset-0 rounded-full pointer-events-none p-[3px]"
+        className="absolute inset-0 rounded-full pointer-events-none p-[3px] overflow-hidden"
         style={{
           WebkitMask:
             "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",

@@ -78,7 +78,9 @@ export function HeroWaveImages({
   className = "",
 }: HeroWaveImagesProps) {
   return (
-    <div className={`relative w-full py-16 md:py-20 lg:py-24 px-6 md:px-8 lg:px-12 xl:px-16 ${className}`}>
+    <div
+      className={`relative w-full py-16 md:py-20 lg:py-24 px-6 md:px-8 lg:px-12 xl:px-16 ${className}`}
+    >
       {/* Gradient Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -127,23 +129,26 @@ export function HeroWaveImages({
           </motion.div>
 
           {/* Main Title */}
-          <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-none tracking-tight font-jost">
+          <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5 ">
+            <h2 className="text-4xl md:text-5xl lg:text-8xl font-black text-white leading-none tracking-tight font-jost">
               Streetwear
             </h2>
-            <ShaderText
-              fontSize="clamp(48px, 8vw, 96px)"
-              fontWeight="900"
-              maxFontSize={96}
-              className="leading-none"
-            >
-              Essentials
-            </ShaderText>
+            <div className="">
+              <ShaderText
+                fontSize="150"
+                fontWeight="900"
+                maxFontSize={150}
+                className="leading-none"
+              >
+                Essentials
+              </ShaderText>
+            </div>
           </div>
 
           {/* Subtitle */}
           <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed">
-            Crea il tuo outfit dei sogni, o completa il tuo guardaroba con i nostri esclusivi capi streetwear
+            Crea il tuo outfit dei sogni, o completa il tuo guardaroba con i
+            nostri esclusivi capi streetwear
           </p>
         </motion.div>
 
@@ -223,7 +228,13 @@ export function HeroWaveImages({
                   {/* CTA Link */}
                   <div className="mt-auto">
                     <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 group-hover:text-amber-300 group-hover:gap-2.5 transition-all duration-300">
-                      Scopri {image.alt === "Felpe" ? "le nostre" : image.alt === "T-shirt" ? "le nostre" : "i nostri"} {image.alt}
+                      Scopri{" "}
+                      {image.alt === "Felpe"
+                        ? "le nostre"
+                        : image.alt === "T-shirt"
+                        ? "le nostre"
+                        : "i nostri"}{" "}
+                      {image.alt}
                       <svg
                         className="w-4 h-4 transition-transform group-hover:translate-x-1"
                         fill="none"
