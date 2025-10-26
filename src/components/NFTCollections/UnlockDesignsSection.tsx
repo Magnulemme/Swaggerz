@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState, useId, useMemo } from "react";
 import Image from "next/image";
 import ShaderText from "@/components/ShaderText";
 import CircularDiagram from "./CircularDiagram";
+import CentralLock from "./CentralLock";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { exclusiveNFTs } from "@/constants/nftCollections";
 import * as THREE from "three";
@@ -127,6 +128,7 @@ export default function UnlockDesignsSection() {
               </ShaderText>
             </div>
           </div>
+
           <p className="text-zinc-400 text-lg max-w-prose mx-auto mb-8">
             Possiedi l&apos;NFT, stampa il design. Solo tu puoi indossarlo
             finché non decidi di rivenderlo.

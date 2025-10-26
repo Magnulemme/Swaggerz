@@ -3,6 +3,7 @@
 import React from "react";
 import { Truck, Package, Shield, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { InfiniteMovingBanner } from "@/components/ui/infinite-moving-banner";
 
 const shippingFeatures = [
   {
@@ -36,39 +37,20 @@ export default function ShippingInfoSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-950/5 to-transparent" />
 
       {/* Infinite Scrolling Banner - Full Width */}
-      <div className="relative mb-16 py-6 overflow-hidden w-full">
-        {/* Gradient fade on edges */}
-        <div className="absolute inset-y-0 left-0 w-32 md:w-48 bg-gradient-to-r from-zinc-900 to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-32 md:w-48 bg-gradient-to-l from-zinc-900 to-transparent z-10 pointer-events-none" />
-
-        <motion.div
-          className="flex gap-12 whitespace-nowrap"
-          animate={{
-            x: [0, "-50%"],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        >
-          {/* Duplicate content for seamless loop */}
-          {[...Array(2)].map((_, i) => (
-            <div key={i} className="flex gap-12 items-center">
-              {[...Array(4)].map((_, j) => (
-                <React.Fragment key={j}>
-                  <div className="flex items-center gap-4">
-                    <Truck className="w-8 h-8 text-orange-400 flex-shrink-0" />
-                    <span className="text-2xl md:text-3xl font-black text-white font-jost tracking-tight">
-                      SPEDIZIONE GRATUITA SEMPRE
-                    </span>
-                  </div>
-                  <span className="text-orange-400 text-2xl">•</span>
-                </React.Fragment>
-              ))}
-            </div>
+      <div className="relative mb-16">
+        <InfiniteMovingBanner direction="left" speed="fast" pauseOnHover={false}>
+          {[...Array(4)].map((_, j) => (
+            <React.Fragment key={j}>
+              <div className="flex items-center gap-4">
+                <Truck className="w-8 h-8 text-orange-400 flex-shrink-0" />
+                <span className="text-2xl md:text-3xl font-black text-white font-jost tracking-tight whitespace-nowrap">
+                  SPEDIZIONE GRATUITA SEMPRE
+                </span>
+              </div>
+              <span className="text-orange-400 text-2xl">•</span>
+            </React.Fragment>
           ))}
-        </motion.div>
+        </InfiniteMovingBanner>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 md:px-6">
