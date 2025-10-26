@@ -145,7 +145,6 @@ export function SwagLoader({
     console.log('📊 Loading state:', {
       video: componentsReady.video,
       shaderText: componentsReady.shaderText,
-      models3d: componentsReady.models3d,
       isLoading,
     });
 

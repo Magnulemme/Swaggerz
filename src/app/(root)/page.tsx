@@ -4,12 +4,14 @@ import HeroSection from "@/components/Hero";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[var(--color-light-100)] text-[var(--color-dark-900)] max-w-[100vw] overflow-x-hidden">
-      <AnnouncementBar />
-      <Navbar />
-      <main className="">
-        <HeroSection />
-      </main>
-    </div>
+    <>
+      <div className="relative z-[1] bg-zinc-950" style={{ transform: 'translate3d(0, 0, 0)' }}>
+        <AnnouncementBar />
+        <Navbar />
+        <main className="">
+          <HeroSection />
+        </main>
+      </div>
+    </>
   );
 }

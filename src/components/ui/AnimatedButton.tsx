@@ -21,6 +21,10 @@ interface AnimatedButtonProps {
   size?: "sm" | "md" | "lg";
   /** Whether to render as a button or link */
   as?: "button" | "a";
+  /** Button type (for form submissions) */
+  type?: "button" | "submit" | "reset";
+  /** Border color for the animated gradient (hex color) */
+  borderColor?: string;
 }
 
 const sizeVariants = {
@@ -38,6 +42,8 @@ export function AnimatedButton({
   style,
   size = "md",
   as = "a",
+  type = "button",
+  borderColor = "#f97316",
 }: AnimatedButtonProps) {
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -45,7 +51,7 @@ export function AnimatedButton({
 
   const props = {
     ...(as === "a" && href ? { href } : {}),
-    ...(as === "button" && onClick ? { onClick, type: "button" as const } : {}),
+    ...(as === "button" ? { onClick, type } : {}),
   };
 
   return (
@@ -72,7 +78,12 @@ export function AnimatedButton({
           maskComposite: "exclude",
         }}
       >
-        <div className="absolute inset-[-200%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#f97316_0%,transparent_50%,#f97316_100%)]" />
+        <div
+          className="absolute inset-[-200%] animate-[spin_2s_linear_infinite]"
+          style={{
+            background: `conic-gradient(from 90deg at 50% 50%, ${borderColor} 0%, transparent 50%, ${borderColor} 100%)`,
+          }}
+        />
       </div>
 
       {/* Button content - transparent with backdrop blur */}
@@ -102,9 +113,10 @@ export function AnimatedButton({
             {children}
           </motion.span>
 
-          {/* Orange content - slides in from bottom on hover */}
+          {/* Colored content - slides in from bottom on hover */}
           <motion.span
-            className="absolute top-0 flex items-center gap-2 md:gap-3 text-orange-500 whitespace-nowrap leading-relaxed"
+            className="absolute top-0 flex items-center gap-2 md:gap-3 whitespace-nowrap leading-relaxed"
+            style={{ color: borderColor }}
             animate={{
               y: isHovered ? "0%" : "150%",
               opacity: isHovered ? 1 : 0,

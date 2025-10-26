@@ -27,7 +27,7 @@ const defaultSocials = [
 
 export default function Footer({ links = defaultLinks, socials = defaultSocials }: FooterProps) {
   return (
-    <footer className="mt-16 border-t border-[var(--color-light-300)] bg-[var(--color-light-100)]">
+    <footer className="mt-16 bg-[var(--color-light-100)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
           <div className="flex items-center gap-3">
