@@ -25,9 +25,9 @@ const BentoHero = () => {
   }, []);
 
   return (
-    <section className="relative bg-zinc-950 font-jost  min-h-screen">
+    <section className="relative bg-zinc-950 font-jost min-h-screen overflow-x-hidden">
       {/* Main content container */}
-      <div className="relative z-50 w-full">
+      <div className="relative z-50 w-full overflow-x-hidden">
         {/* Simplified Hero Grid - Only Banner and 3D Content */}
         <div className="relative grid grid-cols-2 lg:grid-cols-4 auto-rows-auto z-50">
           {/* Video Banner Section */}

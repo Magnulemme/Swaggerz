@@ -370,5 +370,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+  html {
+    overflow-x: clip;
+    max-width: 100vw;
   }
 }
