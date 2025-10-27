@@ -20,14 +20,14 @@ interface AnimatedNavLinkProps {
 }
 
 // Componente per il testo animato con slide
-function AnimatedText({ 
-  icon, 
-  label, 
+function AnimatedText({
+  icon,
+  label,
   isActive,
-  isSemiActive
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
+  isSemiActive,
+}: {
+  icon: React.ReactNode;
+  label: string;
   isActive: boolean;
   isSemiActive: boolean;
 }) {
@@ -37,19 +37,23 @@ function AnimatedText({
   // Forza i colori delle icone con !important per sovrascrivere l'eredità del parent
   useEffect(() => {
     if (whiteIconRef.current) {
-      whiteIconRef.current.style.setProperty('color', 'rgb(255 255 255)', 'important');
-      const svg = whiteIconRef.current.querySelector('svg');
+      whiteIconRef.current.style.setProperty(
+        "color",
+        "rgb(255 255 255)",
+        "important"
+      );
+      const svg = whiteIconRef.current.querySelector("svg");
       if (svg) {
-        svg.style.setProperty('color', 'rgb(255 255 255)', 'important');
+        svg.style.setProperty("color", "rgb(255 255 255)", "important");
       }
     }
-    
+
     if (orangeIconRef.current) {
-      const color = isActive ? 'rgb(249 115 22)' : 'rgb(251 146 60)';
-      orangeIconRef.current.style.setProperty('color', color, 'important');
-      const svg = orangeIconRef.current.querySelector('svg');
+      const color = isActive ? "rgb(249 115 22)" : "rgb(251 146 60)";
+      orangeIconRef.current.style.setProperty("color", color, "important");
+      const svg = orangeIconRef.current.querySelector("svg");
       if (svg) {
-        svg.style.setProperty('color', color, 'important');
+        svg.style.setProperty("color", color, "important");
       }
     }
   }, [isActive, isSemiActive]);
@@ -63,13 +67,13 @@ function AnimatedText({
           ref={whiteIconRef}
           className="absolute inset-0 flex items-center justify-center"
           animate={{
-            y: isActive || isSemiActive ? '-150%' : '0%',
-            opacity: isActive || isSemiActive ? 0 : 1
+            y: isActive || isSemiActive ? "-150%" : "0%",
+            opacity: isActive || isSemiActive ? 0 : 1,
           }}
           transition={{
             duration: 0.4,
             ease: [0.34, 1.56, 0.64, 1],
-            opacity: { duration: 0.15, ease: "easeOut" }
+            opacity: { duration: 0.15, ease: "easeOut" },
           }}
         >
           {icon}
@@ -80,13 +84,13 @@ function AnimatedText({
           ref={orangeIconRef}
           className="absolute inset-0 flex items-center justify-center"
           animate={{
-            y: isActive || isSemiActive ? '0%' : '150%',
-            opacity: isActive || isSemiActive ? 1 : 0
+            y: isActive || isSemiActive ? "0%" : "150%",
+            opacity: isActive || isSemiActive ? 1 : 0,
           }}
           transition={{
             duration: 0.4,
             ease: [0.34, 1.56, 0.64, 1],
-            opacity: { duration: 0.15, ease: "easeIn", delay: isActive || isSemiActive ? 0.1 : 0 }
+            opacity: { duration: 0.15, ease: "easeIn" },
           }}
         >
           {icon}
@@ -99,13 +103,13 @@ function AnimatedText({
         <motion.span
           className="text-sm font-medium text-white whitespace-nowrap leading-relaxed"
           animate={{
-            y: isActive || isSemiActive ? '-150%' : '0%',
-            opacity: isActive || isSemiActive ? 0 : 1
+            y: isActive || isSemiActive ? "-150%" : "0%",
+            opacity: isActive || isSemiActive ? 0 : 1,
           }}
           transition={{
             duration: 0.4,
             ease: [0.34, 1.56, 0.64, 1],
-            opacity: { duration: 0.15, ease: "easeOut" }
+            opacity: { duration: 0.15, ease: "easeOut" },
           }}
         >
           {label}
@@ -115,16 +119,16 @@ function AnimatedText({
         <motion.span
           className="absolute top-0 text-sm font-medium whitespace-nowrap leading-relaxed"
           style={{
-            color: isActive ? "rgb(249 115 22)" : "rgb(251 146 60)"
+            color: isActive ? "rgb(249 115 22)" : "rgb(251 146 60)",
           }}
           animate={{
-            y: isActive || isSemiActive ? '0%' : '150%',
-            opacity: isActive || isSemiActive ? 1 : 0
+            y: isActive || isSemiActive ? "0%" : "100%",
+            opacity: isActive || isSemiActive ? 1 : 0,
           }}
           transition={{
             duration: 0.4,
             ease: [0.34, 1.56, 0.64, 1],
-            opacity: { duration: 0.15, ease: "easeIn", delay: isActive || isSemiActive ? 0.1 : 0 }
+            opacity: { duration: 0.25, ease: "easeIn" },
           }}
         >
           {label}
@@ -139,7 +143,7 @@ export default function AnimatedNavLink({
   label,
   icon,
   hasDropdown = false,
-  dropdownItems = []
+  dropdownItems = [],
 }: AnimatedNavLinkProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -149,14 +153,14 @@ export default function AnimatedNavLink({
     if (!hasDropdown || !triggerRef.current) return;
 
     const checkState = () => {
-      const state = triggerRef.current?.getAttribute('data-state');
-      setIsOpen(state === 'open');
+      const state = triggerRef.current?.getAttribute("data-state");
+      setIsOpen(state === "open");
     };
 
     const observer = new MutationObserver(checkState);
     observer.observe(triggerRef.current, {
       attributes: true,
-      attributeFilter: ['data-state']
+      attributeFilter: ["data-state"],
     });
 
     checkState();
@@ -176,31 +180,29 @@ export default function AnimatedNavLink({
       <NavigationMenuItem>
         <NavigationMenuTrigger
           ref={triggerRef}
-          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent h-10 px-4 py-2 overflow-visible rounded-full transition-colors"
+          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent px-4 py-sm overflow-hidden rounded-full transition-colors"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           style={{
             // Forza il colore per tutto il contenuto inclusa la freccia SVG
-            color: getChevronColor()
+            color: getChevronColor(),
           }}
         >
-          <AnimatedText 
-            icon={icon} 
-            label={label} 
+          <AnimatedText
+            icon={icon}
+            label={label}
             isActive={isHovered}
             isSemiActive={isOpen && !isHovered}
           />
         </NavigationMenuTrigger>
-        <NavigationMenuContent 
-          className="!bg-zinc-950 backdrop-blur-xl border border-white/10 shadow-2xl shadow-red-500/10 rounded-lg"
-        >
-          <ul className="grid w-48 gap-2 p-2">
+        <NavigationMenuContent className="!bg-zinc-950 backdrop-blur-xl border border-white/10 shadow-2xl shadow-orange-500/10 rounded-xl">
+          <ul className="grid w-52 gap-2 p-4">
             {dropdownItems.map((item) => (
               <li key={item.label}>
                 <NavigationMenuLink asChild>
                   <Link
                     href={item.href}
-                    className="block px-3 py-2 text-sm text-zinc-300 hover:bg-gradient-to-r hover:from-red-500/20 hover:to-orange-500/20 rounded-md transition-all"
+                    className="block px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-orange-400 rounded-lg transition-all duration-300"
                   >
                     {item.label}
                   </Link>
@@ -218,13 +220,13 @@ export default function AnimatedNavLink({
       <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
         <Link
           href={href}
-          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent h-10 px-4 py-2 overflow-visible rounded-full transition-colors"
+          className="!bg-transparent hover:bg-white/5 focus:bg-transparent data-[active]:bg-transparent px-4 py-sm overflow-hidden rounded-full transition-colors"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <AnimatedText 
-            icon={icon} 
-            label={label} 
+          <AnimatedText
+            icon={icon}
+            label={label}
             isActive={isHovered}
             isSemiActive={false}
           />
