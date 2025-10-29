@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Autoplay } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import StarRating from "@/components/ui/StarRating";
 
 interface Product {
@@ -53,37 +56,12 @@ const featuredProducts: Product[] = [
 ];
 
 export default function FeaturedProduct() {
-  const autoplayPlugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
-  );
-
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    autoplayPlugin.current,
-  ]);
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+  const scrollPrev = () => swiperInstance?.slidePrev();
+  const scrollNext = () => swiperInstance?.slideNext();
 
   const currentProduct = featuredProducts[selectedIndex];
 
@@ -105,13 +83,25 @@ export default function FeaturedProduct() {
         />
       </div>
 
-      {/* Embla Carousel Container */}
-      <div className="overflow-hidden h-full" ref={emblaRef}>
-        <div className="flex h-full">
-          {featuredProducts.map((product) => (
-            <div key={product.id} className="flex-[0_0_100%] min-w-0 h-full">
-              {/* Responsive Layout: Vertical on mobile, Horizontal on md+ */}
-              <div className="relative h-full flex flex-col md:flex-row p-6 gap-4 md:gap-6">
+      {/* Swiper Carousel Container */}
+      <Swiper
+        modules={[Navigation, Autoplay]}
+        spaceBetween={0}
+        slidesPerView={1}
+        loop={true}
+        autoplay={{
+          delay: 4000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+        onSwiper={setSwiperInstance}
+        onSlideChange={(swiper) => setSelectedIndex(swiper.realIndex)}
+        className="h-full"
+      >
+        {featuredProducts.map((product) => (
+          <SwiperSlide key={product.id}>
+            {/* Responsive Layout: Vertical on mobile, Horizontal on md+ */}
+            <div className="relative h-full flex flex-col md:flex-row p-6 gap-4 md:gap-6">
                 {/* Product Image */}
                 <div className="relative w-full md:w-[50%] xl:w-[55%] flex-1 md:flex-none md:h-full min-h-[150px]">
                   <motion.div
@@ -244,10 +234,9 @@ export default function FeaturedProduct() {
                   </motion.div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       {/* Navigation Arrows - Visible only on hover */}
       <button
@@ -268,7 +257,7 @@ export default function FeaturedProduct() {
         {featuredProducts.map((_, index) => (
           <button
             key={index}
-            onClick={() => emblaApi?.scrollTo(index)}
+            onClick={() => swiperInstance?.slideToLoop(index)}
             className={`transition-all duration-300 rounded-full ${
               index === selectedIndex
                 ? "w-8 h-2 bg-amber-500"

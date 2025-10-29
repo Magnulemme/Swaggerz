@@ -10,6 +10,7 @@ import { exclusiveNFTs } from "@/constants/nftCollections";
 import * as THREE from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { vertexShader, fragmentShader } from "@/constants/shaders";
+import { useJostAlignment } from "@/hooks/useAlignedFontSize";
 
 export default function UnlockDesignsSection() {
   const uniqueId = useId();
@@ -21,6 +22,10 @@ export default function UnlockDesignsSection() {
   const canvasRefs = useMemo(() => [canvasRef0, canvasRef1, canvasRef2], []);
   const materialsRef = useRef<THREE.ShaderMaterial[]>([]);
   const timeRefs = useRef<number[]>([0, 1, 2]); // Offset iniziali diversi
+
+  // Ref e hook per allineamento font Jost -> ShaderText
+  const jostTitleRef = useRef<HTMLHeadingElement>(null);
+  const alignedFontSize = useJostAlignment(jostTitleRef);
 
   // Setup Three.js con sharedRenderer per tutti i cerchi
   useEffect(() => {
@@ -119,11 +124,14 @@ export default function UnlockDesignsSection() {
         {/* Colonna 1: Header */}
         <div className="order-2 xl:order-2 text-center">
           <div className="mb-6 flex flex-col items-center">
-            <h2 className="text-3xl md:text-4xl lg:text-6xl font-black text-white mb-2 font-jost tracking-tight leading-none">
+            <h2
+              ref={jostTitleRef}
+              className="text-3xl md:text-4xl lg:text-6xl font-black text-white mb-2 font-jost tracking-tight leading-none"
+            >
               Sblocca Design
             </h2>
             <div className="w-fit">
-              <ShaderText fontSize="90" fontWeight="900">
+              <ShaderText fontSize={alignedFontSize || "72px"} fontWeight="900">
                 Esclusivi
               </ShaderText>
             </div>

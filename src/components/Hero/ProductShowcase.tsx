@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import StarRating from "@/components/ui/StarRating";
-import useEmblaCarousel from "embla-carousel-react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import type { Swiper as SwiperType } from 'swiper';
+import 'swiper/css';
 
 interface Product {
   id: number;
@@ -209,29 +211,12 @@ const collections: Collection[] = [
 ];
 
 const ProductShowcase = () => {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start" });
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const scrollTo = useCallback(
-    (index: number) => {
-      if (emblaApi) emblaApi.scrollTo(index);
-    },
-    [emblaApi]
-  );
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
+  const scrollTo = (index: number) => {
+    swiperInstance?.slideTo(index);
+  };
 
   const currentCollection = collections[selectedIndex];
 
@@ -275,12 +260,17 @@ const ProductShowcase = () => {
       </div>
 
       {/* Slider Container */}
-      <div className="relative overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {collections.map((collection) => (
-            <div key={collection.id} className="flex-[0_0_100%] min-w-0">
-              {/* Product Grid */}
-              <div className="relative px-6 lg:px-8 py-6 lg:py-8">
+      <Swiper
+        spaceBetween={0}
+        slidesPerView={1}
+        loop={false}
+        onSwiper={setSwiperInstance}
+        onSlideChange={(swiper) => setSelectedIndex(swiper.activeIndex)}
+      >
+        {collections.map((collection) => (
+          <SwiperSlide key={collection.id}>
+            {/* Product Grid */}
+            <div className="relative px-6 lg:px-8 py-6 lg:py-8">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8">
                   {collection.products.map((product) => (
                     <div key={product.id} className="group cursor-pointer">
@@ -326,10 +316,9 @@ const ProductShowcase = () => {
                   ))}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
       {/* Bottom Info */}
       <div className="relative px-6 lg:px-8 py-4 lg:py-6 border-t border-zinc-800/50 bg-zinc-950/50">

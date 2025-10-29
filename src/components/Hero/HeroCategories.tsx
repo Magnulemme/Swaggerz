@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import type { Swiper as SwiperType } from 'swiper';
@@ -9,6 +9,7 @@ import 'swiper/css/navigation';
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
+import { useJostAlignment } from "@/hooks/useAlignedFontSize";
 
 interface ImageConfig {
   url: string;
@@ -90,6 +91,10 @@ export function HeroCategories({
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
 
+  // Ref per allineamento font Jost -> ShaderText
+  const jostTitleRef = useRef<HTMLHeadingElement>(null);
+  const alignedFontSize = useJostAlignment(jostTitleRef);
+
   // Configura slidesPerView dinamicamente
   const getSlidesPerView = (breakpoint: number) => {
     if (breakpoint >= 6 && imageCount >= 6) return 6;
@@ -155,14 +160,16 @@ export function HeroCategories({
 
           {/* Main Title */}
           <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5">
-            <h2 className="text-4xl md:text-5xl lg:text-8xl font-black text-light leading-none tracking-tight font-jost">
+            <h2
+              ref={jostTitleRef}
+              className="text-4xl md:text-5xl lg:text-8xl font-black text-light leading-none tracking-tight font-jost"
+            >
               Streetwear
             </h2>
             <div className="">
               <ShaderText
-                fontSize="150"
+                fontSize={alignedFontSize || "72px"}
                 fontWeight="900"
-                maxFontSize={150}
                 className="leading-none"
               >
                 Essentials
