@@ -61,6 +61,7 @@ const fragmentShader = `
 `;
 
 export interface WaveShaderUniforms {
+  [uniform: string]: { value: any };
   uTexture: { value: THREE.Texture | null };
   uTime: { value: number };
   uHover: { value: number };
