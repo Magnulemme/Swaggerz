@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface ImageConfig {
   url: string;
@@ -80,11 +82,45 @@ export function HeroCategories({
   className = "",
   useWaveShader = false,
 }: HeroCategoriesProps) {
-  const [emblaRef] = useEmblaCarousel({
+  const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
     loop: false,
-    dragFree: true,
+    slidesToScroll: 1,
+    breakpoints: {
+      '(min-width: 640px)': { slidesToScroll: 2 },
+      '(min-width: 1024px)': { slidesToScroll: 3 },
+      '(min-width: 1280px)': { slidesToScroll: 4 },
+      '(min-width: 1536px)': { slidesToScroll: 6 },
+    }
   });
+
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
 
   return (
     <div
@@ -161,13 +197,58 @@ export function HeroCategories({
           </p>
         </motion.div>
 
-        {/* Slider Responsive - si adatta automaticamente */}
+        {/* Navigation Controls */}
+        <div className="flex justify-end gap-3 mb-4">
+          <button
+            onClick={scrollPrev}
+            disabled={!canScrollPrev}
+            className={`group w-10 h-10 rounded-2xl bg-dark-elevated border transition-all duration-200 flex items-center justify-center cursor-pointer
+              ${
+                !canScrollPrev
+                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
+                  : "opacity-100 border-light-subtle hover:border-brand"
+              }`}
+            aria-label="Previous slides"
+          >
+            <ArrowLeft
+              className={`w-4 h-4 transition-colors duration-200
+                ${
+                  !canScrollPrev
+                    ? "text-light-tertiary"
+                    : "text-light-secondary group-hover:text-brand"
+                }`}
+            />
+          </button>
+
+          <button
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            className={`group w-10 h-10 rounded-2xl bg-dark-elevated border transition-all duration-200 flex items-center justify-center cursor-pointer
+              ${
+                !canScrollNext
+                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
+                  : "opacity-100 border-light-subtle hover:border-brand"
+              }`}
+            aria-label="Next slides"
+          >
+            <ArrowRight
+              className={`w-4 h-4 transition-colors duration-200
+                ${
+                  !canScrollNext
+                    ? "text-light-tertiary"
+                    : "text-light-secondary group-hover:text-brand"
+                }`}
+            />
+          </button>
+        </div>
+
+        {/* Slider Responsive - gestito da Embla */}
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-md pl-sm pr-sm">
+          <div className="flex gap-md">
             {images.map((image, index) => (
               <div
                 key={image.url}
-                className="flex-[0_0_min(85%,320px)] sm:flex-[0_0_min(48%,340px)] md:flex-[0_0_350px]"
+                className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-8px)] lg:flex-[0_0_calc(33.333%-11px)] xl:flex-[0_0_calc(25%-12px)] 2xl:flex-[0_0_calc(16.666%-13px)]"
                 style={{
                   animationDelay: `${index * 100}ms`,
                 }}
