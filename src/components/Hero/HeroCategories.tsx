@@ -178,21 +178,22 @@ export function HeroCategories({
           </p>
         </motion.div>
 
-        {/* Navigation Controls */}
-        <div className="flex justify-end gap-3 mb-4">
+        {/* Slider con controlli laterali */}
+        <div className="relative flex items-center gap-4">
+          {/* Freccia Sinistra */}
           <button
             onClick={scrollPrev}
             disabled={!canScrollPrev}
-            className={`group w-10 h-10 rounded-2xl bg-dark-elevated border transition-all duration-200 flex items-center justify-center cursor-pointer
+            className={`hidden md:flex group w-12 h-12 rounded-2xl bg-dark-elevated border transition-all duration-200 items-center justify-center cursor-pointer flex-shrink-0 z-10
               ${
                 !canScrollPrev
                   ? "opacity-40 !cursor-not-allowed border-light-subtle"
-                  : "opacity-100 border-light-subtle hover:border-brand"
+                  : "opacity-100 border-light-subtle hover:border-brand hover:shadow-lg hover:shadow-brand/20"
               }`}
             aria-label="Previous slides"
           >
             <ArrowLeft
-              className={`w-4 h-4 transition-colors duration-200
+              className={`w-5 h-5 transition-colors duration-200
                 ${
                   !canScrollPrev
                     ? "text-light-tertiary"
@@ -201,30 +202,9 @@ export function HeroCategories({
             />
           </button>
 
-          <button
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            className={`group w-10 h-10 rounded-2xl bg-dark-elevated border transition-all duration-200 flex items-center justify-center cursor-pointer
-              ${
-                !canScrollNext
-                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
-                  : "opacity-100 border-light-subtle hover:border-brand"
-              }`}
-            aria-label="Next slides"
-          >
-            <ArrowRight
-              className={`w-4 h-4 transition-colors duration-200
-                ${
-                  !canScrollNext
-                    ? "text-light-tertiary"
-                    : "text-light-secondary group-hover:text-brand"
-                }`}
-            />
-          </button>
-        </div>
-
-        {/* Swiper - dimensioni automatiche */}
-        <Swiper
+          {/* Swiper - dimensioni automatiche */}
+          <div className="flex-1 overflow-hidden">
+            <Swiper
           modules={[Navigation]}
           spaceBetween={8}
           slidesPerView={getSlidesPerView(1)}
@@ -244,12 +224,36 @@ export function HeroCategories({
             setCanScrollNext(!swiper.isEnd);
           }}
         >
-          {images.map((image, index) => (
+          {images.map((image) => (
             <SwiperSlide key={image.url}>
               <CategoryCard image={image} useWaveShader={useWaveShader} />
             </SwiperSlide>
           ))}
         </Swiper>
+          </div>
+
+          {/* Freccia Destra */}
+          <button
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+            className={`hidden md:flex group w-12 h-12 rounded-2xl bg-dark-elevated border transition-all duration-200 items-center justify-center cursor-pointer flex-shrink-0 z-10
+              ${
+                !canScrollNext
+                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
+                  : "opacity-100 border-light-subtle hover:border-brand hover:shadow-lg hover:shadow-brand/20"
+              }`}
+            aria-label="Next slides"
+          >
+            <ArrowRight
+              className={`w-5 h-5 transition-colors duration-200
+                ${
+                  !canScrollNext
+                    ? "text-light-tertiary"
+                    : "text-light-secondary group-hover:text-brand"
+                }`}
+            />
+          </button>
+        </div>
       </div>
     </div>
   );
