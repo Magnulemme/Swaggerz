@@ -101,7 +101,7 @@ function AnimatedText({
       <span className="relative inline-flex flex-col h-[1.5em] overflow-visible">
         {/* Testo bianco - esce verso l'alto */}
         <motion.span
-          className="text-sm font-medium text-white whitespace-nowrap leading-relaxed"
+          className="text-sm font-medium text-light-primary whitespace-nowrap leading-relaxed"
           animate={{
             y: isActive || isSemiActive ? "-150%" : "0%",
             opacity: isActive || isSemiActive ? 0 : 1,
@@ -202,7 +202,7 @@ export default function AnimatedNavLink({
                 <NavigationMenuLink asChild>
                   <Link
                     href={item.href}
-                    className="block px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-orange-400 rounded-lg transition-all duration-300"
+                    className="block px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-light-primary hover:bg-orange-400 rounded-lg transition-all duration-300"
                   >
                     {item.label}
                   </Link>

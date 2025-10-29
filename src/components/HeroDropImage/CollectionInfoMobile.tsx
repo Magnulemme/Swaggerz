@@ -71,7 +71,7 @@ const CollectionInfoMobile: React.FC<CollectionInfoMobileProps> = ({
         <div className="flex flex-col items-end gap-2">
           {/* Descrizione - solo su tablet (md) */}
           <motion.div
-            className="hidden md:inline-block px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/10 max-w-xs"
+            className="hidden md:inline-block px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/10 max-w-prose-sm"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.5, ease: [0.23, 1, 0.320, 1] }}

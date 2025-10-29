@@ -46,7 +46,7 @@ export default function StickyFooter() {
           {/* Brand Section */}
           <div className="col-span-2">
             <h3 className="text-2xl font-black text-white mb-4">Swaggerz</h3>
-            <p className="text-zinc-400 mb-6 max-w-sm">
+            <p className="text-zinc-400 mb-6 max-w-prose-sm">
               L&apos;unico marketplace dove i tuoi NFT diventano streetwear
               esclusivo. Possiedi l&apos;arte, indossa lo stile.
             </p>
@@ -143,9 +143,7 @@ export default function StickyFooter() {
             <p className="text-zinc-500 text-sm">
               © {new Date().getFullYear()} Swaggerz. Tutti i diritti riservati.
             </p>
-            <p className="text-zinc-500 text-sm">
-              Made with 💜 in Italy
-            </p>
+            <p className="text-zinc-500 text-sm">Made with 💜 in Italy</p>
           </div>
         </div>
       </div>

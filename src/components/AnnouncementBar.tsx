@@ -37,17 +37,17 @@ export default function AnnouncementBar() {
   return (
     <div
       ref={barRef}
-      className="fixed top-0 left-0 right-0 w-full bg-orange-500 text-white py-2 px-4 text-center text-sm font-medium tracking-wide z-[70] transition-transform duration-500 shadow-lg"
+      className="fixed top-0 left-0 right-0 w-full bg-brand text-light-primary py-xs px-sm text-center text-sm font-medium tracking-wide z-[70] transition-transform duration-500 shadow-lg"
       style={{
         transform: scrolled ? 'translateY(-100%)' : 'translateY(0)',
       }}
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 relative">
+      <div className="max-w-7xl mx-auto flex items-center justify-center gap-sm relative">
         <p className="flex-1 text-center">
           <span className="font-bold">NFT Esclusivi</span> fuori ora - Collezione limitata disponibile
           <a
             href="/shop/nft"
-            className="ml-2 underline underline-offset-2 hover:text-orange-100 transition-colors font-semibold"
+            className="ml-2 underline underline-offset-2 hover:bg-white/20 rounded px-xs py-2xs transition-colors font-semibold"
           >
             Scopri ora
           </a>
@@ -55,7 +55,7 @@ export default function AnnouncementBar() {
 
         <button
           onClick={handleClose}
-          className="absolute right-0 p-1 hover:bg-white/20 rounded transition-colors"
+          className="absolute right-0 p-2xs hover:bg-white/20 rounded transition-colors"
           aria-label="Chiudi banner"
         >
           <X size={16} />

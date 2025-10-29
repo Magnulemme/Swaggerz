@@ -127,7 +127,7 @@ const Hero3dContent: React.FC = () => {
 
             {/* Brand Description */}
             <motion.p
-              className="text-zinc-300 text-base md:text-lg text-center lg:text-left max-w-md px-4 lg:px-0 leading-relaxed mt-8"
+              className="text-zinc-300 text-base md:text-lg text-center lg:text-left max-w-prose px-4 lg:px-0 leading-relaxed mt-8"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{

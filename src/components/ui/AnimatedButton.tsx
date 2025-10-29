@@ -95,12 +95,11 @@ export function AnimatedButton({
       >
         {/* Text and content container with slide animation */}
         <span
-          className="relative inline-flex items-center gap-2 md:gap-3 flex-col"
-          style={{ height: "1.5em" }}
+          className="relative inline-flex items-center gap-xs md:gap-sm"
         >
           {/* White content - slides up on hover */}
           <motion.span
-            className="flex items-center gap-2 md:gap-3 text-white whitespace-nowrap leading-relaxed"
+            className="flex items-center gap-xs md:gap-sm text-light-primary whitespace-nowrap leading-relaxed"
             animate={{
               y: isHovered ? "-150%" : "0%",
               opacity: isHovered ? 0 : 1,
@@ -115,7 +114,7 @@ export function AnimatedButton({
 
           {/* Colored content - slides in from bottom on hover */}
           <motion.span
-            className="absolute top-0 flex items-center gap-2 md:gap-3 whitespace-nowrap leading-relaxed"
+            className="absolute top-0 flex items-center gap-xs md:gap-sm whitespace-nowrap leading-relaxed"
             style={{ color: borderColor }}
             animate={{
               y: isHovered ? "0%" : "150%",

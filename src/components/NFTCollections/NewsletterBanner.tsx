@@ -26,7 +26,7 @@ export default function NewsletterBanner() {
       <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
 
-      <div className="relative z-10 max-w-4xl mx-auto">
+      <div className="relative z-10 max-w-prose-lg mx-auto">
         {/* Badge decorativo */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -58,7 +58,7 @@ export default function NewsletterBanner() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
-          className="text-white/95 text-base md:text-lg lg:text-xl mb-12 max-w-2xl mx-auto leading-relaxed text-center"
+          className="text-white/95 text-base md:text-lg lg:text-xl mb-12 max-w-prose mx-auto leading-relaxed text-center"
         >
           Unisciti alla community esclusiva. Ricevi aggiornamenti sui nuovi
           drop, offerte speciali e design NFT in anteprima.
@@ -71,7 +71,7 @@ export default function NewsletterBanner() {
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
           onSubmit={handleSubmit}
-          className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto mb-8"
+          className="flex flex-col sm:flex-row gap-4 max-w-title mx-auto mb-8"
         >
           <div className="relative flex-1 flex items-center">
             <Mail className="absolute left-4 w-5 h-5 text-zinc-400 pointer-events-none" />

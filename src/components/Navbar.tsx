@@ -79,22 +79,21 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
 
   return (
     <header
-      className="fixed left-0 right-0 w-full z-[60] transition-all duration-500"
+      className={`fixed left-0 right-0 w-full z-[60] transition-all duration-500 ${
+        scrolled ? "bg-dark border-b border-white/10 shadow-lg" : "bg-transparent"
+      }`}
       style={{
         top: scrolled ? "0px" : "var(--announcement-bar-height, 0px)",
-        backgroundColor: scrolled ? "rgb(9 9 11)" : "transparent",
-        borderBottom: scrolled ? "1px solid rgba(255, 255, 255, 0.1)" : "none",
-        boxShadow: scrolled ? "0 10px 15px -3px rgb(0 0 0 / 0.1)" : "none",
       }}
     >
-      <nav className="mx-auto w-full max-w-[100vw] px-4 sm:px-6 lg:px-24 py-sm flex items-center justify-between ">
+      <nav className="mx-auto w-full max-w-[100vw] px-sm sm:px-md lg:px-3xl py-sm flex items-center justify-between ">
         <NavbarLogo />
 
         {/* Desktop menu con NavigationMenu - Pill-shaped container */}
         <NavigationMenu className="hidden lg:block" viewport={false}>
           <div
-            className={`px-6 backdrop-blur-md border border-white/10 rounded-full shadow-lg transition-all duration-500 ${
-              scrolled ? 'bg-orange-500/15' : 'bg-black'
+            className={`px-md backdrop-blur-md border border-white/10 rounded-full shadow-lg transition-all duration-500 ${
+              scrolled ? 'bg-orange-500/15' : 'bg-dark-elevated'
             }`}
           >
             <NavigationMenuList className="flex items-center gap-1">

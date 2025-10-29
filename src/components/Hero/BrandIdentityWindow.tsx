@@ -157,7 +157,7 @@ export default function BrandIdentityWindow() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-4"
           >
-            <p className="text-zinc-200 text-sm lg:text-base leading-relaxed max-w-lg">
+            <p className="text-zinc-200 text-sm lg:text-base leading-relaxed max-w-prose-lg">
               Swaggerz nasce per chi vive la strada come una tela da
               reinventare. Non seguiamo le tendenze:{" "}
               <span className="text-white font-medium italic">le creiamo</span>.

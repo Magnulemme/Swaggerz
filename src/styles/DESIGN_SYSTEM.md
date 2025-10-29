@@ -1,509 +1,336 @@
 # Swaggerz Design System
 
-Questo documento descrive il design system di Swaggerz e come utilizzare le classi semantiche custom per mantenere coerenza visiva in tutto il sito.
-
-## 📋 Indice
-
-- [Perché un Design System?](#perché-un-design-system)
-- [Spacing](#spacing)
-- [Typography](#typography)
-- [Border Radius](#border-radius)
-- [Shadows](#shadows)
-- [Transitions](#transitions)
-- [Classi Preset](#classi-preset)
-- [Esempi Pratici](#esempi-pratici)
-- [Migrazione](#migrazione)
+Sistema di design **dedotto** dal codice esistente. Non imponiamo un sistema, lo estraiamo.
 
 ---
 
-## Perché un Design System?
+## 🎯 Approccio: Deduzione, non Induzione
 
-Prima del design system, il codice aveva valori inconsistenti:
-- ❌ `p-6` in alcuni card, `px-6 py-4` in altri
-- ❌ `gap-1`, `gap-2`, `gap-3`, `gap-4`, `gap-6`, `gap-8` (troppa variazione)
-- ❌ `text-lg` vs `text-sm` per scopi simili
-- ❌ Responsive padding non standardizzato
-
-Con il design system:
-- ✅ Classi semantiche come `p-md`, `text-header`, `rounded-xl`
-- ✅ Valori coerenti e prevedibili
-- ✅ Facile da mantenere e aggiornare
-- ✅ Comunicazione chiara dell'intenzione
+1. **Analizziamo** i componenti esistenti
+2. **Estraiamo** i pattern ricorrenti
+3. **Standardizziamo** solo ciò che ha senso
+4. **Migriamo** gradualmente
 
 ---
 
-## Spacing
+## 📐 Spacing/Padding System
 
-### Scale di Spacing
+Scala Tailwind standard (multipli di 4px): **4px → 80px**
 
-| Classe | Valore | Pixel | Uso Consigliato |
-|--------|--------|-------|------------------|
-| `xs` | 0.5rem | 8px | Spaziature minime, gap tight |
-| `sm` | 0.75rem | 12px | Spaziature piccole, elementi vicini |
-| `md` | 1rem | 16px | **Spaziature base** (default) |
-| `lg` | 1.5rem | 24px | Spaziature medie, sezioni |
-| `xl` | 2rem | 32px | Spaziature larghe |
-| `2xl` | 2.5rem | 40px | Spaziature extra larghe |
-| `3xl` | 3rem | 48px | Spaziature molto larghe |
-| `4xl` | 4rem | 64px | Section spacing |
-| `5xl` | 5rem | 80px | Large section spacing |
-| `6xl` | 6rem | 96px | Hero spacing |
-
-### Classi Disponibili
-
-#### Padding
 ```css
-/* Tutti i lati */
-.p-xs, .p-sm, .p-md, .p-lg, .p-xl, .p-2xl, .p-3xl
-
-/* Orizzontale (left + right) */
-.px-xs, .px-sm, .px-md, .px-lg, .px-xl, .px-2xl, .px-3xl
-
-/* Verticale (top + bottom) */
-.py-xs, .py-sm, .py-md, .py-lg, .py-xl, .py-2xl, .py-3xl
-
-/* Singoli lati */
-.pt-xs, .pb-xs, .pl-xs, .pr-xs (e tutte le varianti)
+p-2xs  → 4px   (0.25rem)  = p-1
+p-xs   → 8px   (0.5rem)   = p-2
+p-sm   → 16px  (1rem)     = p-4
+p-md   → 24px  (1.5rem)   = p-6
+p-lg   → 32px  (2rem)     = p-8
+p-xl   → 48px  (3rem)     = p-12
+p-2xl  → 64px  (4rem)     = p-16
+p-3xl  → 80px  (5rem)     = p-20
 ```
 
-#### Margin
-```css
-/* Stessa struttura del padding */
-.m-xs, .mx-sm, .my-md, .mt-lg, .mb-xl, etc.
-```
+### Utilizzo
 
-#### Gap (Flexbox/Grid)
-```css
-/* Gap standard */
-.gap-xs, .gap-sm, .gap-md, .gap-lg, .gap-xl, .gap-2xl, .gap-3xl
-
-/* Gap direzionale */
-.gap-x-md, .gap-y-lg
-```
-
-#### Space Between
-```css
-/* Spacing tra children (flexbox) */
-.space-x-sm, .space-y-md
-```
-
-### Esempi
+Funziona con **tutte le utility Tailwind**:
 
 ```tsx
-// Card con padding medio
-<div className="p-lg rounded-2xl">
-  <h2 className="text-header mb-sm">Titolo</h2>
-  <p className="text-description">Descrizione</p>
-</div>
+// Padding
+<div className="p-xl">      {/* 16px tutti i lati */}
+<div className="px-lg">     {/* 12px horizontal */}
+<div className="py-2xl">    {/* 20px vertical */}
 
-// Grid con gap consistente
-<div className="grid grid-cols-3 gap-lg">
-  {items.map(item => <Card key={item.id} />)}
-</div>
+// Margin
+<div className="m-lg">      {/* 12px */}
+<div className="mb-xl">     {/* 16px bottom */}
 
-// Stack verticale
-<div className="flex flex-col space-y-md">
-  <Button />
-  <Button />
-</div>
+// Gap
+<div className="gap-md">    {/* 8px gap */}
+<div className="gap-x-lg">  {/* 12px horizontal gap */}
+
+// Space Between
+<div className="space-y-xl"> {/* 16px tra children */}
 ```
+
+### Quando usare cosa?
+
+- **Tailwind defaults** (p-1, p-2, p-4...): Per multipli di 4px (4, 8, 16, 32...)
+- **Custom scale** (p-xs, p-sm...): Per valori intermedi (2, 6, 12, 20...)
 
 ---
 
-## Typography
+## 📏 Max-Width System (Leggibilità)
 
-### Font Sizes Semantici
+Sistema per contenitori di testo con larghezze ottimali per la lettura.
 
-| Classe | Valore | Pixel | Uso |
-|--------|--------|-------|-----|
-| `text-caption` | 0.75rem | 12px | Note, piccoli testi |
-| `text-small` | 0.875rem | 14px | Testo secondario |
-| `text-description` | 0.875rem | 14px | Descrizioni prodotti |
-| `text-label` | 0.875rem | 14px | Labels form |
-| `text-body` | 1rem | 16px | **Testo principale** |
-| `text-body-lg` | 1.125rem | 18px | Testo enfatizzato |
-| `text-subheader` | 1.25rem | 20px | Sottotitoli |
-| `text-header` | 1.5rem | 24px | Titoli sezioni |
-| `text-header-lg` | 1.875rem | 30px | Titoli grandi |
-| `text-display` | 2.25rem | 36px | Display text |
-| `text-display-lg` | 3rem | 48px | Hero titles |
-| `text-display-xl` | 3.75rem | 60px | Large hero |
-| `text-display-2xl` | 4.5rem | 72px | Extra large hero |
+```css
+max-w-prose-sm  → 384px (24rem)  - Testo breve/didascalie (40-50 caratteri)
+max-w-prose     → 512px (32rem)  - Testo medio (50-60 caratteri)
+max-w-prose-lg  → 672px (42rem)  - Testo lungo/paragrafi (60-70 caratteri)
+max-w-title     → 768px (48rem)  - Titoli/headline
+```
 
-### Line Heights
-
-| Classe | Valore | Uso |
-|--------|--------|-----|
-| `leading-tight` | 1.25 | Titoli, headers |
-| `leading-snug` | 1.375 | Sottotitoli |
-| `leading-normal` | 1.5 | **Testo normale** (default) |
-| `leading-relaxed` | 1.625 | Paragrafi lunghi |
-| `leading-loose` | 2 | Testo molto spaziato |
-
-### Esempi
+### Utilizzo
 
 ```tsx
-// Hero section
-<h1 className="text-display-2xl leading-tight font-bold">
-  Benvenuto su Swaggerz
-</h1>
-
-// Card title
-<h3 className="text-header leading-snug font-semibold mb-sm">
-  Nome Prodotto
-</h3>
-
-// Product description
-<p className="text-description leading-normal text-gray-600">
-  Descrizione del prodotto...
+// Footer description (testo breve)
+<p className="text-zinc-400 max-w-prose-sm">
+  L'unico marketplace dove i tuoi NFT diventano streetwear esclusivo.
 </p>
 
-// Form label
-<label className="text-label font-medium">
-  Email
-</label>
+// Paragrafo normale
+<p className="text-zinc-300 leading-relaxed max-w-prose">
+  Swaggerz nasce per chi vive la strada come una tela da reinventare.
+  Non seguiamo le tendenze: le creiamo.
+</p>
+
+// Paragrafo lungo
+<p className="text-zinc-200 max-w-prose-lg">
+  Con ogni drop, celebriamo l'arte, la libertà e la voglia di cambiare
+  le regole — insieme. Non avere paura, entra nel movimento.
+</p>
+```
+
+### Quando usare cosa?
+
+- `max-w-prose-sm`: Descrizioni brevi, footer, cards
+- `max-w-prose`: Paragrafi standard, body text
+- `max-w-prose-lg`: Articoli, contenuti lunghi
+- `max-w-title`: Titoli hero, headlines
+
+---
+
+## ✍️ Typography (TODO)
+
+**Da dedurre analizzando i componenti**
+
+Per ora: usa Tailwind defaults
+```css
+text-xs, text-sm, text-base, text-lg, text-xl, text-2xl...
+font-light, font-normal, font-medium, font-semibold, font-bold
+leading-tight, leading-normal, leading-relaxed
 ```
 
 ---
 
-## Border Radius
+## 🎨 Color System - Semantico
 
-### Scale di Border Radius
+**Sistema semantico light/dark**: non numeri, ma SIGNIFICATI.
 
-| Classe | Valore | Pixel | Uso |
-|--------|--------|-------|-----|
-| `rounded-xs` | 0.25rem | 4px | Extra small |
-| `rounded-base` | 0.5rem | 8px | Inputs, small cards |
-| `rounded-lg` | 0.75rem | 12px | Buttons, medium cards |
-| `rounded-xl` | 1rem | 16px | Cards, panels |
-| `rounded-2xl` | 1.25rem | 20px | **Large cards** (standard) |
-| `rounded-3xl` | 1.75rem | 28px | Featured sections |
-| `rounded-4xl` | 2rem | 32px | Hero sections |
-| `rounded-full` | 9999px | ∞ | Circular elements |
+### Perché Semantico?
 
-### Classi per Angoli Specifici
+❌ `text-zinc-400` → Devi ricordare: 400 = secondario?
+✅ `text-light-secondary` → Capisci subito: testo secondario!
 
-```css
-/* Top corners */
-.rounded-t-base, .rounded-t-lg, .rounded-t-xl
+**Coerenza**: Usiamo già `p-sm`, `gap-md` (semantico), perché i colori dovrebbero essere diversi?
 
-/* Bottom corners */
-.rounded-b-base, .rounded-b-lg, .rounded-b-xl
+---
+
+### Backgrounds (Dark Mode)
+
+```tsx
+bg-dark            → Base surface (fondazione del sito)
 ```
+**Perché**: Profondità massima, crea atmosfera premium
+**Valore**: zinc-950
+**Dove**: Body, hero sections, base page
 
-### Esempi
+```tsx
+bg-dark-elevated   → Elevated surface (elementi fluttuanti)
+```
+**Perché**: Contrasto con base, fa "levitare" elementi
+**Valore**: black
+**Dove**: Navbar pill, overlay, elementi rialzati
+
+```tsx
+bg-dark-element    → Element surface (contenitori, icone)
+```
+**Perché**: Separazione visiva senza peso
+**Valore**: zinc-900
+**Dove**: Card, icone, buttons, footer, qualsiasi elemento che necessita contrasto
+
+---
+
+### Text Colors (On Dark)
+
+```tsx
+text-light                → Primary text
+```
+**Perché**: Massima leggibilità, contrasto perfetto
+**Valore**: white
+**Dove**: Titoli, CTA, testo principale
+
+```tsx
+text-light-secondary      → Secondary text
+```
+**Perché**: Gerarchia visiva, senza perdere leggibilità
+**Valore**: zinc-300 (più chiaro)
+**Dove**: Sottotitoli, descrizioni importanti, testo di supporto
+
+```tsx
+text-light-tertiary       → Tertiary text
+```
+**Perché**: Info non critiche, livello più basso nella gerarchia
+**Valore**: zinc-400 (più scuro)
+**Dove**: Descrizioni nelle card, caption, metadata
+
+---
+
+### Brand Colors
+
+```tsx
+text-brand         → Primary brand
+bg-brand           → Brand background
+border-brand       → Brand borders
+```
+**Perché**: Identità, energia, attenzione
+**Valore**: orange-500
+**Dove**: CTA, link, focus, elementi interattivi
+
+```tsx
+/* Brand Gradient Signature */
+from-red-500 via-orange-500 to-yellow-400
+```
+**Perché**: Firma distintiva Swaggerz
+**Dove**: Logo, hero titles, elementi premium
+
+---
+
+### Interactive States (Verified - NavbarActions)
+
+```tsx
+bg-dark-element-hover      → Hover state per elementi
+```
+**Perché**: Feedback visivo chiaro senza essere invasivo
+**Valore**: zinc-800
+**Dove**: Hover su icon buttons, elementi interattivi
+
+---
+
+### Borders (Verified)
+
+```tsx
+border-white/10            → Separatori sottili
+```
+**Perché**: Separazione delicata, non invasiva
+**Valore**: white con 10% opacità
+**Dove**: Borders di default, separatori, outline
+
+```tsx
+border-brand/40            → Interactive borders
+```
+**Perché**: Feedback hover con colore brand
+**Valore**: orange-500 con 40% opacità
+**Dove**: Hover/focus state su borders
+
+---
+
+### Transizioni Standard
+
+```tsx
+transition-all duration-300  → Smooth transitions
+```
+**Dove**: Tutti gli stati hover, animazioni UI
+
+---
+
+### Esempi d'Uso
 
 ```tsx
 // Card standard
-<div className="rounded-2xl bg-white p-lg">
-  Content
+<div className="bg-dark-element border border-light">
+  <h3 className="text-light">Title</h3>
+  <p className="text-light-secondary">Description</p>
+  <span className="text-light-tertiary">Metadata</span>
 </div>
 
-// Button
-<button className="rounded-xl px-lg py-sm">
-  Click me
+// Icon button
+<button className="bg-dark-element">
+  <Icon className="text-light-secondary" />
 </button>
 
-// Avatar circolare
-<img className="rounded-full w-12 h-12" />
-
-// Input
-<input className="rounded-base px-md py-sm" />
+// Link brand
+<a className="text-brand">Learn more</a>
 ```
 
 ---
 
-## Shadows
+### Scala di Gerarchia
 
-### Scale di Shadows
+**Backgrounds** (dal più scuro al più chiaro):
+1. `bg-dark` → Foundation
+2. `bg-dark-elevated` → Floating elements
+3. `bg-dark-element` → Content containers, icons, buttons
 
-| Classe | Uso |
-|--------|-----|
-| `shadow-sm` | Subtle shadow, hover states |
-| `shadow-base` | Default shadow per cards |
-| `shadow-md` | Medium shadow, elevated cards |
-| `shadow-lg` | Large shadow, modals |
-| `shadow-xl` | Extra large shadow, popovers |
-| `shadow-inner` | Inner shadow, depressed elements |
-| `shadow-glow` | Glow effect |
-| `shadow-glow-lg` | Large glow effect |
-| `shadow-none` | Rimuovi shadow |
+**Text** (dal più visibile al meno):
+1. `text-light` (white) → Headings, titoli principali
+2. `text-light-secondary` (zinc-300) → Sottotitoli, descrizioni importanti
+3. `text-light-tertiary` (zinc-400) → Descrizioni card, caption, metadata
+4. `text-brand` (orange-500) → Interactive, CTA
 
-### Esempi
+---
+
+## 📦 Esempi Base
 
 ```tsx
-// Card con shadow standard
-<div className="rounded-2xl shadow-base p-lg">
-  Content
+// Card con spacing custom
+<div className="p-xl rounded-2xl border">
+  <h3 className="text-2xl font-semibold mb-lg">Titolo</h3>
+  <p className="text-sm mb-xl">Descrizione</p>
 </div>
 
-// Card hover con shadow animata
-<div className="rounded-2xl shadow-base hover:shadow-lg transition-base">
-  Hover me
+// Grid con gap custom
+<div className="grid grid-cols-3 gap-lg">
+  <Card />
+  <Card />
+  <Card />
 </div>
 
-// CTA button con glow
-<button className="rounded-xl shadow-glow hover:shadow-glow-lg">
-  Shop Now
-</button>
+// Navigation con padding custom
+<nav className="px-xl py-lg flex gap-md">
+  <a>Home</a>
+  <a>Shop</a>
+</nav>
 ```
 
 ---
 
-## Transitions
+## 🔄 Migrazione
 
-### Durate delle Transizioni
+### Step 1: Spacing ✅ (Completato)
+- [x] Definita scala pragmatica 2-24px
+- [x] Zero conflitti con Tailwind
+- [x] Implementata in `globals.css`
 
-| Classe | Valore | Uso |
-|--------|--------|-----|
-| `transition-fast` | 150ms | Hover rapidi, micro-interactions |
-| `transition-base` | 200ms | **Transizioni standard** |
-| `transition-slow` | 300ms | Transizioni smooth |
-| `transition-slower` | 500ms | Transizioni elaborate |
+### Step 2: Typography (In attesa)
+- [ ] Analizzare font-size usati nei componenti
+- [ ] Identificare pattern ricorrenti
+- [ ] Creare variabili semantiche
 
-### Esempi
+### Step 3: Colors (In attesa)
+- [ ] Analizzare palette colori usata
+- [ ] Identificare brand colors
+- [ ] Standardizzare naming
 
-```tsx
-// Button con hover
-<button className="rounded-xl shadow-base hover:shadow-lg transition-base">
-  Hover me
-</button>
-
-// Card con multiple transizioni
-<div className="
-  rounded-2xl
-  shadow-base
-  hover:shadow-xl
-  hover:scale-105
-  transition-slow
-">
-  Content
-</div>
-```
+### Step 4: Ottimizzazione componenti (In attesa)
+- [ ] Migrare componenti chiave
+- [ ] Testare consistenza visiva
+- [ ] Refactoring graduale
 
 ---
 
-## Classi Preset
+## 📁 File
 
-### Card Padding
-
-Presets per padding dei card:
-
-```css
-.card-padding-sm  /* padding: 16px */
-.card-padding-md  /* padding: 24px */
-.card-padding-lg  /* padding: 32px */
-```
-
-### Container Padding (Responsive)
-
-```css
-.container-padding
-/* Mobile:  16px */
-/* Tablet:  32px */
-/* Desktop: 48px */
-```
-
-### Section Spacing (Responsive)
-
-```css
-.section-spacing-y
-/* Mobile:  py-16px */
-/* Tablet:  py-24px */
-/* Desktop: py-48px */
-```
-
-### Esempi
-
-```tsx
-// Card con preset
-<div className="rounded-2xl shadow-base card-padding-md">
-  Content
-</div>
-
-// Container con padding responsive
-<div className="container-padding max-w-7xl mx-auto">
-  <h1>Content</h1>
-</div>
-
-// Section con spacing verticale
-<section className="section-spacing-y">
-  <h2>Section Title</h2>
-</section>
-```
+- **globals.css** - Definizioni `@theme` con scale spacing
+- **DESIGN_SYSTEM.md** - Questa documentazione (living document)
 
 ---
 
-## Esempi Pratici
+## 🚀 Next Steps
 
-### Product Card
-
-**Prima (inconsistente):**
-```tsx
-<div className="p-6 rounded-2xl shadow-md">
-  <img className="aspect-square rounded-xl mb-3" />
-  <h3 className="text-lg font-semibold mb-2">Product Name</h3>
-  <p className="text-sm text-gray-600 mb-4">Description</p>
-  <button className="px-5 py-3 rounded-xl">Shop Now</button>
-</div>
-```
-
-**Dopo (design system):**
-```tsx
-<div className="p-lg rounded-2xl shadow-base">
-  <img className="aspect-square rounded-xl mb-sm" />
-  <h3 className="text-header font-semibold mb-xs">Product Name</h3>
-  <p className="text-description text-gray-600 mb-md">Description</p>
-  <button className="px-lg py-sm rounded-xl">Shop Now</button>
-</div>
-```
-
-### Hero Section
-
-**Prima:**
-```tsx
-<section className="py-8 md:py-12 lg:py-20 px-4 md:px-6">
-  <h1 className="text-5xl md:text-6xl lg:text-7xl mb-6">Title</h1>
-  <p className="text-lg mb-8">Description</p>
-</section>
-```
-
-**Dopo:**
-```tsx
-<section className="section-spacing-y container-padding">
-  <h1 className="text-display-2xl leading-tight mb-lg">Title</h1>
-  <p className="text-body-lg mb-xl">Description</p>
-</section>
-```
-
-### Form
-
-**Prima:**
-```tsx
-<form className="space-y-4">
-  <div>
-    <label className="text-sm font-medium">Email</label>
-    <input className="px-4 py-3 rounded-lg" />
-  </div>
-  <button className="px-6 py-4 rounded-xl">Submit</button>
-</form>
-```
-
-**Dopo:**
-```tsx
-<form className="space-y-md">
-  <div>
-    <label className="text-label font-medium">Email</label>
-    <input className="px-md py-sm rounded-base" />
-  </div>
-  <button className="px-lg py-sm rounded-xl">Submit</button>
-</form>
-```
+1. **Analizzare un componente** (es. Navbar, Card)
+2. **Estrarre valori reali** di typography e colors
+3. **Discutere** quali standardizzare
+4. **Iterare** componente per componente
 
 ---
 
-## Migrazione
-
-### Mappatura Rapida
-
-Ecco come convertire le vecchie classi alle nuove:
-
-#### Padding/Margin
-```
-p-2  → p-xs   (8px)
-p-3  → p-sm   (12px)
-p-4  → p-md   (16px)
-p-6  → p-lg   (24px)
-p-8  → p-xl   (32px)
-p-10 → p-2xl  (40px)
-p-12 → p-3xl  (48px)
-```
-
-#### Gap
-```
-gap-1   → gap-xs  (8px)
-gap-1.5 → gap-xs  (8px)
-gap-2   → gap-xs  (8px)
-gap-3   → gap-sm  (12px)
-gap-4   → gap-md  (16px)
-gap-6   → gap-lg  (24px)
-gap-8   → gap-xl  (32px)
-```
-
-#### Typography
-```
-text-xs  → text-caption     (12px)
-text-sm  → text-small       (14px)
-text-base → text-body       (16px)
-text-lg  → text-body-lg     (18px)
-text-xl  → text-subheader   (20px)
-text-2xl → text-header      (24px)
-text-3xl → text-header-lg   (30px)
-text-4xl → text-display     (36px)
-text-5xl → text-display-lg  (48px)
-text-6xl → text-display-xl  (60px)
-text-7xl → text-display-2xl (72px)
-```
-
-#### Border Radius
-```
-rounded-md  → rounded-base  (8px)
-rounded-lg  → rounded-lg    (12px)
-rounded-xl  → rounded-xl    (16px)
-rounded-2xl → rounded-2xl   (20px)
-rounded-3xl → rounded-3xl   (28px)
-```
-
-### Strategia di Migrazione
-
-1. **Inizia dai componenti core**: Navbar, Card, Button
-2. **Poi Hero sections**: Hanno più variazioni
-3. **Forms e Auth**: Molti padding diversi
-4. **Resta del sito**: Gradualmente
-
-### Trova e Sostituisci Globale
-
-Puoi usare search & replace nel tuo editor:
-
-```bash
-# Esempio: sostituire p-6 con p-lg
-# Cerca:    className="(.*?)p-6(.*?)"
-# Sostituisci: className="$1p-lg$2"
-```
-
-**⚠️ ATTENZIONE**: Verifica sempre manualmente dopo la sostituzione!
-
----
-
-## Best Practices
-
-### ✅ DO
-
-- Usa classi semantiche: `text-header`, `p-lg`
-- Scegli il valore giusto per il contesto
-- Mantieni consistenza tra componenti simili
-- Usa i preset per pattern comuni
-
-### ❌ DON'T
-
-- Non mixare vecchie e nuove classi: ~~`p-6 mb-lg`~~ → `p-lg mb-lg`
-- Non usare valori custom quando esiste una classe: ~~`className="p-[24px]"`~~ → `p-lg`
-- Non creare troppi spacing diversi: usa la scale esistente
-
----
-
-## Riferimenti Rapidi
-
-### Design Tokens File
-[src/styles/design-tokens.ts](./design-tokens.ts) - Tutti i valori del design system
-
-### CSS Variables
-[src/app/globals.css](../app/globals.css) - Variabili CSS e utility classes
-
----
-
-## Supporto
-
-Per domande o suggerimenti sul design system, contatta il team di design o apri una issue su GitHub.
-
-**Happy coding! 🎨**
+**Living document - Si evolve con il progetto**

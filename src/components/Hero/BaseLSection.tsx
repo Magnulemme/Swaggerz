@@ -54,7 +54,7 @@ export default function BaseLSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-zinc-400 text-sm lg:text-base leading-relaxed mb-6 max-w-md"
+          className="text-zinc-400 text-sm lg:text-base leading-relaxed mb-6 max-w-prose"
         >
           Swaggerz nasce per chi vive la strada come una tela da reinventare.
 Non seguiamo le tendenze: le creiamo.

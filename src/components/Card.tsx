@@ -38,10 +38,10 @@ export default function Card({
   const [liked, setLiked] = useState(false);
 
   return (
-    <article className="relative flex flex-col overflow-hidden min-w-[200px] bg-white border border-zinc-200 hover:border-orange-400 transition-all duration-300 shadow-sm hover:shadow-md rounded-2xl h-full">
-      
+    <article className="relative flex flex-col overflow-hidden min-w-[200px] max-w-[320px] bg-white border border-zinc-200 hover:border-orange-400 transition-all duration-300 shadow-sm hover:shadow-md rounded-2xl h-full">
+
       {/* Immagine */}
-      <div className="relative w-full aspect-square overflow-hidden">
+      <div className="relative w-full aspect-[2/3] max-h-[380px] overflow-hidden">
         {(badgeText || isNew || isBestseller) && (
           <div className="absolute left-4 top-4 z-20 flex gap-2">
             {isNew && (

@@ -177,9 +177,11 @@ export default function Slider({ items, children, showHeader = true, showBackgro
                             <div
                                 key={p.id}
                                 className="embla__slide flex-none
-                                    max-sm:w-[calc(100%)]
-                                    sm:w-[calc(50%-8px)]
-                                    lg:w-[350px]"
+                                    max-sm:w-[calc(100%-16px)]
+                                    sm:w-[calc(50%-16px)]
+                                    md:w-[calc(33.333%-16px)]
+                                    lg:w-[280px]
+                                    xl:w-[300px]"
                             >
                                 <Card
                                   title={p.title}

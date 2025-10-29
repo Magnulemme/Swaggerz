@@ -128,18 +128,88 @@
 }
 
 @theme {
-  /* Dark shades */
+  /* ==============================================
+     SPACING/PADDING SYSTEM
+     Scala Tailwind (multipli di 4px = 0.25rem)
+     Usage: p-2xs, p-xs, p-sm, p-md, p-lg, p-xl, p-2xl, p-3xl
+     Equivale a: p-1, p-2, p-4, p-6, p-8, p-12, p-16, p-20
+     ============================================== */
+  --spacing-2xs: 0.25rem;   /* 4px   (equivale a p-1)  */
+  --spacing-xs: 0.5rem;     /* 8px   (equivale a p-2)  */
+  --spacing-sm: 1rem;       /* 16px  (equivale a p-4)  */
+  --spacing-md: 1.5rem;     /* 24px  (equivale a p-6)  */
+  --spacing-lg: 2rem;       /* 32px  (equivale a p-8)  */
+  --spacing-xl: 3rem;       /* 48px  (equivale a p-12) */
+  --spacing-2xl: 4rem;      /* 64px  (equivale a p-16) */
+  --spacing-3xl: 5rem;      /* 80px  (equivale a p-20) */
+
+  /* ==============================================
+     MAX-WIDTH READABLE (Leggibilità testo)
+     Basato su lunghezza ottimale di lettura
+     Usage: max-w-prose-sm, max-w-prose, max-w-prose-lg, max-w-title
+     ============================================== */
+  --max-width-prose-sm: 24rem;   /* 384px - Testo breve/didascalie (40-50 caratteri) */
+  --max-width-prose: 32rem;      /* 512px - Testo medio (50-60 caratteri) */
+  --max-width-prose-lg: 42rem;   /* 672px - Testo lungo/paragrafi (60-70 caratteri) */
+  --max-width-title: 48rem;      /* 768px - Titoli/headline */
+
+  /* ==============================================
+     ICON SIZES (Icone)
+     Dimensioni standardizzate per icone
+     Usage: size-icon-sm, size-icon, size-icon-lg
+     ============================================== */
+  --size-icon-sm: 1rem;          /* 16px */
+  --size-icon: 1.125rem;         /* 18px */
+  --size-icon-lg: 1.25rem;       /* 20px */
+
+  /* ==============================================
+     TYPOGRAPHY & COLORS
+     Da dedurre analizzando i componenti esistenti
+     ============================================== */
+  /* TODO: Analizzare componenti per dedurre valori reali */
+
+  /* ==============================================
+     COLOR SYSTEM - Semantico (light/dark)
+     Non numeri, ma SIGNIFICATI
+     Usage: bg-dark, text-light-secondary, text-brand
+     ============================================== */
+
+  /* Backgrounds - Dark Mode */
+  --color-dark: 9 9 11;                    /* zinc-950 - Base surface */
+  --color-dark-elevated: 0 0 0;            /* black - Elevated elements (navbar pill, overlay) */
+  --color-dark-element: 24 24 27;          /* zinc-900 - Elements (cards, icons, buttons) */
+  --color-dark-element-hover: 39 39 42;    /* zinc-800 - Hover state for elements */
+
+  /* Text - On Dark Backgrounds */
+  --color-light: 255 255 255;              /* white - Primary text */
+  --color-light-secondary: 212 212 216;    /* zinc-300 - Secondary text (sottotitoli) */
+  --color-light-tertiary: 161 161 170;     /* zinc-400 - Tertiary text (descrizioni card) */
+
+  /* Brand Colors */
+  --color-brand: 249 115 22;               /* orange-500 - Primary brand */
+  --color-brand-light: 251 146 60;         /* orange-400 - Lighter brand for hover */
+
+  /* Borders */
+  --color-border-light: 255 255 255;       /* white - for opacity usage (white/10) */
+  --color-border-brand: 249 115 22;        /* orange-500 - Brand borders */
+
+  /* ==============================================
+     OLD VARIABLES (Deprecated - To be migrated)
+     Manteniamo per retro-compatibilità
+     ============================================== */
+
+  /* OLD - Dark shades (usa --color-dark-* invece) */
   --color-dark-900: #111111;
   --color-dark-700: #757575;
   --color-dark-500: #aaaaaa;
 
-  /* Light shades */
+  /* OLD - Light shades (usa --color-light-* invece) */
   --color-light-100: #ffffff;
   --color-light-200: #f5f5f5;
   --color-light-300: #e5e5e5;
   --color-light-400: #cccccc;
 
-  /* Supporting colors */
+  /* OLD - Supporting colors */
   --color-green: #007d48;
   --color-red: #d33918;
   --color-orange: #d37918;
@@ -148,7 +218,7 @@
   --font-jost: "Jost", sans-serif;
   --font-pastor: var(--font-pastor-of-muppets), sans-serif;
 
-  /* Heading sizes */
+  /* OLD - Heading sizes */
   --text-heading-1: 72px;
   --text-heading-1--line-height: 78px;
   --text-heading-1--font-weight: 700;
@@ -161,12 +231,12 @@
   --text-heading-3--line-height: 30px;
   --text-heading-3--font-weight: 500;
 
-  /* Lead */
+  /* OLD - Lead */
   --text-lead: 20px;
   --text-lead--line-height: 28px;
   --text-lead--font-weight: 500;
 
-  /* Body */
+  /* OLD - Body */
   --text-body: 16px;
   --text-body--line-height: 24px;
   --text-body--font-weight: 400;
@@ -175,18 +245,159 @@
   --text-body-medium--line-height: 24px;
   --text-body-medium--font-weight: 500;
 
-  /* Caption */
+  /* OLD - Caption */
   --text-caption: 14px;
   --text-caption--line-height: 20px;
   --text-caption--font-weight: 500;
 
-  /* Footnote */
+  /* OLD - Footnote */
   --text-footnote: 12px;
   --text-footnote--line-height: 18px;
   --text-footnote--font-weight: 400;
 }
 
 @layer utilities {
+
+  /* ==============================================
+     SIZE UTILITIES - Semantico
+     ============================================== */
+
+  /* Icon sizes */
+  .size-icon-sm {
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
+  }
+
+  .size-icon {
+    width: var(--size-icon);
+    height: var(--size-icon);
+  }
+
+  .size-icon-lg {
+    width: var(--size-icon-lg);
+    height: var(--size-icon-lg);
+  }
+
+  /* ==============================================
+     BACKGROUND UTILITIES - Semantico
+     ============================================== */
+
+  .bg-dark {
+    background-color: rgb(var(--color-dark));
+  }
+
+  .bg-dark-elevated {
+    background-color: rgb(var(--color-dark-elevated));
+  }
+
+  .bg-dark-element {
+    background-color: rgb(var(--color-dark-element));
+  }
+
+  .bg-dark-element-hover {
+    background-color: rgb(var(--color-dark-element-hover));
+  }
+
+  .bg-brand {
+    background-color: rgb(var(--color-brand));
+  }
+
+  /* ==============================================
+     TEXT UTILITIES - Semantico
+     ============================================== */
+
+  .text-light-primary {
+    color: rgb(var(--color-light));
+  }
+
+  .text-light {
+    color: rgb(var(--color-light));
+  }
+
+  .text-light-secondary {
+    color: rgb(var(--color-light-secondary));
+  }
+
+  .text-light-tertiary {
+    color: rgb(var(--color-light-tertiary));
+  }
+
+  .text-brand {
+    color: rgb(var(--color-brand));
+  }
+
+  .text-dark {
+    color: rgb(var(--color-dark));
+  }
+
+  /* ==============================================
+     BORDER UTILITIES - Semantico
+     ============================================== */
+
+  .border-light-subtle {
+    border-color: rgba(113, 113, 122, 0.5); /* zinc-700/50 - Standard border */
+  }
+
+  .border-brand-subtle {
+    border-color: rgba(249, 115, 22, 0.4); /* orange-500/40 - Interactive hover */
+  }
+
+  .border-brand {
+    border-color: rgb(var(--color-brand));
+  }
+
+  /* Border con opacità */
+  .border-brand\/40 {
+    border-color: rgba(var(--color-brand), 0.4);
+  }
+
+  /* ==============================================
+     HOVER STATE UTILITIES - Semantico
+     ============================================== */
+
+  .hover\:bg-dark-element-hover:hover {
+    background-color: rgb(var(--color-dark-element-hover));
+  }
+
+  .hover\:text-brand:hover {
+    color: rgb(var(--color-brand));
+  }
+
+  .hover\:border-brand-subtle:hover {
+    border-color: rgba(249, 115, 22, 0.4); /* orange-500/40 */
+  }
+
+  .hover\:border-brand\/40:hover {
+    border-color: rgba(var(--color-brand), 0.4);
+  }
+
+  .group:hover .group-hover\:text-brand {
+    color: rgb(var(--color-brand));
+  }
+
+  /* ==============================================
+     BRAND GRADIENT - Signature gradient
+     ============================================== */
+
+  .bg-gradient-brand {
+    background-image: linear-gradient(to right, rgb(239 68 68), rgb(249 115 22), rgb(250 204 21));
+  }
+
+  /* Per uso con bg-clip-text */
+  .text-gradient-brand {
+    background-image: linear-gradient(to right, rgb(239 68 68), rgb(249 115 22), rgb(250 204 21));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* ==============================================
+     TYPOGRAPHY - Font families
+     ============================================== */
+
+  .font-brand-logo {
+    font-family: var(--font-pastor-of-muppets), sans-serif;
+  }
 
   .bg-size-200 {
     background-size: 200% 200%;

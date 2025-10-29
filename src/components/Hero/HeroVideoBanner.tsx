@@ -28,30 +28,48 @@ export default function HeroVideoBanner() {
   });
 
   // Trasformazioni 2.5D per vero effetto parallax:
+  // Desktop: effetto pieno per esperienza immersiva
   // - scale: rimpicciolisce da 1 a 0.85 (effetto zoom out)
   // - rotateX: rotazione 3D lungo l'asse X da 0 a 15deg (testa indietro, piedi avanti)
-  // - opacity: fade out progressivo per transizione fluida verso la sezione successiva
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
-  const rotateX = useTransform(scrollYProgress, [0, 1], [0, 15]);
+  const scaleDesktop = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
+  const rotateXDesktop = useTransform(scrollYProgress, [0, 1], [0, 15]);
+
+  // Mobile: effetto ridotto per performance e UX
+  // - scale: rimpicciolisce da 1 a 0.92 (più conservativo)
+  // - rotateX: rotazione 3D da 0 a 8deg (più delicato)
+  const scaleMobile = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
+  const rotateXMobile = useTransform(scrollYProgress, [0, 1], [0, 8]);
+
+  // Opacity: fade out progressivo uguale per tutti i dispositivi
   const opacity = useTransform(scrollYProgress, [0.2, 0.6, 0.85], [1, 0.5, 0]);
 
   // Fade out separato per il contenuto (testo e button) - inizia prima per effetto elegante
-  const contentOpacity = useTransform(scrollYProgress, [0.15, 0.4, 0.7], [1, 0.5, 0]);
+  const contentOpacity = useTransform(
+    scrollYProgress,
+    [0.15, 0.4, 0.7],
+    [1, 0.5, 0]
+  );
 
   // Transform CSS completa con perspective per evitare stacking context issues
-  const transform = useTransform(
-    [scale, rotateX],
+  const transformDesktop = useTransform(
+    [scaleDesktop, rotateXDesktop],
+    ([scaleVal, rotateXVal]) =>
+      `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
+  );
+
+  const transformMobile = useTransform(
+    [scaleMobile, rotateXMobile],
     ([scaleVal, rotateXVal]) =>
       `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
   );
 
   // Preload video con massima priorità
   useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'video';
-    link.href = '/videos/hero-video-hq.mp4';
-    link.type = 'video/mp4';
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "video";
+    link.href = "/videos/hero-video-hq.mp4";
+    link.type = "video/mp4";
     document.head.appendChild(link);
 
     return () => {
@@ -77,7 +95,8 @@ export default function HeroVideoBanner() {
     const calculateOffsets = () => {
       if (buttonRef.current && scrollIndicatorRef.current) {
         const buttonHeight = buttonRef.current.getBoundingClientRect().height;
-        const scrollHeight = scrollIndicatorRef.current.getBoundingClientRect().height;
+        const scrollHeight =
+          scrollIndicatorRef.current.getBoundingClientRect().height;
         setButtonOffset(buttonHeight / 2);
         setScrollOffset(scrollHeight / 2);
         setIsCalculated(true);
@@ -125,7 +144,7 @@ export default function HeroVideoBanner() {
       },
       {
         threshold: 0.1, // Attiva quando almeno il 10% è visibile
-        rootMargin: "50px" // Inizia a renderizzare 50px prima che entri nel viewport
+        rootMargin: "50px", // Inizia a renderizzare 50px prima che entri nel viewport
       }
     );
 
@@ -164,16 +183,13 @@ export default function HeroVideoBanner() {
   }, [shouldUseShader, setComponentReady]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-screen relative overflow-hidden"
-    >
-      {/* Video container con effetto parallax 2.5D - solo desktop */}
+    <div ref={containerRef} className="w-full h-screen relative">
+      {/* Video container con effetto parallax 2.5D - Desktop: pieno, Mobile: ridotto */}
       <motion.div
         className="absolute inset-0 w-full h-full origin-center"
         style={{
-          transform: shouldUseShader ? transform : undefined,
-          opacity: shouldUseShader ? opacity : 1,
+          transform: shouldUseShader ? transformDesktop : transformMobile,
+          opacity: opacity,
         }}
       >
         {shouldUseShader && (
@@ -204,22 +220,17 @@ export default function HeroVideoBanner() {
         className="absolute inset-0 z-20 pointer-events-none transition-opacity duration-200 origin-center"
         style={{
           opacity: isCalculated ? contentOpacity : 0,
-          transform: shouldUseShader ? transform : undefined,
+          transform: shouldUseShader ? transformDesktop : transformMobile,
         }}
       >
-        <div
-          className="h-full w-full pointer-events-auto grid"
-          style={{
-            gridTemplateRows: `1fr auto 1fr`,
-            rowGap: 0,
-          }}
-        >
-          <div style={{ paddingBottom: `${buttonOffset + scrollOffset}px` }}></div>
+        <div className="h-full w-full pointer-events-auto flex flex-col">
+          {/* Spacer superiore - si espande per riempire lo spazio */}
+          <div className="flex-1 " />
 
+          {/* Contenuto centrale - altezza automatica */}
           <div
             ref={shaderTextRef}
-            className="text-center self-center w-full"
-            style={{ marginTop: `-${buttonOffset + scrollOffset}px` }}
+            className="text-center flex-shrink-0 w-full "
           >
             <ShaderText
               className="w-full"
@@ -229,16 +240,20 @@ export default function HeroVideoBanner() {
             >
               SwaggerZ
             </ShaderText>
-            <div className="">
-              <p className="text-base md:text-lg  text-zinc-200 tracking-wide pt-2">
+            <div>
+              <p className="text-base md:text-lg text-light-secondary tracking-wide pt-xs">
                 Streetwear and Digital art since 2025
               </p>
             </div>
           </div>
 
+          {/* Spacer inferiore - si espande + padding bilanciato */}
           <div
-            className="flex flex-col items-center justify-center gap-8 max-lg:items-center max-lg:mt-16"
-            style={{ paddingTop: `${buttonOffset + scrollOffset}px` }}
+            className="flex-1 flex flex-col justify-center items-center relative "
+            style={{
+              paddingTop: `${(buttonOffset + scrollOffset + 32) / 2}px`,
+              paddingBottom: `${(buttonOffset + scrollOffset + 32) / 2}px`,
+            }}
           >
             <AnimatedButton
               href="#collection"
@@ -247,7 +262,7 @@ export default function HeroVideoBanner() {
               size="md"
             >
               <span className="hidden md:flex">Scopri la Collezione</span>
-              <span className="flex md:hidden flex-col text-center leading-tight gap-1">
+              <span className="flex md:hidden flex-col text-center leading-tight gap-2xs">
                 <span>Scopri</span>
                 <span>la Collezione</span>
               </span>
@@ -266,14 +281,16 @@ export default function HeroVideoBanner() {
               </svg>
             </AnimatedButton>
 
-            {/* Scroll Indicator - Integrato nel layout */}
+            {/* Scroll Indicator */}
             <div
               ref={scrollIndicatorRef}
-              className={`transition-opacity duration-500 ${
-                showScrollIndicator && isCalculated ? "opacity-100" : "opacity-0"
+              className={`transition-opacity duration-500 absolute bottom-sm ${
+                showScrollIndicator && isCalculated
+                  ? "opacity-100"
+                  : "opacity-0"
               }`}
             >
-              <div className="flex flex-col items-center gap-2 animate-bounce">
+              <div className="flex flex-col items-center gap-xs animate-bounce">
                 <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
                   Scroll
                 </span>

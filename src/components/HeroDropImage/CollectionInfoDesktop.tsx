@@ -65,7 +65,7 @@ const CollectionInfoDesktop: React.FC<CollectionInfoDesktopProps> = ({
       </div>
 
       {/* Colonna destra: Descrizione e CTA */}
-      <div className="flex flex-col items-end gap-3 max-w-xs">
+      <div className="flex flex-col items-end gap-3 max-w-prose">
         {/* Descrizione */}
         <motion.div
           className="inline-block px-4 py-2.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/10"

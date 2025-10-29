@@ -1,8 +1,8 @@
 "use client";
 
-import { WaveImageShader } from "./WaveImageShader";
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
+import { CategoryCard } from "./CategoryCard";
 
 interface ImageConfig {
   url: string;
@@ -79,7 +79,7 @@ export function HeroWaveImages({
 }: HeroWaveImagesProps) {
   return (
     <div
-      className={`relative w-full py-16 md:py-20 lg:py-24 px-6 md:px-8 lg:px-12 xl:px-16 ${className}`}
+      className={`relative w-full py-2xl md:py-3xl lg:py-3xl px-md md:px-lg lg:px-xl xl:px-2xl ${className}`}
     >
       {/* Gradient Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -109,7 +109,7 @@ export function HeroWaveImages({
       <div className="relative max-w-[1600px] mx-auto z-10">
         {/* Header Section */}
         <motion.div
-          className="text-center mb-12 md:mb-16 lg:mb-20 space-y-6 md:space-y-7"
+          className="text-center mb-xl md:mb-2xl lg:mb-3xl space-y-md md:space-y-lg"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
@@ -123,14 +123,14 @@ export function HeroWaveImages({
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-zinc-700/60 bg-zinc-900/50 text-zinc-400 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-light-subtle bg-dark-elevated text-light-secondary text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
               Collezione 2025
             </span>
           </motion.div>
 
           {/* Main Title */}
           <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5 ">
-            <h2 className="text-4xl md:text-5xl lg:text-8xl font-black text-white leading-none tracking-tight font-jost">
+            <h2 className="text-4xl md:text-5xl lg:text-8xl font-black text-light leading-none tracking-tight font-jost">
               Streetwear
             </h2>
             <div className="">
@@ -146,18 +146,17 @@ export function HeroWaveImages({
           </div>
 
           {/* Subtitle */}
-          <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-light-secondary max-w-prose mx-auto leading-relaxed">
             Crea il tuo outfit dei sogni, o completa il tuo guardaroba con i
             nostri esclusivi capi streetwear
           </p>
         </motion.div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-7 lg:gap-8 xl:gap-9">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md md:gap-lg">
           {images.map((image, index) => (
-            <motion.article
+            <motion.div
               key={image.url}
-              className="group relative flex flex-col cursor-pointer"
               initial={{ opacity: 0, y: 60 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
@@ -167,92 +166,8 @@ export function HeroWaveImages({
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
             >
-              {/* Container esterno con bordo e glow */}
-              <div className="relative border border-zinc-700/60 rounded-2xl overflow-hidden hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 bg-zinc-950 backdrop-blur-sm">
-                {/* Padding container per separare immagine dal bordo */}
-                <div className="pb-2">
-                  {/* Image Container con overflow hidden */}
-                  <div className="relative overflow-hidden rounded-t-lg">
-                    <div
-                      className="relative w-full overflow-hidden"
-                      style={{
-                        aspectRatio: `${(image.aspectRatio ?? 2 / 3) * 1.2}`,
-                      }}
-                    >
-                      {/* Canvas con margine extra per l'effetto wave */}
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          width: "calc(100% + 64px)",
-                          height: "calc(100% + 64px)",
-                          left: "-32px",
-                          top: "-32px",
-                        }}
-                      >
-                        <WaveImageShader
-                          imageUrl={image.url}
-                          aspectRatio={image.aspectRatio ?? 4 / 5}
-                          amplitude={image.waveIntensity}
-                          waveSpeed={image.waveSpeed}
-                          className="w-full h-full group-hover:scale-105 transition-transform duration-700"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Content Section */}
-                <div className="relative px-6 pb-6 pt-3">
-                  {/* Nickname Tag - Above title */}
-                  {image.nickname && (
-                    <span className="absolute -top-8 left-0 z-10 inline-block px-3 py-1 text-sm italic font-bold uppercase tracking-wider text-zinc-200 bg-zinc-950 rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-amber-400 transition-all duration-300">
-                      {image.emoji && (
-                        <span className="mr-1">{image.emoji}</span>
-                      )}
-                      &ldquo;{image.nickname}&rdquo;
-                    </span>
-                  )}
-
-                  {/* Title */}
-                  <h3 className="text-2xl lg:text-3xl font-jost font-black leading-tight tracking-tight text-white mb-3">
-                    {image.alt}
-                  </h3>
-
-                  {/* Description */}
-                  {image.description && (
-                    <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 mb-5">
-                      {image.description}
-                    </p>
-                  )}
-
-                  {/* CTA Link */}
-                  <div className="mt-auto">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-400 group-hover:text-amber-300 group-hover:gap-2.5 transition-all duration-300">
-                      Scopri{" "}
-                      {image.alt === "Felpe"
-                        ? "le nostre"
-                        : image.alt === "T-shirt"
-                        ? "le nostre"
-                        : "i nostri"}{" "}
-                      {image.alt}
-                      <svg
-                        className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </motion.article>
+              <CategoryCard image={image} useWaveShader={true} />
+            </motion.div>
           ))}
         </div>
       </div>
