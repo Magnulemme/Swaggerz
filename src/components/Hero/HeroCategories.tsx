@@ -9,7 +9,6 @@ import 'swiper/css/navigation';
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface ImageConfig {
   url: string;
@@ -187,7 +186,19 @@ export function HeroCategories({
               className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
               aria-label="Previous slides"
             >
-              <ArrowLeft className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
+              <svg
+                className="size-icon text-light-primary group-hover:text-brand transition-all duration-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                />
+              </svg>
             </button>
           )}
 
@@ -226,7 +237,19 @@ export function HeroCategories({
               className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
               aria-label="Next slides"
             >
-              <ArrowRight className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
+              <svg
+                className="size-icon text-light-primary group-hover:text-brand transition-all duration-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
             </button>
           )}
         </div>
