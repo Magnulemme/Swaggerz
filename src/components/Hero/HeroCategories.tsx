@@ -184,10 +184,10 @@ export function HeroCategories({
           {canScrollPrev && (
             <button
               onClick={scrollPrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group w-12 h-12 rounded-full bg-dark-element backdrop-blur-sm border-2 border-brand transition-all duration-200 items-center justify-center cursor-pointer hover:shadow-xl hover:shadow-brand/40 hover:scale-110"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
               aria-label="Previous slides"
             >
-              <ArrowLeft className="w-5 h-5 text-brand transition-transform duration-200 group-hover:scale-110" />
+              <ArrowLeft className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
             </button>
           )}
 
@@ -223,10 +223,10 @@ export function HeroCategories({
           {canScrollNext && (
             <button
               onClick={scrollNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group w-12 h-12 rounded-full bg-dark-element backdrop-blur-sm border-2 border-brand transition-all duration-200 items-center justify-center cursor-pointer hover:shadow-xl hover:shadow-brand/40 hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
               aria-label="Next slides"
             >
-              <ArrowRight className="w-5 h-5 text-brand transition-transform duration-200 group-hover:scale-110" />
+              <ArrowRight className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
             </button>
           )}
         </div>
