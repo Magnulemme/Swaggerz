@@ -46,7 +46,7 @@ export default function CircularDiagram({
       </div>
 
       {/* Layout Desktop: Diagramma circolare (nascosto su mobile) */}
-      <div className="hidden md:block relative w-full max-w-xl mx-auto xl:mx-0 aspect-square xl:order-1">
+      <div className="hidden md:block relative w-full max-w-title mx-auto xl:mx-0 aspect-square xl:order-1">
         {/* SVG con cerchi rotanti */}
         <motion.svg
           className="absolute inset-0 w-full h-full"

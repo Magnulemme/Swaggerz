@@ -53,8 +53,8 @@ interface UseAlignedFontSizeOptions {
  * );
  * ```
  */
-export function useAlignedFontSize(
-  referenceElementRef: RefObject<HTMLElement>,
+export function useAlignedFontSize<T extends HTMLElement = HTMLElement>(
+  referenceElementRef: RefObject<T> | RefObject<T | null>,
   options: UseAlignedFontSizeOptions = {}
 ): string | null {
   const {
@@ -218,8 +218,8 @@ export function useAlignedFontSize(
  * );
  * ```
  */
-export function useJostAlignment(
-  referenceElementRef: RefObject<HTMLElement>
+export function useJostAlignment<T extends HTMLElement = HTMLElement>(
+  referenceElementRef: RefObject<T> | RefObject<T | null>
 ): string | null {
   return useAlignedFontSize(referenceElementRef);
 }
