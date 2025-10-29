@@ -1,5 +1,6 @@
 "use client";
 
+import useEmblaCarousel from "embla-carousel-react";
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
@@ -11,17 +12,18 @@ interface ImageConfig {
   price?: string;
   nickname?: string;
   emoji?: string;
-  waveIntensity?: number;
-  waveSpeed?: number;
   badge?: "hot" | "sale" | "new" | "exclusive";
   aspectRatio?: number;
+  waveIntensity?: number;
+  waveSpeed?: number;
   soldCount?: number;
   popularityLabel?: string;
 }
 
-interface HeroWaveImagesProps {
+interface HeroCategoriesProps {
   images?: ImageConfig[];
   className?: string;
+  useWaveShader?: boolean;
 }
 
 const defaultImages: ImageConfig[] = [
@@ -73,10 +75,17 @@ const defaultImages: ImageConfig[] = [
   },
 ];
 
-export function HeroWaveImages({
+export function HeroCategories({
   images = defaultImages,
   className = "",
-}: HeroWaveImagesProps) {
+  useWaveShader = false,
+}: HeroCategoriesProps) {
+  const [emblaRef] = useEmblaCarousel({
+    align: "start",
+    loop: false,
+    dragFree: true,
+  });
+
   return (
     <div
       className={`relative w-full py-2xl md:py-3xl lg:py-3xl px-md md:px-lg lg:px-xl xl:px-2xl ${className}`}
@@ -129,7 +138,7 @@ export function HeroWaveImages({
           </motion.div>
 
           {/* Main Title */}
-          <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5 ">
+          <div className="flex flex-wrap items-start justify-center gap-4 lg:gap-5">
             <h2 className="text-4xl md:text-5xl lg:text-8xl font-black text-light leading-none tracking-tight font-jost">
               Streetwear
             </h2>
@@ -152,23 +161,21 @@ export function HeroWaveImages({
           </p>
         </motion.div>
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md md:gap-lg">
-          {images.map((image, index) => (
-            <motion.div
-              key={image.url}
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{
-                duration: 0.7,
-                delay: index * 0.1,
-                ease: [0.25, 0.46, 0.45, 0.94],
-              }}
-            >
-              <CategoryCard image={image} useWaveShader={true} />
-            </motion.div>
-          ))}
+        {/* Slider Responsive - si adatta automaticamente */}
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-md pl-sm pr-sm">
+            {images.map((image, index) => (
+              <div
+                key={image.url}
+                className="flex-[0_0_min(85%,320px)] sm:flex-[0_0_min(48%,340px)] md:flex-[0_0_350px]"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                }}
+              >
+                <CategoryCard image={image} useWaveShader={useWaveShader} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

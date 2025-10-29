@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import HeroVideoBanner from "./Hero/HeroVideoBanner";
-import { HeroWaveImages } from "./Hero/HeroWaveImages";
-import { HeroWaveImagesMobile } from "./Hero/HeroWaveImagesMobile";
+import { HeroCategories } from "./Hero/HeroCategories";
 import GridContent from "./GridContent";
 import ReviewsSection from "./NFTCollections/ReviewsSection";
 import ShippingInfoSection from "./NFTCollections/ShippingInfoSection";
@@ -35,9 +34,9 @@ const BentoHero = () => {
             <HeroVideoBanner />
           </div>
 
-          {/* Wave Images Section - Desktop: Shader, Mobile/Tablet: No Shader */}
+          {/* Categories Section - Responsive Slider with Shader on Desktop */}
           <div className="col-span-2 lg:col-span-4 w-full">
-            {isDesktop ? <HeroWaveImages /> : <HeroWaveImagesMobile />}
+            <HeroCategories useWaveShader={isDesktop} />
           </div>
 
           {/* Grid Content Section - Banners and Collections */}
