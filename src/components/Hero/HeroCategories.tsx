@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import useEmblaCarousel from "embla-carousel-react";
+import { useState } from "react";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import ShaderText from "@/components/ShaderText";
 import { motion } from "framer-motion";
 import { CategoryCard } from "./CategoryCard";
@@ -82,45 +86,22 @@ export function HeroCategories({
   className = "",
   useWaveShader = false,
 }: HeroCategoriesProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    loop: false,
-    slidesToScroll: 1,
-    breakpoints: {
-      '(min-width: 640px)': { slidesToScroll: 2 },
-      '(min-width: 1024px)': { slidesToScroll: 3 },
-      '(min-width: 1280px)': { slidesToScroll: 4 },
-      '(min-width: 1536px)': { slidesToScroll: 6 },
-    }
-  });
-
+  const imageCount = images.length;
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
 
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
+  // Configura slidesPerView dinamicamente
+  const getSlidesPerView = (breakpoint: number) => {
+    if (breakpoint >= 6 && imageCount >= 6) return 6;
+    if (breakpoint >= 4 && imageCount >= 4) return 4;
+    if (breakpoint >= 3 && imageCount >= 3) return 3;
+    if (breakpoint >= 2 && imageCount >= 2) return 2;
+    return 1;
+  };
 
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
-    return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onSelect);
-    };
-  }, [emblaApi, onSelect]);
+  const scrollPrev = () => swiperInstance?.slidePrev();
+  const scrollNext = () => swiperInstance?.slideNext();
 
   return (
     <div
@@ -242,22 +223,33 @@ export function HeroCategories({
           </button>
         </div>
 
-        {/* Slider Responsive - gestito da Embla */}
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-md">
-            {images.map((image, index) => (
-              <div
-                key={image.url}
-                className="flex-[0_0_100%] sm:flex-[0_0_calc(50%-8px)] lg:flex-[0_0_calc(33.333%-11px)] xl:flex-[0_0_calc(25%-12px)] 2xl:flex-[0_0_calc(16.666%-13px)]"
-                style={{
-                  animationDelay: `${index * 100}ms`,
-                }}
-              >
-                <CategoryCard image={image} useWaveShader={useWaveShader} />
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Swiper - dimensioni automatiche */}
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={8}
+          slidesPerView={getSlidesPerView(1)}
+          breakpoints={{
+            640: { slidesPerView: getSlidesPerView(2) },
+            1024: { slidesPerView: getSlidesPerView(3) },
+            1280: { slidesPerView: getSlidesPerView(4) },
+            1536: { slidesPerView: getSlidesPerView(6) },
+          }}
+          onSwiper={setSwiperInstance}
+          onSlideChange={(swiper) => {
+            setCanScrollPrev(!swiper.isBeginning);
+            setCanScrollNext(!swiper.isEnd);
+          }}
+          onInit={(swiper) => {
+            setCanScrollPrev(!swiper.isBeginning);
+            setCanScrollNext(!swiper.isEnd);
+          }}
+        >
+          {images.map((image, index) => (
+            <SwiperSlide key={image.url}>
+              <CategoryCard image={image} useWaveShader={useWaveShader} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </div>
   );
