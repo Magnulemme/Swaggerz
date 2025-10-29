@@ -178,33 +178,21 @@ export function HeroCategories({
           </p>
         </motion.div>
 
-        {/* Slider con controlli laterali */}
-        <div className="relative flex items-center gap-4">
-          {/* Freccia Sinistra */}
-          <button
-            onClick={scrollPrev}
-            disabled={!canScrollPrev}
-            className={`hidden md:flex group w-12 h-12 rounded-2xl bg-dark-elevated border transition-all duration-200 items-center justify-center cursor-pointer flex-shrink-0 z-10
-              ${
-                !canScrollPrev
-                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
-                  : "opacity-100 border-light-subtle hover:border-brand hover:shadow-lg hover:shadow-brand/20"
-              }`}
-            aria-label="Previous slides"
-          >
-            <ArrowLeft
-              className={`w-5 h-5 transition-colors duration-200
-                ${
-                  !canScrollPrev
-                    ? "text-light-tertiary"
-                    : "text-light-secondary group-hover:text-brand"
-                }`}
-            />
-          </button>
+        {/* Slider con controlli overlay */}
+        <div className="relative">
+          {/* Freccia Sinistra - Overlay */}
+          {canScrollPrev && (
+            <button
+              onClick={scrollPrev}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group w-12 h-12 rounded-full bg-dark-elevated/90 backdrop-blur-sm border border-light-subtle transition-all duration-200 items-center justify-center cursor-pointer hover:border-brand hover:shadow-xl hover:shadow-brand/30 hover:bg-dark-elevated"
+              aria-label="Previous slides"
+            >
+              <ArrowLeft className="w-5 h-5 text-light-secondary group-hover:text-brand transition-colors duration-200" />
+            </button>
+          )}
 
           {/* Swiper - dimensioni automatiche */}
-          <div className="flex-1 overflow-hidden">
-            <Swiper
+          <Swiper
           modules={[Navigation]}
           spaceBetween={8}
           slidesPerView={getSlidesPerView(1)}
@@ -230,29 +218,17 @@ export function HeroCategories({
             </SwiperSlide>
           ))}
         </Swiper>
-          </div>
 
-          {/* Freccia Destra */}
-          <button
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-            className={`hidden md:flex group w-12 h-12 rounded-2xl bg-dark-elevated border transition-all duration-200 items-center justify-center cursor-pointer flex-shrink-0 z-10
-              ${
-                !canScrollNext
-                  ? "opacity-40 !cursor-not-allowed border-light-subtle"
-                  : "opacity-100 border-light-subtle hover:border-brand hover:shadow-lg hover:shadow-brand/20"
-              }`}
-            aria-label="Next slides"
-          >
-            <ArrowRight
-              className={`w-5 h-5 transition-colors duration-200
-                ${
-                  !canScrollNext
-                    ? "text-light-tertiary"
-                    : "text-light-secondary group-hover:text-brand"
-                }`}
-            />
-          </button>
+          {/* Freccia Destra - Overlay */}
+          {canScrollNext && (
+            <button
+              onClick={scrollNext}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex group w-12 h-12 rounded-full bg-dark-elevated/90 backdrop-blur-sm border border-light-subtle transition-all duration-200 items-center justify-center cursor-pointer hover:border-brand hover:shadow-xl hover:shadow-brand/30 hover:bg-dark-elevated"
+              aria-label="Next slides"
+            >
+              <ArrowRight className="w-5 h-5 text-light-secondary group-hover:text-brand transition-colors duration-200" />
+            </button>
+          )}
         </div>
       </div>
     </div>
