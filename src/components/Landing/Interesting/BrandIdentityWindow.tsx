@@ -141,12 +141,15 @@ export default function BrandIdentityWindow() {
               >
                 Non un brand, una
               </h3>
-              <span
-                style={{ fontSize: titleFontSize, fontWeight: 900 }}
-                className="text-orange-500 pb-4"
-              >
-                Community
-              </span>
+              <div className="pb-4">
+                <ShaderText
+                  fontSize={shaderFontSize}
+                  fontWeight="900"
+                  fontFamily="var(--font-jost), sans-serif"
+                >
+                  Community
+                </ShaderText>
+              </div>
             </div>
           </motion.div>
 

@@ -1,10 +1,10 @@
 "use client";
-import useEmblaCarousel from 'embla-carousel-react';
+import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 
 // Importa Card dal file originale (assumiamo che sia disponibile)
-import Card from "./Card";
+import Card from "../Card";
 
 // Define proper types for the slider items
 interface SliderItem {
@@ -25,16 +25,20 @@ interface SliderProps {
   showBackground?: boolean;
 }
 
-export default function Slider({ items, children, showHeader = true, showBackground = true }: SliderProps) {
-
+export default function Slider({
+  items,
+  children,
+  showHeader = true,
+  showBackground = true,
+}: SliderProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'start',
+    align: "start",
     slidesToScroll: 1,
     breakpoints: {
-      '(max-width: 639px)': { slidesToScroll: 1 },
-      '(min-width: 640px)': { slidesToScroll: 1 },
-      '(min-width: 1024px)': { slidesToScroll: 3 }
-    }
+      "(max-width: 639px)": { slidesToScroll: 1 },
+      "(min-width: 640px)": { slidesToScroll: 1 },
+      "(min-width: 1024px)": { slidesToScroll: 3 },
+    },
   });
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -58,19 +62,23 @@ export default function Slider({ items, children, showHeader = true, showBackgro
   useEffect(() => {
     setIsLoaded(true);
     if (!emblaApi) return;
-    
+
     onSelect();
-    emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
-    
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+
     return () => {
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onSelect);
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onSelect);
     };
   }, [emblaApi, onSelect]);
 
   return (
-    <div className={`w-full mx-auto relative overflow-hidden font-jost ${showBackground ? 'bg-light-100 py-24' : ''}`}>
+    <div
+      className={`w-full mx-auto relative overflow-hidden font-jost ${
+        showBackground ? "bg-light-100 py-24" : ""
+      }`}
+    >
       {/* Background effects */}
       {showBackground && (
         <div className="absolute top-1/4 right-1/3 w-72 h-72 bg-gradient-to-r from-orange-500/5 to-red-500/5 rounded-full blur-3xl"></div>
@@ -81,7 +89,7 @@ export default function Slider({ items, children, showHeader = true, showBackgro
         {showHeader && (
           <div
             className={`text-center transform transition-all duration-1000 ease-out ${
-              isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              isLoaded ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
             }`}
           >
             {/* Top indicator */}
@@ -109,53 +117,50 @@ export default function Slider({ items, children, showHeader = true, showBackgro
         <div className="relative">
           <div className="relative px-8 max-sm:px-4">
             <div className="py-8  w-full flex items-center justify-center">
-              
               {/* Container che definisce la larghezza del contenuto */}
               <div className="w-full lg:max-w-7xl relative">
-                
                 {/* Frecce allineate al contenuto delle slide */}
                 <div className="flex justify-end gap-3 mb-4">
-                <button
+                  <button
                     onClick={scrollPrev}
                     disabled={!canScrollPrev}
                     className={`group w-10 h-10 rounded-2xl bg-white border transition-all duration-200 flex items-center justify-center cursor-pointer
                     ${
-                        !canScrollPrev
+                      !canScrollPrev
                         ? "opacity-40 !cursor-not-allowed border-zinc-200"
                         : "opacity-100 border-zinc-300 hover:border-orange-500"
                     }`}
-                >
+                  >
                     <ArrowLeft
-                    className={`w-4 h-4 transition-colors duration-200
+                      className={`w-4 h-4 transition-colors duration-200
                         ${
-                        !canScrollPrev
+                          !canScrollPrev
                             ? "text-zinc-400"
                             : "text-zinc-600 group-hover:text-orange-500"
                         }`}
                     />
-                </button>
+                  </button>
 
-                <button
+                  <button
                     onClick={scrollNext}
                     disabled={!canScrollNext}
                     className={`group w-10 h-10 rounded-2xl bg-white border transition-all duration-200 flex items-center justify-center cursor-pointer
                     ${
-                        !canScrollNext
+                      !canScrollNext
                         ? "opacity-40 !cursor-not-allowed border-zinc-200"
                         : "opacity-100 border-zinc-300 hover:border-orange-500"
                     }`}
-                >
+                  >
                     <ArrowRight
-                    className={`w-4 h-4 transition-colors duration-200
+                      className={`w-4 h-4 transition-colors duration-200
                         ${
-                        !canScrollNext
+                          !canScrollNext
                             ? "text-zinc-400"
                             : "text-zinc-600 group-hover:text-orange-500"
                         }`}
                     />
-                </button>
+                  </button>
                 </div>
-
 
                 {/* Dissolvenze responsive */}
                 <div
@@ -168,32 +173,37 @@ export default function Slider({ items, children, showHeader = true, showBackgro
                     !canScrollNext ? "opacity-0" : "opacity-100"
                   }`}
                 />
-                <div className="embla overflow-hidden pb-8 px-3 max-sm:px-0" ref={emblaRef}>
-                    <div className="embla__container flex gap-4 max-sm:gap-2 items-stretch">
-                        {children ? (
-                          children
-                        ) : items ? (
-                          items.map((p, i) => (
-                            <div
-                                key={p.id}
-                                className="embla__slide flex-none
+                <div
+                  className="embla overflow-hidden pb-8 px-3 max-sm:px-0"
+                  ref={emblaRef}
+                >
+                  <div className="embla__container flex gap-4 max-sm:gap-2 items-stretch">
+                    {children
+                      ? children
+                      : items
+                      ? items.map((p, i) => (
+                          <div
+                            key={p.id}
+                            className="embla__slide flex-none
                                     max-sm:w-[calc(100%-16px)]
                                     sm:w-[calc(50%-16px)]
                                     md:w-[calc(33.333%-16px)]
                                     lg:w-[280px]
                                     xl:w-[300px]"
-                            >
-                                <Card
-                                  title={p.title}
-                                  description={p.description || "No description available"}
-                                  imageSrc={`/shoes/shoe-${6 + i}.avif`}
-                                  price={p.priceCents / 100}
-                                  href={"/#"}
-                                />
-                            </div>
-                          ))
-                        ) : null}
-                    </div>
+                          >
+                            <Card
+                              title={p.title}
+                              description={
+                                p.description || "No description available"
+                              }
+                              imageSrc={`/shoes/shoe-${6 + i}.avif`}
+                              price={p.priceCents / 100}
+                              href={"/#"}
+                            />
+                          </div>
+                        ))
+                      : null}
+                  </div>
                 </div>
               </div>
             </div>
@@ -201,5 +211,5 @@ export default function Slider({ items, children, showHeader = true, showBackgro
         </div>
       </div>
     </div>
-  )
+  );
 }

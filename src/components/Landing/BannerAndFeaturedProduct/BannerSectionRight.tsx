@@ -1,5 +1,5 @@
 import React from 'react';
-import FeaturedCollectionBanner from '../NFTCollections/FeaturedCollectionBanner';
+import FeaturedCollectionBanner from './FeaturedCollectionBanner';
 
 /**
  * Right banner section with custom border and corner styling

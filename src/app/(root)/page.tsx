@@ -1,6 +1,6 @@
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/Hero";
+import Landing from "@/components/Landing";
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
         <AnnouncementBar />
         <Navbar />
         <main className="overflow-x-hidden">
-          <HeroSection />
+          <Landing />
         </main>
       </div>
     </>

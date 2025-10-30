@@ -63,8 +63,6 @@ export default function FeaturedProduct() {
   const scrollPrev = () => swiperInstance?.slidePrev();
   const scrollNext = () => swiperInstance?.slideNext();
 
-  const currentProduct = featuredProducts[selectedIndex];
-
   return (
     <div className="relative w-full h-full min-h-[300px] rounded-3xl border border-zinc-700/50 bg-black overflow-hidden group/slider">
       {/* Animated gradient background */}

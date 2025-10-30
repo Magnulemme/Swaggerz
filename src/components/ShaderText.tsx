@@ -13,7 +13,6 @@ interface ShaderTextProps {
   fontWeight?: string | number;
   fontFamily?: string; // Custom font family
   maxFontSize?: number; // Maximum font size in pixels (overrides fontSize max)
-  maxHeight?: number; // Maximum height in pixels
   shouldRender?: boolean; // Se false, skip setup completo
   shouldAnimate?: boolean; // Se false, render singolo
 }
@@ -32,7 +31,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   fontWeight = "900",
   fontFamily = "var(--font-pastor-of-muppets), cursive",
   maxFontSize,
-  maxHeight,
   shouldRender = true,
   shouldAnimate = true,
 }) => {
@@ -138,7 +136,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
             await document.fonts.load(
               `${fontWeight} ${scaledFontSize} ${fontFamily}`
             );
-          } catch (e) {
+          } catch {
             // Ignora errori di caricamento font
           }
         }

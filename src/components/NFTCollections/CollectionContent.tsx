@@ -1,18 +1,19 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import ShaderText from '@/components/ShaderText';
-import CollectionBadge from './CollectionBadge';
-import CollectionStats from './CollectionStats';
-import ShopButton from './ShopButton';
-import { Collection } from './types';
+import ShaderText from "@/components/ShaderText";
+import { motion } from "framer-motion";
+import CollectionBadge from "../Deprecated/CollectionBadge";
+import ShopButton from "../Deprecated/ShopButton";
+import CollectionStats from "../Deprecated/CollectionStats";
+import { Collection } from "../Landing/BannerAndFeaturedProduct/types";
 
 interface CollectionContentProps {
   collection: Collection;
 }
 
-export default function CollectionContent({ collection }: CollectionContentProps) {
+export default function CollectionContent({
+  collection,
+}: CollectionContentProps) {
   return (
     <motion.div
       className="flex flex-col justify-center h-full"

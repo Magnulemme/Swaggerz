@@ -218,8 +218,6 @@ const ProductShowcase = () => {
     swiperInstance?.slideTo(index);
   };
 
-  const currentCollection = collections[selectedIndex];
-
   return (
     <div className="relative w-full bg-black rounded-3xl overflow-hidden border border-zinc-700/50">
       {/* Animated gradient background */}

@@ -1,4 +1,4 @@
-import { MagicLinkTest } from '@/components/MagicLinkTest';
+import { MagicLinkTest } from '@/components/Deprecated/MagicLinkTest';
 
 export default function TestMagicLinkPage() {
   return (

@@ -4,7 +4,6 @@ import React, { useRef, useEffect, useState, useId, useMemo } from "react";
 import Image from "next/image";
 import ShaderText from "@/components/ShaderText";
 import CircularDiagram from "./CircularDiagram";
-import CentralLock from "./CentralLock";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { exclusiveNFTs } from "@/constants/nftCollections";
 import * as THREE from "three";

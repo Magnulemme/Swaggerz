@@ -2,7 +2,7 @@
 
 import React from "react";
 import { collections } from "@/constants/heroCollections";
-import TopCollections from "@/components/Hero/TopCollections";
+import TopCollections from "@/components/NFTCollections/TopCollections";
 import FeaturedArtist from "@/components/FeaturedArtist";
 
 export default function NFTCollectionsPage() {

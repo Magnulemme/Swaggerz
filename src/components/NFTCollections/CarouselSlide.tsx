@@ -1,23 +1,35 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import ShaderText from '@/components/ShaderText';
-import AnimatedGradientOrb from './AnimatedGradientOrb';
-import CollectionBadge from './CollectionBadge';
-import ShopButton from './ShopButton';
-import { Collection } from './types';
+import ShaderText from "@/components/ShaderText";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useState } from "react";
+import AnimatedGradientOrb from "../Deprecated/AnimatedGradientOrb";
+import CollectionBadge from "../Deprecated/CollectionBadge";
+import ShopButton from "../Deprecated/ShopButton";
+import { Collection } from "../Landing/BannerAndFeaturedProduct/types";
 
 interface CarouselSlideProps {
   collection: Collection;
 }
 
 const colorMap = {
-  emerald: { shadow: 'rgba(16, 185, 129, 0.6)', gradient: 'from-emerald-500 via-green-600 to-teal-500' },
-  cyan: { shadow: 'rgba(6, 182, 212, 0.6)', gradient: 'from-cyan-500 via-blue-600 to-sky-500' },
-  orange: { shadow: 'rgba(249, 115, 22, 0.6)', gradient: 'from-orange-500 via-amber-600 to-yellow-500' },
-  purple: { shadow: 'rgba(168, 85, 247, 0.6)', gradient: 'from-purple-500 via-violet-600 to-fuchsia-500' }
+  emerald: {
+    shadow: "rgba(16, 185, 129, 0.6)",
+    gradient: "from-emerald-500 via-green-600 to-teal-500",
+  },
+  cyan: {
+    shadow: "rgba(6, 182, 212, 0.6)",
+    gradient: "from-cyan-500 via-blue-600 to-sky-500",
+  },
+  orange: {
+    shadow: "rgba(249, 115, 22, 0.6)",
+    gradient: "from-orange-500 via-amber-600 to-yellow-500",
+  },
+  purple: {
+    shadow: "rgba(168, 85, 247, 0.6)",
+    gradient: "from-purple-500 via-violet-600 to-fuchsia-500",
+  },
 };
 
 export default function CarouselSlide({ collection }: CarouselSlideProps) {
@@ -34,8 +46,9 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
     >
       {/* Background effects */}
       <div className="absolute inset-0 opacity-20">
-        <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} blur-3xl`}
-          style={{ animation: 'pulse 4s ease-in-out infinite' }}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} blur-3xl`}
+          style={{ animation: "pulse 4s ease-in-out infinite" }}
         />
       </div>
 
@@ -48,17 +61,18 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
       {/* Main Grid: 2:1 ratio */}
       <div className="relative h-full px-8 lg:px-12 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 min-h-[600px]">
-
           {/* LEFT COLUMN - 2/3 - Titolo sopra + Immagini sotto */}
           <div className="lg:col-span-2 flex flex-col justify-between space-y-8">
-
             {/* Titolo in alto */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
             >
-              <CollectionBadge badge={collection.badge} badgeColor={collection.badgeColor} />
+              <CollectionBadge
+                badge={collection.badge}
+                badgeColor={collection.badgeColor}
+              />
 
               <h2 className="text-6xl lg:text-7xl font-black text-white mt-6 mb-4 leading-none tracking-tight">
                 {collection.title}
@@ -88,16 +102,18 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
                   whileHover={{
                     scale: 1.05,
                     zIndex: 50,
-                    rotate: idx % 2 === 0 ? 2 : -2
+                    rotate: idx % 2 === 0 ? 2 : -2,
                   }}
                 >
                   {/* Glow effect */}
                   <motion.div
                     className="absolute -inset-3 rounded-2xl blur-2xl"
-                    style={{ background: `radial-gradient(circle, ${colors.shadow}, transparent 70%)` }}
+                    style={{
+                      background: `radial-gradient(circle, ${colors.shadow}, transparent 70%)`,
+                    }}
                     animate={{
                       opacity: hoveredImg === idx ? 1 : 0,
-                      scale: hoveredImg === idx ? 1.2 : 1
+                      scale: hoveredImg === idx ? 1.2 : 1,
                     }}
                     transition={{ duration: 0.3 }}
                   />
@@ -110,8 +126,9 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
                       fill
                       className="object-cover"
                       style={{
-                        transform: hoveredImg === idx ? 'scale(1.15)' : 'scale(1)',
-                        transition: 'transform 0.7s ease-out'
+                        transform:
+                          hoveredImg === idx ? "scale(1.15)" : "scale(1)",
+                        transition: "transform 0.7s ease-out",
                       }}
                     />
 
@@ -128,9 +145,13 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
                       initial={{ scale: 0, rotate: -180 }}
                       animate={{
                         scale: hoveredImg === idx ? 1 : 0,
-                        rotate: hoveredImg === idx ? 0 : -180
+                        rotate: hoveredImg === idx ? 0 : -180,
                       }}
-                      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 25,
+                      }}
                     >
                       {idx + 1}
                     </motion.div>
@@ -160,14 +181,20 @@ export default function CarouselSlide({ collection }: CarouselSlideProps) {
               />
             </motion.div>
           </div>
-
         </div>
       </div>
 
       <style jsx>{`
         @keyframes pulse {
-          0%, 100% { opacity: 0.2; transform: scale(1.5); }
-          50% { opacity: 0.3; transform: scale(1.7); }
+          0%,
+          100% {
+            opacity: 0.2;
+            transform: scale(1.5);
+          }
+          50% {
+            opacity: 0.3;
+            transform: scale(1.7);
+          }
         }
       `}</style>
     </motion.div>

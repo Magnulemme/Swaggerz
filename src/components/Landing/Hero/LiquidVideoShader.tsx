@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useId } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { vertexShader, fragmentShader } from './shaders/liquidShader';
+import { vertexShader, fragmentShader } from '../Shared/shaders/liquidShader';
 
 interface LiquidVideoShaderProps {
   videoSrc: string;
@@ -15,9 +15,6 @@ const LiquidVideoShader: React.FC<LiquidVideoShaderProps> = ({
   className = "",
   containerRef: externalContainerRef
 }) => {
-  const uniqueId = useId();
-  const taskId = `liquid-video-${uniqueId.replace(/:/g, '-')}`;
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const internalContainerRef = useRef<HTMLDivElement>(null);

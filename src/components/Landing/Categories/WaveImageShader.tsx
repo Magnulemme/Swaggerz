@@ -7,7 +7,7 @@ import {
   waveFragmentShader,
   SHADER_CONSTANTS,
   createShaderUniforms,
-} from "./shaders";
+} from "../Shared/shaders";
 
 interface WaveImageShaderProps {
   imageUrl: string;
@@ -35,7 +35,6 @@ export function WaveImageShader({
   const geometryDimensionsRef = useRef({ width: 1, height: 1 });
   const mouseRef = useRef({ x: 0, y: 0 });
   const [isReady, setIsReady] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const targetAmplitudeRef = useRef(0); // Amplitude target (0 quando non hover, amplitude quando hover)
   const currentAmplitudeRef = useRef(0); // Amplitude corrente (interpolata)
 
@@ -213,13 +212,11 @@ export function WaveImageShader({
 
     // Mouse enter handler - attiva effetto
     const handleMouseEnter = () => {
-      setIsHovered(true);
       targetAmplitudeRef.current = amplitude; // Attiva effetto
     };
 
     // Mouse leave handler - disattiva effetto
     const handleMouseLeave = () => {
-      setIsHovered(false);
       targetAmplitudeRef.current = 0; // Disattiva effetto
 
       if (materialRef.current) {

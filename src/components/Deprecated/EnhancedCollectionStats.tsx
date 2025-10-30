@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import AnimatedCounter from './AnimatedCounter';
-import GlassmorphicCard from './GlassmorphicCard';
+import React from "react";
+import { motion } from "framer-motion";
+import AnimatedCounter from "./AnimatedCounter";
+import GlassmorphicCard from "./GlassmorphicCard";
 
 interface EnhancedCollectionStatsProps {
   price: string;
@@ -14,36 +14,36 @@ interface EnhancedCollectionStatsProps {
 
 const colorMap = {
   emerald: {
-    text: 'text-emerald-400',
-    glow: 'rgba(16, 185, 129, 0.3)',
-    gradient: 'from-emerald-500/20 to-green-500/10',
-    border: 'border-emerald-500/30'
+    text: "text-emerald-400",
+    glow: "rgba(16, 185, 129, 0.3)",
+    gradient: "from-emerald-500/20 to-green-500/10",
+    border: "border-emerald-500/30",
   },
   cyan: {
-    text: 'text-cyan-400',
-    glow: 'rgba(6, 182, 212, 0.3)',
-    gradient: 'from-cyan-500/20 to-blue-500/10',
-    border: 'border-cyan-500/30'
+    text: "text-cyan-400",
+    glow: "rgba(6, 182, 212, 0.3)",
+    gradient: "from-cyan-500/20 to-blue-500/10",
+    border: "border-cyan-500/30",
   },
   orange: {
-    text: 'text-orange-400',
-    glow: 'rgba(249, 115, 22, 0.3)',
-    gradient: 'from-orange-500/20 to-amber-500/10',
-    border: 'border-orange-500/30'
+    text: "text-orange-400",
+    glow: "rgba(249, 115, 22, 0.3)",
+    gradient: "from-orange-500/20 to-amber-500/10",
+    border: "border-orange-500/30",
   },
   purple: {
-    text: 'text-purple-400',
-    glow: 'rgba(168, 85, 247, 0.3)',
-    gradient: 'from-purple-500/20 to-violet-500/10',
-    border: 'border-purple-500/30'
-  }
+    text: "text-purple-400",
+    glow: "rgba(168, 85, 247, 0.3)",
+    gradient: "from-purple-500/20 to-violet-500/10",
+    border: "border-purple-500/30",
+  },
 };
 
 export default function EnhancedCollectionStats({
   price,
   pieces,
   nftLabel,
-  badgeColor
+  badgeColor,
 }: EnhancedCollectionStatsProps) {
   const colors = colorMap[badgeColor];
 
@@ -124,7 +124,7 @@ export default function EnhancedCollectionStats({
               whileInView={{ x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1.5, delay: 0.7 }}
-              style={{ width: '75%' }}
+              style={{ width: "75%" }}
             />
           </motion.div>
         </GlassmorphicCard>
@@ -182,7 +182,9 @@ export default function EnhancedCollectionStats({
               {[...Array(5)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className={`w-1.5 h-1.5 rounded-full ${i < 3 ? colors.text : 'bg-white/10'}`}
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    i < 3 ? colors.text : "bg-white/10"
+                  }`}
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
@@ -217,7 +219,9 @@ export default function EnhancedCollectionStats({
                 Limited Edition
               </motion.p>
               <div className="flex items-center gap-2">
-                <span className={`text-2xl font-bold ${colors.text}`}>{nftLabel}</span>
+                <span className={`text-2xl font-bold ${colors.text}`}>
+                  {nftLabel}
+                </span>
                 <motion.div
                   className={`px-2 py-1 rounded-md bg-white/5 text-xs ${colors.text} font-medium`}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -239,11 +243,15 @@ export default function EnhancedCollectionStats({
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "easeInOut"
+                ease: "easeInOut",
               }}
             >
-              <div className={`absolute inset-0 bg-gradient-to-r ${colors.gradient} blur-xl opacity-50`} />
-              <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center border ${colors.border}`}>
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${colors.gradient} blur-xl opacity-50`}
+              />
+              <div
+                className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center border ${colors.border}`}
+              >
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"

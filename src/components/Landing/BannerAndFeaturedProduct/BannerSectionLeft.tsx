@@ -1,5 +1,5 @@
 import React from "react";
-import FeaturedCollectionBanner from "../NFTCollections/FeaturedCollectionBanner";
+import FeaturedCollectionBanner from "./FeaturedCollectionBanner";
 
 /**
  * Left banner section with gradient backgrounds and L-shaped border

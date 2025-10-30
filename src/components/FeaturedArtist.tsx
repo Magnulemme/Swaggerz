@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import CircularGallery from './Hero/CircularGallery';
+import CircularGallery from './NFTCollections/CircularGallery';
 
 interface Card {
   id: number;

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLoadingStore } from '@/store/useLoadingStore';
+import { usePathname } from 'next/navigation';
 
 interface SwagLoaderProps {
   message?: string;
@@ -105,8 +106,14 @@ export function SwagLoader({
     message || swagMessages[0]
   );
   const [isComplete, setIsComplete] = useState(false);
+  const pathname = usePathname();
   const isLoading = useLoadingStore((state) => state.isLoading);
   const componentsReady = useLoadingStore((state) => state.componentsReady);
+  const resetLoading = useLoadingStore((state) => state.resetLoading);
+
+  // Determina se la pagina corrente ha componenti che devono caricare
+  const isLandingPage = pathname === '/';
+  const needsComponentLoading = isLandingPage;
 
   // Gestione messaggi random
   useEffect(() => {
@@ -118,6 +125,28 @@ export function SwagLoader({
 
     return () => clearInterval(interval);
   }, [showRandomMessages, message]);
+
+  // Reset loading state quando si cambia pagina
+  useEffect(() => {
+    if (!isPageLoader) return;
+
+    console.log('🔄 Page changed to:', pathname);
+    setIsComplete(false);
+
+    // Se non siamo sulla landing, non aspettare i componenti
+    if (!needsComponentLoading) {
+      console.log('⚡ Non-landing page detected, skipping component loading');
+      // Dai un breve delay per evitare flash
+      const timer = setTimeout(() => {
+        setIsComplete(true);
+        onLoadComplete?.();
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      // Reset per la landing page
+      resetLoading();
+    }
+  }, [pathname, isPageLoader, needsComponentLoading, resetLoading, onLoadComplete]);
 
   // Disabilita scroll durante il loading
   useEffect(() => {
@@ -137,9 +166,25 @@ export function SwagLoader({
     };
   }, [isPageLoader, isLoading]);
 
+  // Timeout di fallback per la landing page (max 5 secondi)
+  useEffect(() => {
+    if (!isPageLoader || !needsComponentLoading) return;
+
+    console.log('⏱️ Starting fallback timeout for landing page');
+    const fallbackTimer = setTimeout(() => {
+      if (isLoading) {
+        console.warn('⚠️ Loading timeout reached, forcing completion');
+        setIsComplete(true);
+        onLoadComplete?.();
+      }
+    }, 5000); // 5 secondi massimo
+
+    return () => clearTimeout(fallbackTimer);
+  }, [isPageLoader, needsComponentLoading, isLoading, onLoadComplete]);
+
   // Gestione caricamento pagina (solo se isPageLoader=true)
   useEffect(() => {
-    if (!isPageLoader) return;
+    if (!isPageLoader || !needsComponentLoading) return;
 
     // Log dello stato dei componenti
     console.log('📊 Loading state:', {
@@ -154,7 +199,7 @@ export function SwagLoader({
       setIsComplete(true);
       onLoadComplete?.();
     }
-  }, [isPageLoader, isLoading, componentsReady, onLoadComplete]);
+  }, [isPageLoader, needsComponentLoading, isLoading, componentsReady, onLoadComplete]);
 
   // Se è un page loader, usa AnimatePresence per l'uscita
   if (isPageLoader) {
