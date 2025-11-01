@@ -57,18 +57,14 @@ export function CategoryCard({ image, useWaveShader = false }: CategoryCardProps
               </div>
             ) : (
               // Mobile: Simple Image Version
-              <div
-                className="relative w-full"
-                style={{
-                  aspectRatio: `${image.aspectRatio ?? 4 / 5}`,
-                }}
-              >
+              <div className="relative w-full aspect-[4/5]">
                 <LazyImage
                   src={image.url}
                   alt={image.alt}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
                   rootMargin="300px"
+                  eager={true}
                   unoptimized
                 />
               </div>

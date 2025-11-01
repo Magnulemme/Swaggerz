@@ -183,7 +183,7 @@ export default function HeroVideoBanner() {
   }, [shouldUseShader, setComponentReady]);
 
   return (
-    <div ref={containerRef} className="w-full h-screen relative">
+    <div ref={containerRef} className="w-full h-dvh relative">
       {/* Video container con effetto parallax 2.5D - Desktop: pieno, Mobile: ridotto */}
       <motion.div
         className="absolute inset-0 w-full h-full origin-center"
