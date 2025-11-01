@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import Image from 'next/image';
+import { LazyImage } from '@/components/ui/LazyImage';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -85,11 +85,12 @@ export default function NFTSlider({ title, collections }: NFTSliderProps) {
               >
                 {/* Image */}
                 <div className="relative w-full aspect-square overflow-hidden bg-zinc-800">
-                  <Image
+                  <LazyImage
                     src={nft.image}
                     alt={nft.name}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    rootMargin="400px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>

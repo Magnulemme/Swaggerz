@@ -125,6 +125,8 @@ export default function FeaturedProduct() {
                         alt={product.name}
                         fill
                         className="object-cover"
+                        loading="lazy"
+                        sizes="(max-width: 768px) 100vw, 50vw"
                       />
 
                       {/* Overlay gradient */}

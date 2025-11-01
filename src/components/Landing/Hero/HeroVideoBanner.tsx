@@ -68,8 +68,8 @@ export default function HeroVideoBanner() {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "video";
-    link.href = "/videos/hero-video-hq.mp4";
-    link.type = "video/mp4";
+    link.href = "/videos/hero-video.webm";
+    link.type = "video/webm";
     document.head.appendChild(link);
 
     return () => {
@@ -194,7 +194,7 @@ export default function HeroVideoBanner() {
       >
         {shouldUseShader && (
           <LiquidVideoShader
-            videoSrc="/videos/hero-video-hq.mp4"
+            videoSrc="/videos/hero-video.webm"
             className=""
             containerRef={containerRef}
           />
@@ -210,7 +210,7 @@ export default function HeroVideoBanner() {
             preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/videos/hero-video-hq.mp4" type="video/mp4" />
+            <source src="/videos/hero-video.webm" type="video/webm" />
           </video>
         )}
       </motion.div>

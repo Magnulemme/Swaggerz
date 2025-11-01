@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { LazyImage } from "@/components/ui/LazyImage";
 import Link from "next/link";
 import { useState } from "react";
 import { Heart, Share2, ArrowRight } from "lucide-react";
@@ -83,11 +83,12 @@ export default function Card({
           </svg>
         </button>
 
-        <Image
+        <LazyImage
           src={imageSrc}
           alt={imageAlt || title}
           fill
           className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+          rootMargin="350px"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { LazyImage } from "@/components/ui/LazyImage";
 import { WaveImageShader } from "./WaveImageShader";
 
 export interface CategoryCardImage {
@@ -63,12 +63,12 @@ export function CategoryCard({ image, useWaveShader = false }: CategoryCardProps
                   aspectRatio: `${image.aspectRatio ?? 4 / 5}`,
                 }}
               >
-                <Image
+                <LazyImage
                   src={image.url}
                   alt={image.alt}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="eager"
+                  rootMargin="300px"
                   unoptimized
                 />
               </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import { LazyImage } from '@/components/ui/LazyImage';
 
 interface Card {
   id: number;
@@ -128,12 +128,12 @@ const CircularGallery: React.FC<CircularGalleryProps> = ({ cards = defaultCards 
                       willChange: 'transform',
                     }}
                   >
-                    <Image
+                    <LazyImage
                       src={item.image}
                       alt={item.title}
                       fill
                       className="object-cover"
-                      loading="lazy"
+                      rootMargin="500px"
                     />
                   </div>
                 </div>
