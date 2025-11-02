@@ -57,17 +57,9 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
   }, [open]);
 
   useEffect(() => {
-    let ticking = false;
-
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const isScrolled = window.scrollY > 20;
-          setScrolled(isScrolled);
-          ticking = false;
-        });
-        ticking = true;
-      }
+      const isScrolled = window.scrollY > 20;
+      setScrolled(isScrolled);
     };
 
     // Check iniziale immediato
@@ -79,8 +71,8 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
 
   return (
     <header
-      className={`fixed left-0 right-0 w-full z-[60] transition-all duration-500 ${
-        scrolled ? "bg-dark border-b border-white/10 shadow-lg" : "bg-transparent"
+      className={`fixed left-0 right-0 w-full z-[60] transition-all duration-500 border-b ${
+        scrolled ? "bg-dark border-white/10 shadow-lg" : "bg-transparent border-transparent"
       }`}
       style={{
         top: scrolled ? "0px" : "var(--announcement-bar-height, 0px)",
@@ -92,11 +84,11 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
         {/* Desktop menu con NavigationMenu - Pill-shaped container */}
         <NavigationMenu className="hidden lg:block" viewport={false}>
           <div
-            className={`px-md backdrop-blur-md border border-white/10 rounded-full shadow-lg transition-all duration-500 ${
-              scrolled ? 'bg-orange-500/15' : 'bg-dark-elevated'
-            }`}
+            className="relative px-md backdrop-blur-md border border-white/10 rounded-full shadow-lg transition-all duration-500 bg-dark-elevated"
           >
-            <NavigationMenuList className="flex items-center gap-1">
+            {/* Layer arancione sopra */}
+            <div className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+            <NavigationMenuList className="flex items-center gap-1 relative z-10">
               {navLinks.map((link) => (
                 <AnimatedNavLink
                   key={link.label}
@@ -111,7 +103,7 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
           </div>
         </NavigationMenu>
 
-        <NavbarActions cartCount={cartCount} scrolled={scrolled} />
+        <NavbarActions cartCount={cartCount} />
         <HamburgerButton open={open} onClick={() => setOpen(!open)} />
       </nav>
 

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { WaveImageShader } from "./WaveImageShader";
 
 export interface CategoryCardImage {
   url: string;
@@ -10,16 +9,13 @@ export interface CategoryCardImage {
   nickname?: string;
   emoji?: string;
   aspectRatio?: number;
-  waveIntensity?: number;
-  waveSpeed?: number;
 }
 
 interface CategoryCardProps {
   image: CategoryCardImage;
-  useWaveShader?: boolean;
 }
 
-export function CategoryCard({ image, useWaveShader = false }: CategoryCardProps) {
+export function CategoryCard({ image }: CategoryCardProps) {
   return (
     <article className="group relative flex flex-col cursor-pointer h-full">
       {/* Container esterno con bordo e glow */}
@@ -27,56 +23,26 @@ export function CategoryCard({ image, useWaveShader = false }: CategoryCardProps
         {/* Padding container per separare immagine dal bordo */}
         <div className="pb-xs">
           {/* Image Container */}
-          <div className="relative w-full overflow-hidden rounded-t-lg max-h-[450px]">
-            {useWaveShader ? (
-              // Desktop: Wave Shader Version
-              <div
-                className="relative w-full overflow-hidden"
-                style={{
-                  aspectRatio: `${(image.aspectRatio ?? 4 / 5) * 1.2}`,
-                }}
-              >
-                {/* Canvas con margine extra per l'effetto wave */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    width: "calc(100% + 64px)",
-                    height: "calc(100% + 64px)",
-                    left: "-32px",
-                    top: "-32px",
-                  }}
-                >
-                  <WaveImageShader
-                    imageUrl={image.url}
-                    aspectRatio={image.aspectRatio ?? 4 / 5}
-                    amplitude={image.waveIntensity}
-                    waveSpeed={image.waveSpeed}
-                    className="w-full h-full group-hover:scale-105 transition-transform duration-700"
-                  />
-                </div>
-              </div>
-            ) : (
-              // Mobile: Simple Image Version
-              <div className="relative w-full aspect-[4/5]">
-                <Image
-                  src={image.url}
-                  alt={image.alt}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  unoptimized
-                />
-              </div>
-            )}
+          <div className="relative w-full overflow-hidden rounded-t-lg">
+            <div className="relative w-full aspect-square">
+              <Image
+                src={image.url}
+                alt={image.alt}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                unoptimized
+              />
+            </div>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="relative px-md pb-md pt-xs">
+        <div className="relative px-lg pb-lg pt-sm">
           {/* Nickname Tag - Above title */}
           {image.nickname && (
-            <span className="absolute -top-lg left-0 z-10 inline-block px-sm py-xs text-sm italic font-bold uppercase tracking-wider text-light-secondary bg-dark-elevated rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-brand transition-all duration-300">
+            <span className="absolute -top-lg left-0 z-10 inline-block px-sm py-xs text-xs italic font-bold uppercase tracking-wider text-light-secondary bg-dark-elevated rounded-tr-2xl shadow-lg backdrop-blur-sm group-hover:text-brand transition-all duration-300">
               {image.emoji && (
                 <span className="pl-2xs mr-2xs">{image.emoji}</span>
               )}

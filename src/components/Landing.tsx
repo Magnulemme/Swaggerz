@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import HeroVideoBanner from "./Landing/Hero/HeroVideoBanner";
-import { HeroCategories } from "./Landing/Categories/HeroCategories";
-import ProductShowcase from "./Landing/ProductShowcase/ProductShowcase";
 import BannerAndFeaturedProductLg from "./Landing/BannerAndFeaturedProduct/BannerAndFeaturedProductLg";
 import BannerAndFeaturedProductMobile from "./Landing/BannerAndFeaturedProduct/BannerAndFeaturedProductMobile";
 import FeaturedProduct from "./Landing/BannerAndFeaturedProduct/FeaturedProduct";
@@ -12,41 +10,33 @@ import UnlockDesignsSection from "./Landing/UnlockDesigns/UnlockDesignsSection";
 import ReviewsSection from "./Landing/Reviews/ReviewsSection";
 import ShippingInfoSection from "./Landing/Shipping/ShippingInfoSection";
 import NewsletterBanner from "./Landing/Newsletter/NewsletterBanner";
+import { SectionTitle } from "./Landing/SectionTitle";
+import { StreetwearEssentials } from "./Landing/StreetwearEssentials";
 
 const Landing = () => {
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    // Check if screen is desktop (>= 1280px for shader performance)
-    const checkDesktop = () => {
-      const desktop = window.innerWidth >= 1280;
-      setIsDesktop(desktop);
-    };
-
-    checkDesktop();
-    window.addEventListener("resize", checkDesktop);
-    return () => window.removeEventListener("resize", checkDesktop);
-  }, []);
-
   return (
-    <section className="relative bg-zinc-950 font-jost min-h-screen overflow-x-hidden">
+    <section className="relative bg-zinc-950 font-jost min-h-screen ">
       {/* Main content container */}
-      <div className="relative z-50 w-full overflow-x-hidden">
-        {/* Hero & Categories Grid */}
-        <div className="relative grid grid-cols-2 lg:grid-cols-4 auto-rows-auto z-50">
-          {/* Hero Video Banner Section */}
-          <div className="col-span-2 lg:col-span-4 lg:row-span-2 w-full">
-            <HeroVideoBanner />
-          </div>
-
-          {/* Categories Section - Responsive Slider with Shader on Desktop */}
-          <div className="col-span-2 lg:col-span-4 w-full">
-            <HeroCategories useWaveShader={isDesktop} />
-          </div>
+      <div className="relative z-50 w-full">
+        {/* Hero Video Banner */}
+        <div className="relative w-full z-50">
+          <HeroVideoBanner />
         </div>
 
+        {/* Streetwear Essentials - Contains Product Showcase, Collections, Categories */}
+        <StreetwearEssentials />
+
+        {/* Collaborations Subtitle */}
+        <SectionTitle
+          eyebrow="Limited Edition"
+          title="Collaborazioni"
+          shaderText="Esclusive"
+          description="Drop limitati e partnership uniche con i migliori brand streetwear"
+          size="md"
+        />
+
         {/* Temporary Collection & Featured Products - Bento Grid Layout */}
-        <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 bg-zinc-950">
           <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 auto-rows-auto z-50">
             {/* Desktop Layout (lg+) */}
             <div className="hidden lg:contents">
@@ -61,11 +51,6 @@ const Landing = () => {
             {/* Featured Product - SOLO mobile */}
             <div className="col-span-2 lg:hidden min-h-[300px] z-20">
               <FeaturedProduct />
-            </div>
-
-            {/* Product Showcase - Full width carousel */}
-            <div className="col-span-2 lg:col-span-4 min-h-[400px] z-20">
-              <ProductShowcase />
             </div>
 
             {/* Transition Banner - Full width */}

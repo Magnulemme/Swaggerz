@@ -5,10 +5,10 @@ import Landing from "@/components/Landing";
 export default function Home() {
   return (
     <>
-      <div className="relative z-[1] bg-zinc-950 overflow-x-hidden">
+      <div className="relative z-[1] bg-zinc-950">
         <AnnouncementBar />
         <Navbar />
-        <main className="overflow-x-hidden">
+        <main>
           <Landing />
         </main>
       </div>

@@ -39,12 +39,12 @@ const socialLinks = [
 
 export default function StickyFooter() {
   return (
-    <footer className="sticky bottom-0 left-0 z-0 bg-zinc-950 font-jost">
+    <footer className="relative md:sticky bottom-0 left-0 z-0 bg-zinc-950 font-jost">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 lg:py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
           {/* Brand Section */}
-          <div className="col-span-2">
+          <div className="col-span-2 md:col-span-4 lg:col-span-2">
             <h3 className="text-2xl font-black text-white mb-4">Swaggerz</h3>
             <p className="text-zinc-400 mb-6 max-w-prose-sm">
               L&apos;unico marketplace dove i tuoi NFT diventano streetwear

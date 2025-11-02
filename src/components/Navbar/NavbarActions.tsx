@@ -6,32 +6,30 @@ import { motion } from "framer-motion";
 
 interface NavbarActionsProps {
   cartCount?: number;
-  scrolled?: boolean;
 }
 
 export default function NavbarActions({
   cartCount = 0,
-  scrolled = false,
 }: NavbarActionsProps) {
   return (
     <div className="hidden md:flex items-center gap-sm">
       {/* Search */}
       <button
-        className={`group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 ${
-          scrolled ? "bg-orange-500/15" : "bg-dark-elevated"
-        }`}
+        className="group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated"
       >
-        <Search className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
+        {/* Layer arancione sopra */}
+        <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        <Search className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 relative z-10" />
       </button>
 
       {/* Account */}
       <Link
         href="/sign-in"
-        className={`group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 ${
-          scrolled ? "bg-orange-500/15" : "bg-dark-elevated"
-        }`}
+        className="group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated"
       >
-        <User className="size-icon text-light-primary group-hover:text-brand transition-all duration-500" />
+        {/* Layer arancione sopra */}
+        <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        <User className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 relative z-10" />
       </Link>
 
       {/* Cart - Special CTA with animated border */}
@@ -45,11 +43,9 @@ export default function NavbarActions({
         />
 
         <span className="inline-flex h-full w-full items-center justify-center rounded-full px-md py-sm gap-xs backdrop-blur-3xl relative bg-dark-elevated">
-          {/* Layer arancione on scroll */}
+          {/* Layer arancione sempre attivo */}
           <span
-            className={`absolute inset-0 rounded-full transition-all duration-500 ${
-              scrolled ? "bg-orange-500/15" : "bg-transparent"
-            }`}
+            className="absolute inset-0 rounded-full transition-all duration-500 bg-orange-500/15"
           ></span>
 
           {/* Contenuto sopra i layer */}

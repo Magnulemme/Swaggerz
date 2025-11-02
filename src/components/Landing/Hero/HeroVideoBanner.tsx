@@ -1,17 +1,17 @@
 "use client";
 
 import ShaderText from "@/components/ShaderText";
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import LiquidVideoShader from "./LiquidVideoShader";
-import { useLoadingStore } from "@/store/useLoadingStore";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
+import { useLoadingStore } from "@/store/useLoadingStore";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import LiquidVideoShader from "./LiquidVideoShader";
 
 export default function HeroVideoBanner() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [shouldUseShader, setShouldUseShader] = useState(false);
   const [buttonOffset, setButtonOffset] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
@@ -20,48 +20,16 @@ export default function HeroVideoBanner() {
   const [isShaderTextVisible, setIsShaderTextVisible] = useState(false);
   const shaderTextRef = useRef<HTMLDivElement>(null);
   const setComponentReady = useLoadingStore((state) => state.setComponentReady);
+  const isLoading = useLoadingStore((state) => state.isLoading);
 
-  // Parallax scroll tracking - solo su desktop
+  // Fade out progressivo quando il video esce dal viewport (50% scroll)
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end start"]
   });
 
-  // Trasformazioni 2.5D per vero effetto parallax:
-  // Desktop: effetto pieno per esperienza immersiva
-  // - scale: rimpicciolisce da 1 a 0.85 (effetto zoom out)
-  // - rotateX: rotazione 3D lungo l'asse X da 0 a 15deg (testa indietro, piedi avanti)
-  const scaleDesktop = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
-  const rotateXDesktop = useTransform(scrollYProgress, [0, 1], [0, 15]);
-
-  // Mobile: effetto ridotto per performance e UX
-  // - scale: rimpicciolisce da 1 a 0.92 (più conservativo)
-  // - rotateX: rotazione 3D da 0 a 8deg (più delicato)
-  const scaleMobile = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
-  const rotateXMobile = useTransform(scrollYProgress, [0, 1], [0, 8]);
-
-  // Opacity: fade out progressivo uguale per tutti i dispositivi
-  const opacity = useTransform(scrollYProgress, [0.2, 0.6, 0.85], [1, 0.5, 0]);
-
-  // Fade out separato per il contenuto (testo e button) - inizia prima per effetto elegante
-  const contentOpacity = useTransform(
-    scrollYProgress,
-    [0.15, 0.4, 0.7],
-    [1, 0.5, 0]
-  );
-
-  // Transform CSS completa con perspective per evitare stacking context issues
-  const transformDesktop = useTransform(
-    [scaleDesktop, rotateXDesktop],
-    ([scaleVal, rotateXVal]) =>
-      `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
-  );
-
-  const transformMobile = useTransform(
-    [scaleMobile, rotateXMobile],
-    ([scaleVal, rotateXVal]) =>
-      `perspective(1000px) scale(${scaleVal}) rotateX(${rotateXVal}deg)`
-  );
+  // Opacity: 1 quando è visibile, fade out progressivo a partire dal 50%
+  const videoOpacity = useTransform(scrollYProgress, [0.5, 1], [1, 0]);
 
   // Preload video con massima priorità
   useEffect(() => {
@@ -183,21 +151,17 @@ export default function HeroVideoBanner() {
   }, [shouldUseShader, setComponentReady]);
 
   return (
-    <div ref={containerRef} className="w-full h-dvh relative">
-      {/* Video container con effetto parallax 2.5D - Desktop: pieno, Mobile: ridotto */}
+    <div ref={containerRef} className="w-full h-dvh relative bg-black overflow-hidden">
+      {/* Video Background - Fade in dopo il loader + Fade out scroll-based */}
       <motion.div
-        className="absolute inset-0 w-full h-full origin-center"
-        style={{
-          transform: shouldUseShader ? transformDesktop : transformMobile,
-          opacity: opacity,
-        }}
+        className="absolute inset-0 w-full h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoading ? 0 : 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        style={{ opacity: videoOpacity }}
       >
         {shouldUseShader && (
-          <LiquidVideoShader
-            videoSrc="/videos/hero-video.webm"
-            className=""
-            containerRef={containerRef}
-          />
+          <LiquidVideoShader videoSrc="/videos/hero-video.webm" className="" />
         )}
 
         {!shouldUseShader && (
@@ -215,22 +179,28 @@ export default function HeroVideoBanner() {
         )}
       </motion.div>
 
-      {/* Content Overlay - Nascondi fino al calcolo completato + Parallax + Fade out */}
-      <motion.div
-        className="absolute inset-0 z-20 pointer-events-none transition-opacity duration-200 origin-center"
+      {/* Content Overlay - Animazioni entrata */}
+      <div
+        className="absolute inset-0 z-20 pointer-events-none"
         style={{
-          opacity: isCalculated ? contentOpacity : 0,
-          transform: shouldUseShader ? transformDesktop : transformMobile,
+          opacity: isCalculated ? 1 : 0,
         }}
       >
         <div className="h-full w-full pointer-events-auto flex flex-col">
           {/* Spacer superiore - si espande per riempire lo spazio */}
           <div className="flex-1 " />
 
-          {/* Contenuto centrale - altezza automatica */}
-          <div
+          {/* Contenuto centrale - altezza automatica con animazioni entrata dopo loader */}
+          <motion.div
             ref={shaderTextRef}
-            className="text-center flex-shrink-0 w-full "
+            className="text-center flex-shrink-0 w-full"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 40 : 0 }}
+            transition={{
+              duration: 0.8,
+              delay: isLoading ? 0 : 0.3,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
           >
             <ShaderText
               className="w-full"
@@ -240,12 +210,16 @@ export default function HeroVideoBanner() {
             >
               SwaggerZ
             </ShaderText>
-            <div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isLoading ? 0 : 1 }}
+              transition={{ duration: 0.6, delay: isLoading ? 0 : 0.6 }}
+            >
               <p className="text-base md:text-lg text-light-secondary tracking-wide pt-xs">
                 Streetwear and Digital art since 2025
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Spacer inferiore - si espande + padding bilanciato */}
           <div
@@ -255,40 +229,60 @@ export default function HeroVideoBanner() {
               paddingBottom: `${(buttonOffset + scrollOffset + 32) / 2}px`,
             }}
           >
-            <AnimatedButton
-              href="#collection"
-              buttonRef={buttonRef}
-              className="transition-transform"
-              size="md"
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: isLoading ? 0 : 1, y: isLoading ? 30 : 0 }}
+              transition={{
+                duration: 0.7,
+                delay: isLoading ? 0 : 0.8,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
             >
-              <span className="hidden md:flex">Scopri la Collezione</span>
-              <span className="flex md:hidden flex-col text-center leading-tight gap-2xs">
-                <span>Scopri</span>
-                <span>la Collezione</span>
-              </span>
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
+              <AnimatedButton
+                href="#collection"
+                buttonRef={buttonRef}
+                className="transition-transform"
+                size="md"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </AnimatedButton>
+                <span className="hidden md:flex">Scopri la Collezione</span>
+                <span className="flex md:hidden flex-col text-center leading-tight gap-2xs">
+                  <span>Scopri</span>
+                  <span>la Collezione</span>
+                </span>
+                <svg
+                  className="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </AnimatedButton>
+            </motion.div>
 
-            {/* Scroll Indicator */}
-            <div
+            {/* Scroll Indicator - Animazione entrata dopo loader, scompare veloce */}
+            <motion.div
               ref={scrollIndicatorRef}
-              className={`transition-opacity duration-500 absolute bottom-sm ${
+              className={`transition-opacity duration-150 absolute bottom-sm ${
                 showScrollIndicator && isCalculated
                   ? "opacity-100"
                   : "opacity-0"
               }`}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{
+                opacity: isLoading
+                  ? 0
+                  : showScrollIndicator && isCalculated
+                  ? 1
+                  : 0,
+                y: isLoading ? -20 : 0,
+              }}
+              transition={{ duration: 0.2, delay: isLoading ? 0 : 0.2 }}
             >
               <div className="flex flex-col items-center gap-xs animate-bounce">
                 <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
@@ -308,10 +302,10 @@ export default function HeroVideoBanner() {
                   />
                 </svg>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

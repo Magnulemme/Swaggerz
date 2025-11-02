@@ -35,8 +35,6 @@ export function WaveImageShader({
   const geometryDimensionsRef = useRef({ width: 1, height: 1 });
   const mouseRef = useRef({ x: 0, y: 0 });
   const [isReady, setIsReady] = useState(false);
-  const targetAmplitudeRef = useRef(0); // Amplitude target (0 quando non hover, amplitude quando hover)
-  const currentAmplitudeRef = useRef(0); // Amplitude corrente (interpolata)
 
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -102,10 +100,10 @@ export function WaveImageShader({
         texture.minFilter = THREE.LinearFilter;
         texture.magFilter = THREE.LinearFilter;
 
-        // Shader con onde - inizia con amplitude 0 (attivato solo al hover)
+        // Shader con onde - amplitude costante (nessun effetto hover)
         const uniforms = createShaderUniforms(
           texture,
-          0, // amplitude: parte da 0, viene animata al hover
+          amplitude, // amplitude costante
           2.5, // waveLength: onde più ampie e sicure
           waveSpeed, // speed: personalizzabile per ogni card
           aspectRatio
@@ -164,24 +162,13 @@ export function WaveImageShader({
 
         setIsReady(true);
 
-        // Animation loop con smooth amplitude transition
+        // Animation loop semplice - solo per tempo
         const animate = () => {
-          // Usa materialRef per accesso consistente
           const mat = materialRef.current;
           if (!mat) return;
 
           if (mat.uniforms.uTime) {
             mat.uniforms.uTime.value += 0.016;
-          }
-
-          // Smooth lerp per amplitude - fade in/out elegante
-          const lerpSpeed = 0.08; // Velocità transizione (più basso = più smooth)
-          currentAmplitudeRef.current +=
-            (targetAmplitudeRef.current - currentAmplitudeRef.current) * lerpSpeed;
-
-          // Aggiorna amplitude nello shader
-          if (mat.uniforms.uAmplitude) {
-            mat.uniforms.uAmplitude.value = currentAmplitudeRef.current;
           }
 
           renderer.render(scene, camera);
@@ -210,27 +197,7 @@ export function WaveImageShader({
       }
     };
 
-    // Mouse enter handler - attiva effetto
-    const handleMouseEnter = () => {
-      targetAmplitudeRef.current = amplitude; // Attiva effetto
-    };
-
-    // Mouse leave handler - disattiva effetto
-    const handleMouseLeave = () => {
-      targetAmplitudeRef.current = 0; // Disattiva effetto
-
-      if (materialRef.current) {
-        // Reset mouse position
-        materialRef.current.uniforms.uMouse.value.lerp(
-          new THREE.Vector2(0, 0),
-          0.1
-        );
-      }
-    };
-
     container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseenter", handleMouseEnter);
-    container.addEventListener("mouseleave", handleMouseLeave);
 
     // Resize observer
     const resizeObserver = new ResizeObserver(updateSize);
@@ -242,8 +209,6 @@ export function WaveImageShader({
         cancelAnimationFrame(animationIdRef.current);
       }
       container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseenter", handleMouseEnter);
-      container.removeEventListener("mouseleave", handleMouseLeave);
       resizeObserver.disconnect();
       renderer.dispose();
       if (meshRef.current) {

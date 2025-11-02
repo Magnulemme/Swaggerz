@@ -58,7 +58,7 @@ export function AnimatedButton({
     <Component
       ref={buttonRef as any}
       className={cn(
-        "group relative inline-flex rounded-full p-[3px] overflow-hidden",
+        "group relative inline-flex rounded-full p-[3px] overflow-hidden w-fit",
         className
       )}
       style={style}
@@ -94,9 +94,7 @@ export function AnimatedButton({
         )}
       >
         {/* Text and content container with slide animation */}
-        <span
-          className="relative inline-flex items-center gap-xs md:gap-sm"
-        >
+        <span className="relative inline-flex items-center gap-xs md:gap-sm">
           {/* White content - slides up on hover */}
           <motion.span
             className="flex items-center gap-xs md:gap-sm text-light-primary whitespace-nowrap leading-relaxed"
