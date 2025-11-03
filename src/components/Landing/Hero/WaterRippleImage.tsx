@@ -49,7 +49,19 @@ export default function WaterRippleImage({
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
-    console.log('[WaterRipple] Creating WebGL context', { isActive, width, height });
+    console.log('[WaterRipple] 🎨 Creating WebGL context', {
+      isActive,
+      width,
+      height,
+      parent: {
+        width: container.parentElement?.offsetWidth,
+        height: container.parentElement?.offsetHeight,
+      },
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+    });
 
     // Setup scene
     const scene = new THREE.Scene();
@@ -92,8 +104,25 @@ export default function WaterRippleImage({
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.domElement.style.objectFit = 'cover';
+
+    console.log('[WaterRipple] 🔌 Appending canvas to DOM', {
+      isActive,
+      canvasSize: { width: renderer.domElement.width, height: renderer.domElement.height },
+      containerSize: { width, height },
+      timestamp: performance.now()
+    });
+
     container.appendChild(renderer.domElement);
     rendererRef.current = renderer;
+
+    console.log('[WaterRipple] ✅ Canvas appended', {
+      isActive,
+      containerSize: {
+        width: container.offsetWidth,
+        height: container.offsetHeight
+      },
+      timestamp: performance.now()
+    });
 
     // Create shader material (senza texture inizialmente)
     const material = new THREE.ShaderMaterial({
@@ -183,16 +212,40 @@ export default function WaterRippleImage({
       const newWidth = containerRef.current.offsetWidth;
       const newHeight = containerRef.current.offsetHeight;
 
+      console.log('[WaterRipple] 📐 Window resize', {
+        isActive,
+        newWidth,
+        newHeight,
+        viewport: { width: window.innerWidth, height: window.innerHeight }
+      });
+
       rendererRef.current.setSize(newWidth, newHeight);
       materialRef.current.uniforms.uResolution.value.set(newWidth, newHeight);
       materialRef.current.uniforms.uContainerAspect.value = newWidth / newHeight;
     };
 
+    // ResizeObserver per tracciare cambi di dimensione del container
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width: observedWidth, height: observedHeight } = entry.contentRect;
+        console.log('[WaterRipple] 👀 Container resize observed', {
+          isActive,
+          width: observedWidth,
+          height: observedHeight,
+          viewport: { width: window.innerWidth, height: window.innerHeight },
+          timestamp: performance.now()
+        });
+      }
+    });
+
+    resizeObserver.observe(container);
+
     window.addEventListener("resize", handleResize);
 
     return () => {
       activeContexts--;
-      console.log('[WaterRipple] Cleaning up WebGL context', { activeContexts });
+      console.log('[WaterRipple] 🧹 Cleaning up WebGL context', { activeContexts });
+      resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -204,7 +257,7 @@ export default function WaterRippleImage({
       geometry.dispose();
       material.dispose();
       // Texture disposal è gestito dal parent component
-      console.log('[WaterRipple] WebGL context disposed', { activeContexts });
+      console.log('[WaterRipple] ✅ WebGL context disposed', { activeContexts });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo al mount - isActive è tracciato tramite ref
@@ -231,11 +284,18 @@ export default function WaterRippleImage({
     if (rendererRef.current && sceneRef.current && cameraRef.current) {
       rendererRef.current.render(sceneRef.current, cameraRef.current);
 
-      // Notifica che la prima immagine è stata renderizzata
+      // Aspetta che il browser abbia effettivamente dipinto il frame sullo schermo
+      // Doppio requestAnimationFrame assicura che il paint sia completato
       if (!hasNotifiedReady.current && onReady) {
-        console.log('[WaterRipple] First image rendered, notifying ready');
-        hasNotifiedReady.current = true;
-        onReady();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!hasNotifiedReady.current && onReady) {
+              console.log('[WaterRipple] First image painted and visible, notifying ready');
+              hasNotifiedReady.current = true;
+              onReady();
+            }
+          });
+        });
       }
     }
   }, [texture, onReady]);

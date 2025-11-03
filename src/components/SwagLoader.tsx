@@ -187,14 +187,24 @@ export function SwagLoader({
     if (!isPageLoader || !needsComponentLoading) return;
 
     // Log dello stato dei componenti
-    console.log('📊 Loading state:', {
+    console.log('📊 [SwagLoader] Loading state:', {
       shaderText: componentsReady.shaderText,
+      heroSlideshow: componentsReady.heroSlideshow,
       isLoading,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        body: {
+          scrollHeight: document.body.scrollHeight,
+          offsetHeight: document.body.offsetHeight
+        }
+      },
+      timestamp: performance.now()
     });
 
     // Quando tutti i componenti sono pronti, nascondi immediatamente
     if (!isLoading) {
-      console.log('🎉 All components ready! Hiding loader...');
+      console.log('🎉 [SwagLoader] All components ready! Hiding loader...');
       setIsComplete(true);
       onLoadComplete?.();
     }

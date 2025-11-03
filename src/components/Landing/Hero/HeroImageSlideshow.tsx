@@ -40,7 +40,7 @@ export default function HeroImageSlideshow({
   const [visibleIndex, setVisibleIndex] = useState(0); // Immagine completamente visibile (canvas inferiore)
   const [animatingIndex, setAnimatingIndex] = useState(0); // Immagine che sta entrando (canvas superiore)
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null); // null = non ancora rilevato
   const [texturesReady, setTexturesReady] = useState(false);
   const [firstImageReady, setFirstImageReady] = useState(false);
 
@@ -51,89 +51,118 @@ export default function HeroImageSlideshow({
   // Seleziona le immagini in base alla dimensione dello schermo
   const SLIDESHOW_IMAGES = isMobile ? MOBILE_IMAGES : DESKTOP_IMAGES;
 
-  // Preload tutte le texture (desktop e mobile) al mount
+  // PRIMO: Detect mobile/desktop IMMEDIATAMENTE al mount
   useEffect(() => {
-    console.log('[HeroSlideshow] Starting texture preload');
-    const loader = new THREE.TextureLoader();
-    let loadedCount = 0;
-    const totalTextures = DESKTOP_IMAGES.length + MOBILE_IMAGES.length;
+    let resizeTimeout: NodeJS.Timeout;
 
-    // Copia i ref per il cleanup
-    const desktopTextures = desktopTexturesRef.current;
-    const mobileTextures = mobileTexturesRef.current;
+    const checkMobile = () => {
+      const nowMobile = window.innerWidth < 1024;
 
-    const checkAllLoaded = () => {
-      loadedCount++;
-      console.log(`[HeroSlideshow] Loaded ${loadedCount}/${totalTextures} textures`);
-      if (loadedCount === totalTextures) {
-        console.log('[HeroSlideshow] All textures loaded successfully');
-        setTexturesReady(true);
+      // Se cambia il breakpoint dopo aver caricato, ricarica la pagina
+      if (isMobile !== null && isMobile !== nowMobile && (desktopTexturesRef.current.length > 0 || mobileTexturesRef.current.length > 0)) {
+        console.log('[HeroSlideshow] Breakpoint changed, reloading...');
+        window.location.reload();
       }
+
+      setIsMobile(nowMobile);
     };
 
-    // Preload desktop images
-    DESKTOP_IMAGES.forEach((src, i) => {
-      loader.load(
-        src,
-        (texture) => {
-          texture.minFilter = THREE.LinearFilter;
-          texture.magFilter = THREE.LinearFilter;
-          desktopTextures[i] = texture;
-          console.log(`[HeroSlideshow] Desktop texture ${i} loaded:`, {
-            size: `${texture.image.width}x${texture.image.height}`,
-            src
-          });
-          checkAllLoaded();
-        },
-        undefined,
-        (error) => {
-          console.error(`[HeroSlideshow] Error loading desktop texture ${i}:`, error);
-          checkAllLoaded();
-        }
-      );
-    });
+    const debouncedCheckMobile = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(checkMobile, 150); // Debounce 150ms
+    };
 
-    // Preload mobile images
-    MOBILE_IMAGES.forEach((src, i) => {
-      loader.load(
-        src,
-        (texture) => {
-          texture.minFilter = THREE.LinearFilter;
-          texture.magFilter = THREE.LinearFilter;
-          mobileTextures[i] = texture;
-          console.log(`[HeroSlideshow] Mobile texture ${i} loaded:`, {
-            size: `${texture.image.width}x${texture.image.height}`,
-            src
-          });
-          checkAllLoaded();
-        },
-        undefined,
-        (error) => {
-          console.error(`[HeroSlideshow] Error loading mobile texture ${i}:`, error);
-          checkAllLoaded();
-        }
-      );
-    });
+    checkMobile(); // Rileva subito al mount
+
+    // Solo dopo il loading iniziale, ascolta i resize
+    if (!isLoading) {
+      window.addEventListener("resize", debouncedCheckMobile);
+    }
+
+    return () => {
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", debouncedCheckMobile);
+    };
+  }, [isMobile, isLoading]);
+
+  // SECONDO: Progressive loading - carica PRIMA la prima immagine, poi le altre
+  useEffect(() => {
+    // Aspetta che il device sia stato rilevato
+    if (isMobile === null) return;
+
+    // Reset stati quando cambia device
+    setTexturesReady(false);
+    setFirstImageReady(false);
+
+    const imagesToLoad = isMobile ? MOBILE_IMAGES : DESKTOP_IMAGES;
+    const targetTextures = isMobile ? mobileTexturesRef.current : desktopTexturesRef.current;
+
+    console.log(`[HeroSlideshow] Progressive loading for ${isMobile ? 'mobile' : 'desktop'}`);
+
+    const loader = new THREE.TextureLoader();
+
+    // STEP 1: Carica SOLO la prima immagine (priorità massima)
+    console.log('[HeroSlideshow] Loading first image...');
+    loader.load(
+      imagesToLoad[0],
+      (texture) => {
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        targetTextures[0] = texture;
+        console.log('[HeroSlideshow] First texture loaded!', {
+          size: `${texture.image.width}x${texture.image.height}`
+        });
+
+        // ✅ Texture caricata - imposta texturesReady
+        setTexturesReady(true);
+
+        // Ora aspetta che WaterRippleImage la renderizzi
+        // (onReady callback setterà firstImageReady)
+        // Il loader si nasconderà solo quando ENTRAMBI sono true
+
+        // STEP 2: Carica le altre immagini in background (bassa priorità)
+        console.log('[HeroSlideshow] Loading remaining images in background...');
+        let remainingLoaded = 0;
+
+        imagesToLoad.slice(1).forEach((src, i) => {
+          const actualIndex = i + 1; // Perché slice(1) inizia da index 1
+
+          loader.load(
+            src,
+            (bgTexture) => {
+              bgTexture.minFilter = THREE.LinearFilter;
+              bgTexture.magFilter = THREE.LinearFilter;
+              targetTextures[actualIndex] = bgTexture;
+              remainingLoaded++;
+
+              console.log(`[HeroSlideshow] Background texture ${actualIndex} loaded (${remainingLoaded}/${imagesToLoad.length - 1})`);
+
+              // Tutte le texture caricate
+              if (remainingLoaded === imagesToLoad.length - 1) {
+                console.log('[HeroSlideshow] All textures loaded!');
+              }
+            },
+            undefined,
+            (error) => {
+              console.error(`[HeroSlideshow] Error loading background texture ${actualIndex}:`, error);
+            }
+          );
+        });
+      },
+      undefined,
+      (error) => {
+        console.error('[HeroSlideshow] Error loading first texture:', error);
+        // Fallback: prova a caricare tutte in parallelo
+        setTexturesReady(true);
+      }
+    );
 
     // Cleanup: dispose textures al unmount
     return () => {
-      console.log('[HeroSlideshow] Disposing all textures');
-      desktopTextures.forEach((texture) => texture?.dispose());
-      mobileTextures.forEach((texture) => texture?.dispose());
+      console.log('[HeroSlideshow] Disposing textures');
+      targetTextures.forEach((texture) => texture?.dispose());
     };
-  }, []); // Solo al mount
-
-  // Detect mobile/desktop
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  }, [isMobile]); // Ricarica quando cambia mobile/desktop
 
   // Reset degli indici quando cambiano le immagini (mobile/desktop switch)
   useEffect(() => {
@@ -171,16 +200,32 @@ export default function HeroImageSlideshow({
 
   // Notifica il loader quando tutto è pronto
   useEffect(() => {
+    console.log('[HeroSlideshow] 🔔 Loading state check', {
+      texturesReady,
+      firstImageReady,
+      isLoading,
+      timestamp: performance.now()
+    });
+
     if (texturesReady && firstImageReady) {
-      console.log('[HeroSlideshow] All resources ready, notifying loader');
+      console.log('[HeroSlideshow] ✅ All resources ready, notifying loader');
       setComponentReady('heroSlideshow');
     }
-  }, [texturesReady, firstImageReady, setComponentReady]);
+  }, [texturesReady, firstImageReady, isLoading, setComponentReady]);
 
   // Seleziona le texture corrette in base a mobile/desktop
   const currentTextures = isMobile ? mobileTexturesRef.current : desktopTexturesRef.current;
   const visibleTexture = currentTextures[visibleIndex] || null;
   const animatingTexture = currentTextures[animatingIndex] || null;
+
+  // Log cambio visibilità
+  useEffect(() => {
+    console.log('[HeroSlideshow] 👁️ Visibility changed', {
+      firstImageReady,
+      visibility: firstImageReady ? 'visible' : 'hidden',
+      timestamp: performance.now()
+    });
+  }, [firstImageReady]);
 
   return (
     <motion.div
@@ -190,24 +235,29 @@ export default function HeroImageSlideshow({
       transition={{ duration: 1.2, ease: "easeOut" }}
       style={{ opacity: imageOpacity }}
     >
-      {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (statica) */}
-      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
-        <WaterRippleImage
-          texture={visibleTexture}
-          isActive={false}
-          isTransitioning={false}
-          onReady={() => setFirstImageReady(true)}
-        />
-      </div>
+      {/* Renderizza i canvas SOLO quando la prima texture è pronta */}
+      {visibleTexture && (
+        <>
+          {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (statica) */}
+          <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+            <WaterRippleImage
+              texture={visibleTexture}
+              isActive={false}
+              isTransitioning={false}
+              onReady={() => setFirstImageReady(true)}
+            />
+          </div>
 
-      {/* Canvas superiore: esegue l'animazione della nuova immagine che entra */}
-      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
-        <WaterRippleImage
-          texture={animatingTexture}
-          isActive={true}
-          isTransitioning={isTransitioning}
-        />
-      </div>
+          {/* Canvas superiore: esegue l'animazione della nuova immagine che entra */}
+          <div className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
+            <WaterRippleImage
+              texture={animatingTexture}
+              isActive={true}
+              isTransitioning={isTransitioning}
+            />
+          </div>
+        </>
+      )}
 
       {/* Overlay scuro per migliorare la leggibilità del testo */}
       <div className="absolute inset-0 bg-black/40 z-10" />

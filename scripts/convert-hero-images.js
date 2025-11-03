@@ -4,29 +4,37 @@ const fs = require('fs');
 const path = require('path');
 
 const imagesToConvert = [
+  // Desktop images (keep high res for large screens)
   {
     input: 'public/hero desk/jc-gellidon-Zbrz62vBmb0-unsplash.jpg',
     output: 'public/hero desk/jc-gellidon-Zbrz62vBmb0-unsplash.avif',
+    maxWidth: 1920, // Desktop
   },
   {
     input: 'public/hero desk/adam-barclay-S2W3jMJ6ayc-unsplash.jpg',
     output: 'public/hero desk/adam-barclay-S2W3jMJ6ayc-unsplash.avif',
+    maxWidth: 1920,
   },
   {
     input: 'public/hero desk/swaggerz-hero.jpg',
     output: 'public/hero desk/swaggerz-hero.avif',
+    maxWidth: 1920,
   },
+  // Mobile images (reduce size significantly for mobile viewports)
   {
     input: 'public/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.jpg',
     output: 'public/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.avif',
+    maxWidth: 800, // Mobile 2x retina (400px viewport)
   },
   {
     input: 'public/hero mob/hero-streetwear-1.jpg',
     output: 'public/hero mob/hero-streetwear-1.avif',
+    maxWidth: 800,
   },
   {
     input: 'public/hero mob/hero-streetwear-4.jpg',
     output: 'public/hero mob/hero-streetwear-4.avif',
+    maxWidth: 800,
   },
 ];
 
