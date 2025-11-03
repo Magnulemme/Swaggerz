@@ -54,7 +54,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     x: 0,
     y: 0,
   });
-  console.log(shouldRender, shouldAnimate);
   const [isReady, setIsReady] = useState<boolean>(false);
   const setComponentReady = useLoadingStore((state) => state.setComponentReady);
   const hasReportedReady = useRef<boolean>(false);
@@ -96,14 +95,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
 
       // 100% extra per le decorazioni - Pastor of Muppets ha decorazioni MOLTO estreme
       const decorationBuffer = currentFontSize * 0;
-
-      console.log("ShaderText measurement:", {
-        text: children,
-        fontSize: currentFontSize,
-        bboxWidth: bbox.width,
-        buffer: decorationBuffer,
-        finalWidth: bbox.width + decorationBuffer,
-      });
 
       const newDimensions = {
         width: Math.ceil(bbox.width + decorationBuffer),
@@ -163,17 +154,10 @@ const ShaderText: React.FC<ShaderTextProps> = ({
 
     // Skip se non serve renderizzare
     if (!canvas || !isReady || !shouldRender) {
-      console.log("⏭️ Skipping render:", {
-        canvas: !!canvas,
-        isReady,
-        shouldRender,
-      });
       return;
     }
 
     if (textDimensions.width === 0 || textDimensions.height === 0) return;
-
-    console.log("🎬 Setting up Three.js");
 
     // Setup Three.js
     const scene = new THREE.Scene();
@@ -199,12 +183,10 @@ const ShaderText: React.FC<ShaderTextProps> = ({
 
     if (shouldAnimate) {
       // Avvia animazione continua
-      console.log("🔄 Starting animation");
       const stop = sharedRenderer.startAnimation(taskId);
       stopAnimationRef.current = stop;
     } else {
       // Render singolo
-      console.log("📸 Single render");
       sharedRenderer.renderOnce(taskId, performance.now() * 0.001);
     }
 
@@ -224,7 +206,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     );
 
     return () => {
-      console.log("🧹 Cleaning up");
       clearInterval(updateInterval);
 
       if (stopAnimationRef.current) {
@@ -243,7 +224,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   // Notifica quando lo ShaderText è completamente pronto
   useEffect(() => {
     if (isReady && dataUrl && !hasReportedReady.current) {
-      console.log("✅ ShaderText ready");
       setComponentReady("shaderText");
       hasReportedReady.current = true;
     }

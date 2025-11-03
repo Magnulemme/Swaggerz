@@ -5,7 +5,7 @@ import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import HeroImageSlideshow from "./HeroImageSlideshow";
 
 export default function HeroVideoBanner() {
   const buttonRef = useRef<HTMLAnchorElement>(null);
@@ -99,24 +99,7 @@ export default function HeroVideoBanner() {
       className="w-full h-dvh relative bg-black overflow-hidden"
     >
       {/* Image Background - Fade in dopo il loader + Fade out scroll-based */}
-      <motion.div
-        className="absolute inset-0 w-full h-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isLoading ? 0 : 1 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-        style={{ opacity: imageOpacity }}
-      >
-        <Image
-          src="/swaggerz-hero.jpg"
-          alt="Streetwear Fashion"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        {/* Overlay scuro per migliorare la leggibilità del testo */}
-        <div className="absolute inset-0 bg-black/40" />
-      </motion.div>
+      <HeroImageSlideshow imageOpacity={imageOpacity} />
 
       {/* Content Overlay - Animazioni entrata */}
       <div
