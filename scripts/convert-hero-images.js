@@ -53,7 +53,17 @@ async function convertImages() {
 
       console.log(`Converting: ${path.basename(image.input)} (${originalSizeMB}MB)`);
 
-      await sharp(image.input)
+      const pipeline = sharp(image.input);
+
+      // Resize se specificato maxWidth
+      if (image.maxWidth) {
+        pipeline.resize(image.maxWidth, null, {
+          fit: 'inside',
+          withoutEnlargement: true,
+        });
+      }
+
+      await pipeline
         .avif({
           quality: 80, // Alta qualità, buona compressione
           effort: 6,   // Bilanciamento velocità/qualità

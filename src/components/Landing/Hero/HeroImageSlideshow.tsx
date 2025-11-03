@@ -17,16 +17,16 @@ interface HeroImageSlideshowProps {
 
 // Immagini ottimizzate per desktop (landscape/panoramiche)
 const DESKTOP_IMAGES = [
-  "/hero desk/swaggerz-hero.jpg",
-  "/hero desk/adam-barclay-S2W3jMJ6ayc-unsplash.jpg",
-  "/hero desk/jc-gellidon-Zbrz62vBmb0-unsplash.jpg",
+  "/hero desk/swaggerz-hero.avif",
+  "/hero desk/adam-barclay-S2W3jMJ6ayc-unsplash.avif",
+  "/hero desk/jc-gellidon-Zbrz62vBmb0-unsplash.avif",
 ];
 
 // Immagini ottimizzate per mobile (portrait/verticali)
 const MOBILE_IMAGES = [
-  "/hero mob/hero-streetwear-1.jpg",
-  "/hero mob/hero-streetwear-4.jpg",
-  "/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.jpg",
+  "/hero mob/hero-streetwear-1.avif",
+  "/hero mob/hero-streetwear-4.avif",
+  "/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.avif",
 ];
 
 const SLIDE_INTERVAL = 5000; // 5 secondi tra le transizioni
