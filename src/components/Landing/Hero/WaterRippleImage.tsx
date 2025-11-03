@@ -14,12 +14,14 @@ interface WaterRippleImageProps {
   texture: THREE.Texture | null;
   isActive: boolean;
   isTransitioning: boolean;
+  onReady?: () => void;
 }
 
 export default function WaterRippleImage({
   texture,
   isActive,
   isTransitioning,
+  onReady,
 }: WaterRippleImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -31,6 +33,7 @@ export default function WaterRippleImage({
   const isActiveRef = useRef(isActive);
   const isTransitioningRef = useRef(isTransitioning);
   const animateFnRef = useRef<(() => void) | null>(null);
+  const hasNotifiedReady = useRef(false);
 
   // Aggiorna refs quando cambiano le props
   useEffect(() => {
@@ -227,8 +230,15 @@ export default function WaterRippleImage({
     // Renderizza un singolo frame per mostrare la nuova texture
     if (rendererRef.current && sceneRef.current && cameraRef.current) {
       rendererRef.current.render(sceneRef.current, cameraRef.current);
+
+      // Notifica che la prima immagine è stata renderizzata
+      if (!hasNotifiedReady.current && onReady) {
+        console.log('[WaterRipple] First image rendered, notifying ready');
+        hasNotifiedReady.current = true;
+        onReady();
+      }
     }
-  }, [texture]);
+  }, [texture, onReady]);
 
   // Update progress when transitioning starts
   useEffect(() => {

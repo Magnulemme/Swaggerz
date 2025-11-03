@@ -29,17 +29,20 @@ const MOBILE_IMAGES = [
   "/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.jpg",
 ];
 
-const SLIDE_INTERVAL = 4000; // 4 secondi - per testare l'effetto più frequentemente
+const SLIDE_INTERVAL = 5000; // 5 secondi tra le transizioni
 
 export default function HeroImageSlideshow({
   imageOpacity,
   onTransitionChange,
 }: HeroImageSlideshowProps) {
   const isLoading = useLoadingStore((state) => state.isLoading);
+  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
   const [visibleIndex, setVisibleIndex] = useState(0); // Immagine completamente visibile (canvas inferiore)
   const [animatingIndex, setAnimatingIndex] = useState(0); // Immagine che sta entrando (canvas superiore)
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [texturesReady, setTexturesReady] = useState(false);
+  const [firstImageReady, setFirstImageReady] = useState(false);
 
   // Textures precaricate
   const desktopTexturesRef = useRef<THREE.Texture[]>([]);
@@ -64,6 +67,7 @@ export default function HeroImageSlideshow({
       console.log(`[HeroSlideshow] Loaded ${loadedCount}/${totalTextures} textures`);
       if (loadedCount === totalTextures) {
         console.log('[HeroSlideshow] All textures loaded successfully');
+        setTexturesReady(true);
       }
     };
 
@@ -165,6 +169,14 @@ export default function HeroImageSlideshow({
     return () => clearInterval(interval);
   }, [isLoading, SLIDESHOW_IMAGES.length, animatingIndex]);
 
+  // Notifica il loader quando tutto è pronto
+  useEffect(() => {
+    if (texturesReady && firstImageReady) {
+      console.log('[HeroSlideshow] All resources ready, notifying loader');
+      setComponentReady('heroSlideshow');
+    }
+  }, [texturesReady, firstImageReady, setComponentReady]);
+
   // Seleziona le texture corrette in base a mobile/desktop
   const currentTextures = isMobile ? mobileTexturesRef.current : desktopTexturesRef.current;
   const visibleTexture = currentTextures[visibleIndex] || null;
@@ -184,6 +196,7 @@ export default function HeroImageSlideshow({
           texture={visibleTexture}
           isActive={false}
           isTransitioning={false}
+          onReady={() => setFirstImageReady(true)}
         />
       </div>
 
