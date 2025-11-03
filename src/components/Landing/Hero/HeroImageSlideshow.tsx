@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion, MotionValue } from "framer-motion";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect } from "react";
@@ -16,16 +15,16 @@ interface HeroImageSlideshowProps {
 
 // Immagini ottimizzate per desktop (landscape/panoramiche)
 const DESKTOP_IMAGES = [
-  "/swaggerz-hero.jpg",           // 5616x3744 - 1.5:1
-  "/hero-streetwear-2.jpg",       // 1920x1282 - 1.5:1
-  "/hero-streetwear-3.jpg",       // 1920x1280 - 1.5:1
+  "/hero desk/swaggerz-hero.jpg",
+  "/hero desk/adam-barclay-S2W3jMJ6ayc-unsplash.jpg",
+  "/hero desk/jc-gellidon-Zbrz62vBmb0-unsplash.jpg",
 ];
 
 // Immagini ottimizzate per mobile (portrait/verticali)
 const MOBILE_IMAGES = [
-  "/hero-streetwear-1.jpg",       // 1920x2756 - 0.7:1
-  "/hero-streetwear-4.jpg",       // 1920x2658 - 0.7:1
-  "/swaggerz-hero.jpg",           // fallback
+  "/hero mob/hero-streetwear-1.jpg",
+  "/hero mob/hero-streetwear-4.jpg",
+  "/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.jpg",
 ];
 
 const SLIDE_INTERVAL = 7000; // 7 secondi

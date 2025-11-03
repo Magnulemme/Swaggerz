@@ -315,7 +315,7 @@ const ProductShowcase = () => {
   const scrollNext = () => swiperInstance?.slideNext();
 
   return (
-    <div className="w-full">
+    <div className="w-full pb-xl">
       {/* Product Slider - Desktop only, Grid on mobile */}
       <div className="mb-lg md:mb-xl">
         {/* Mobile: Grid */}

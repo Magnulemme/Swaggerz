@@ -84,10 +84,16 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
         {/* Desktop menu con NavigationMenu - Pill-shaped container */}
         <NavigationMenu className="hidden lg:block" viewport={false}>
           <div
-            className="relative px-md backdrop-blur-md border border-white/10 rounded-full shadow-lg transition-all duration-500 bg-dark-elevated"
+            className={`relative px-md backdrop-blur-md border rounded-full shadow-lg transition-all duration-500 ${
+              scrolled
+                ? "bg-dark border-white/10"
+                : "bg-dark-elevated border-white/10"
+            }`}
           >
-            {/* Layer arancione sopra */}
-            <div className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+            {/* Layer arancione sopra - solo quando scrolled */}
+            {scrolled && (
+              <div className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+            )}
             <NavigationMenuList className="flex items-center gap-1 relative z-10">
               {navLinks.map((link) => (
                 <AnimatedNavLink
@@ -103,7 +109,7 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
           </div>
         </NavigationMenu>
 
-        <NavbarActions cartCount={cartCount} />
+        <NavbarActions cartCount={cartCount} scrolled={scrolled} />
         <HamburgerButton open={open} onClick={() => setOpen(!open)} />
       </nav>
 

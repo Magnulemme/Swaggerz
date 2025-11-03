@@ -6,29 +6,39 @@ import { motion } from "framer-motion";
 
 interface NavbarActionsProps {
   cartCount?: number;
+  scrolled?: boolean;
 }
 
 export default function NavbarActions({
   cartCount = 0,
+  scrolled = false,
 }: NavbarActionsProps) {
   return (
     <div className="hidden md:flex items-center gap-sm">
       {/* Search */}
       <button
-        className="group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated"
+        className={`group relative p-sm rounded-full flex items-center justify-center border hover:border-brand-subtle transition-all duration-500 ${
+          scrolled ? "bg-dark border-white/10" : "bg-dark-elevated border-white/10"
+        }`}
       >
-        {/* Layer arancione sopra */}
-        <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        {/* Layer arancione sopra - solo quando scrolled */}
+        {scrolled && (
+          <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        )}
         <Search className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 relative z-10" />
       </button>
 
       {/* Account */}
       <Link
         href="/sign-in"
-        className="group relative p-sm rounded-full flex items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated"
+        className={`group relative p-sm rounded-full flex items-center justify-center border hover:border-brand-subtle transition-all duration-500 ${
+          scrolled ? "bg-dark border-white/10" : "bg-dark-elevated border-white/10"
+        }`}
       >
-        {/* Layer arancione sopra */}
-        <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        {/* Layer arancione sopra - solo quando scrolled */}
+        {scrolled && (
+          <span className="absolute inset-0 bg-orange-500/15 rounded-full pointer-events-none" />
+        )}
         <User className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 relative z-10" />
       </Link>
 
@@ -42,11 +52,13 @@ export default function NavbarActions({
           className={`absolute inset-[-1000%] animate-[spin_2s_linear_infinite] transition-all duration-500 bg-[conic-gradient(from_90deg_at_50%_50%,#f97316_0%,#18181b_50%,#f97316_100%)]`}
         />
 
-        <span className="inline-flex h-full w-full items-center justify-center rounded-full px-md py-sm gap-xs backdrop-blur-3xl relative bg-dark-elevated">
-          {/* Layer arancione sempre attivo */}
-          <span
-            className="absolute inset-0 rounded-full transition-all duration-500 bg-orange-500/15"
-          ></span>
+        <span className={`inline-flex h-full w-full items-center justify-center rounded-full px-md py-sm gap-xs backdrop-blur-3xl relative transition-all duration-500 ${
+          scrolled ? "bg-dark" : "bg-dark-elevated"
+        }`}>
+          {/* Layer arancione - solo quando scrolled */}
+          {scrolled && (
+            <span className="absolute inset-0 rounded-full bg-orange-500/15" />
+          )}
 
           {/* Contenuto sopra i layer */}
           <ShoppingBag className="size-icon text-brand relative z-10" />

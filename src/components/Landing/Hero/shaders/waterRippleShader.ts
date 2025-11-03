@@ -84,21 +84,31 @@ export const waterRippleFragmentShader = `
       // Effetto di luminosità sul bordo dell'onda più marcato
       float brightness = ripple * 0.35 * waveIntensity;
 
-      // Effetto cromatico leggero sui bordi (simula rifrazione)
-      vec4 colorR = texture2D(uTexture, textureUv + direction * distortion * 0.3);
+      // Aberrazione cromatica intensificata (fish-eye style)
+      float chromaticIntensity = 0.4 + (dist / maxRadius) * 0.3;
+      vec4 colorR = texture2D(uTexture, textureUv + direction * distortion * chromaticIntensity);
       vec4 colorG = texture2D(uTexture, textureUv);
-      vec4 colorB = texture2D(uTexture, textureUv - direction * distortion * 0.3);
+      vec4 colorB = texture2D(uTexture, textureUv - direction * distortion * chromaticIntensity);
 
       vec4 color = vec4(colorR.r, colorG.g, colorB.b, 1.0);
       color.rgb += brightness;
+
+      // Vignetting sottile per effetto fish-eye (più scuro verso i bordi)
+      float vignette = 1.0 - (dist / maxRadius) * 0.15;
+      color.rgb *= vignette;
 
       // Smooth edge del cerchio
       float alpha = smoothstep(maxRadius, maxRadius - 0.02, dist);
 
       gl_FragColor = vec4(color.rgb, alpha);
     } else if (dist < maxRadius) {
-      // Dentro il cerchio ma non nell'onda: mostra immagine normale
+      // Dentro il cerchio ma non nell'onda: mostra immagine normale con vignetting
       vec4 color = texture2D(uTexture, textureUv);
+
+      // Vignetting sottile stile fish-eye
+      float vignette = 1.0 - (dist / maxRadius) * 0.15;
+      color.rgb *= vignette;
+
       float alpha = smoothstep(maxRadius, maxRadius - 0.02, dist);
       gl_FragColor = vec4(color.rgb, alpha);
     } else {

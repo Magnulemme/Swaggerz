@@ -5,10 +5,14 @@ import { SectionTitle } from "./SectionTitle";
 import ProductShowcase from "./ProductShowcase/ProductShowcase";
 import { CollectionsSection } from "./Topics/CollectionsSection";
 import { HeroCategories } from "./Categories/HeroCategories";
+import { ScrollingGradientBlobs } from "./StreetwearEssentials/ScrollingGradientBlobs";
 
 export function StreetwearEssentials() {
   return (
-    <div className="relative w-full bg-zinc-950">
+    <div className="relative w-full bg-zinc-950 pt-xl">
+      {/* Animated Gradient Blobs Background */}
+      <ScrollingGradientBlobs />
+
       {/* Section Title */}
       <SectionTitle
         eyebrow="Collezione 2025"

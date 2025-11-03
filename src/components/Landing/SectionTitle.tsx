@@ -62,7 +62,7 @@ export function SectionTitle({
   return (
     <motion.div
       ref={containerRef}
-      className="text-center py-xl md:py-2xl space-y-md px-md md:px-lg"
+      className="text-center py-md md:py-2xl md:pt-3xl space-y-md px-md md:px-lg"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}

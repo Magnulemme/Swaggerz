@@ -92,7 +92,6 @@ export default function HeroVideoBanner() {
     };
   }, []);
 
-
   return (
     <div
       ref={containerRef}
@@ -207,7 +206,9 @@ export default function HeroVideoBanner() {
               transition={{ duration: 0.2, delay: isLoading ? 0 : 0.2 }}
             >
               <div className="flex flex-col items-center gap-xs animate-bounce">
-                <span className="text-white/80 text-xs uppercase tracking-wider font-normal"></span>
+                <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
+                  SCROLL
+                </span>
                 <svg
                   className="w-6 h-6 text-white/70"
                   fill="none"

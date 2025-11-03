@@ -44,15 +44,15 @@ export function StickyCardsContainer({
   });
 
   return (
-    <div ref={container} className="relative w-full h-full">
-      <div className="py-xl">
-        <SectionTitle
-          eyebrow="Collections"
-          title="Scegli il tuo"
-          shaderText="Mood"
-          description="Scopri le nostre collezioni e trova il mood più adatto a te"
-        />
-      </div>
+    <div
+      ref={container}
+      className="relative w-full h-full flex flex-col items-center justify-center"
+    >
+      <SectionTitle
+        title="Scegli il tuo"
+        shaderText="Mood"
+        description="Scopri le nostre collezioni e trova il mood più adatto a te"
+      />
 
       {topics.map((topic, i) => {
         const isLast = i === topics.length - 1;
