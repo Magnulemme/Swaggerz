@@ -25,7 +25,7 @@ export default function HeroVideoBanner() {
   // Fade out progressivo quando il video esce dal viewport (50% scroll)
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"]
+    offset: ["start start", "end start"],
   });
 
   // Opacity: 1 quando è visibile, fade out progressivo a partire dal 50%
@@ -151,7 +151,10 @@ export default function HeroVideoBanner() {
   }, [shouldUseShader, setComponentReady]);
 
   return (
-    <div ref={containerRef} className="w-full h-dvh relative bg-black overflow-hidden">
+    <div
+      ref={containerRef}
+      className="w-full h-dvh relative bg-black overflow-hidden"
+    >
       {/* Video Background - Fade in dopo il loader + Fade out scroll-based */}
       <motion.div
         className="absolute inset-0 w-full h-full"
@@ -285,9 +288,7 @@ export default function HeroVideoBanner() {
               transition={{ duration: 0.2, delay: isLoading ? 0 : 0.2 }}
             >
               <div className="flex flex-col items-center gap-xs animate-bounce">
-                <span className="text-white/80 text-xs uppercase tracking-wider font-normal">
-                  Scroll
-                </span>
+                <span className="text-white/80 text-xs uppercase tracking-wider font-normal"></span>
                 <svg
                   className="w-6 h-6 text-white/70"
                   fill="none"

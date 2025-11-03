@@ -19,12 +19,21 @@ export function StreetwearEssentials() {
       />
 
       {/* Product Showcase */}
-      <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 pb-2xl md:pb-3xl">
+      <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">
         <ProductShowcase />
       </div>
 
       {/* Collections Section */}
       <CollectionsSection />
+
+      {/* Categories Title */}
+      <SectionTitle
+        eyebrow="Shop by Style"
+        title="Esplora le"
+        shaderText="Categorie"
+        description="Trova il tuo stile perfetto tra le nostre categorie curate"
+        size="md"
+      />
 
       {/* Categories Section - Gallery */}
       <div className="relative w-full z-[60]">

@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import { useScroll } from "framer-motion";
 import { StickyCard } from "./StickyCard";
+import { SectionTitle } from "../SectionTitle";
 
 interface Topic {
   title: string;
@@ -44,6 +45,15 @@ export function StickyCardsContainer({
 
   return (
     <div ref={container} className="relative w-full h-full">
+      <div className="py-xl">
+        <SectionTitle
+          eyebrow="Collections"
+          title="Scegli il tuo"
+          shaderText="Mood"
+          description="Scopri le nostre collezioni e trova il mood più adatto a te"
+        />
+      </div>
+
       {topics.map((topic, i) => {
         const isLast = i === topics.length - 1;
         // Calcola scale uniforme: solo le card che non sono l'ultima scalano
