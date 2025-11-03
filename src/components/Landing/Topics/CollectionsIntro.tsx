@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import ShaderText from "@/components/ShaderText";
 import { useJostAlignment } from "@/hooks/useAlignedFontSize";
@@ -13,14 +13,12 @@ export function CollectionsIntro({ onHeightChange }: CollectionsIntroProps) {
   const jostTitleRef = useRef<HTMLHeadingElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const alignedFontSize = useJostAlignment(jostTitleRef);
-  const [height, setHeight] = useState(0);
 
   useEffect(() => {
     const updateHeight = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const newHeight = rect.height;
-        setHeight(newHeight);
         onHeightChange?.(newHeight);
       }
     };

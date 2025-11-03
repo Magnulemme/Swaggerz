@@ -82,17 +82,8 @@ export function useAlignedFontSize<T extends HTMLElement = HTMLElement>(
 
       // Aspetta che i font siano caricati
       if (document.fonts && document.fonts.ready) {
-        console.log("⏳ Waiting for fonts to load...");
         try {
           await document.fonts.ready;
-          console.log("✅ Fonts loaded!");
-
-          // Verifica che i font specifici siano caricati
-          const fontsStatus = {
-            jost: document.fonts.check("900 100px Jost"),
-            pastor: document.fonts.check("900 100px PastorOfMuppets"),
-          };
-          console.log("🔍 Fonts availability check:", fontsStatus);
         } catch (error) {
           console.warn("⚠️ Error waiting for fonts:", error);
         }
@@ -103,26 +94,8 @@ export function useAlignedFontSize<T extends HTMLElement = HTMLElement>(
       // Debounce per evitare troppi ricalcoli durante resize
       timeoutId = setTimeout(() => {
         if (!isMounted) return;
-        console.log("🔍 useAlignedFontSize: Starting calculation...");
-        console.log("🔍 Reference element:", {
-          tagName: element.tagName,
-          className: element.className,
-          textContent: element.textContent?.substring(0, 50),
-        });
 
         const computed = window.getComputedStyle(element);
-
-        // Log TUTTI gli style rilevanti
-        console.log("🔍 Computed styles:", {
-          fontSize: computed.fontSize,
-          fontFamily: computed.fontFamily,
-          fontWeight: computed.fontWeight,
-          width: computed.width,
-          height: computed.height,
-          display: computed.display,
-          lineHeight: computed.lineHeight,
-        });
-
         const referenceFontSize = parseFloat(computed.fontSize);
 
         if (isNaN(referenceFontSize) || referenceFontSize === 0) {
@@ -133,28 +106,16 @@ export function useAlignedFontSize<T extends HTMLElement = HTMLElement>(
           return;
         }
 
-        console.log("✅ Reference fontSize parsed:", `${referenceFontSize}px`);
-
         // Usa il rapporto fornito o quello precalcolato
         const appliedRatio = ratio ?? getJostPastorRatio();
-        console.log("🔢 Applied ratio:", appliedRatio);
 
         // Calcola fontSize allineato con aggiustamento visivo
         const alignedSize = referenceFontSize * appliedRatio * visualAdjustment;
-        console.log("🧮 Calculation:", {
-          referenceFontSize,
-          ratio: appliedRatio,
-          visualAdjustment,
-          formula: `${referenceFontSize} × ${appliedRatio} × ${visualAdjustment}`,
-          result: alignedSize,
-        });
 
         // Arrotonda a 2 decimali per evitare problemi di precision
         const roundedSize = Math.round(alignedSize * 100) / 100;
 
         const newFontSize = `${roundedSize}px`;
-
-        console.log("✅ Final fontSize for ShaderText:", newFontSize);
 
         setFontSize(newFontSize);
       }, debounceMs);

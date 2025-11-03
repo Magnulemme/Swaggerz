@@ -188,7 +188,6 @@ export function SwagLoader({
 
     // Log dello stato dei componenti
     console.log('📊 Loading state:', {
-      video: componentsReady.video,
       shaderText: componentsReady.shaderText,
       isLoading,
     });

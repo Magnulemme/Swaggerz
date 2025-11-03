@@ -108,7 +108,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     } catch {
       // Error measuring text
     }
-  }, [children, scaledFontSize]);
+  }, [scaledFontSize]);
 
   // Misura il testo al mount e quando cambia il contenuto
   // Aspetta che i font siano caricati prima di misurare

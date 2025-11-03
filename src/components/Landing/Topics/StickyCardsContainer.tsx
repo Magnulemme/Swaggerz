@@ -70,7 +70,6 @@ export function StickyCardsContainer({
             progress={scrollYProgress}
             range={[i * 0.25, lastCardEntry]}
             targetScale={targetScale}
-            isLast={isLast}
           />
         );
       })}

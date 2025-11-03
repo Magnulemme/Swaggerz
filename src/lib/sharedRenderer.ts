@@ -341,9 +341,6 @@ class SharedRendererManager {
       this.canvas = null;
     }
 
-    // ✅ Release shader resources
-    shaderTextRenderer.releaseResources();
-
     console.log("🧹 SharedRenderer disposed");
   }
 

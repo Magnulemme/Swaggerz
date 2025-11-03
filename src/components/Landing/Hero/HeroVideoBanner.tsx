@@ -16,6 +16,7 @@ export default function HeroVideoBanner() {
   const [isCalculated, setIsCalculated] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const [isShaderTextVisible, setIsShaderTextVisible] = useState(false);
+  const [isImageTransitioning, setIsImageTransitioning] = useState(false);
   const shaderTextRef = useRef<HTMLDivElement>(null);
   const isLoading = useLoadingStore((state) => state.isLoading);
 
@@ -98,7 +99,10 @@ export default function HeroVideoBanner() {
       className="w-full h-dvh relative bg-black overflow-hidden"
     >
       {/* Image Background - Fade in dopo il loader + Fade out scroll-based */}
-      <HeroImageSlideshow imageOpacity={imageOpacity} />
+      <HeroImageSlideshow
+        imageOpacity={imageOpacity}
+        onTransitionChange={setIsImageTransitioning}
+      />
 
       {/* Content Overlay - Animazioni entrata */}
       <div
@@ -127,7 +131,7 @@ export default function HeroVideoBanner() {
               className="w-full"
               fontSize="clamp(78px, 12vw, 180px)"
               shouldRender={isShaderTextVisible}
-              shouldAnimate={isShaderTextVisible}
+              shouldAnimate={isShaderTextVisible && !isImageTransitioning}
             >
               SwaggerZ
             </ShaderText>

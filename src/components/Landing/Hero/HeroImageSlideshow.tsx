@@ -2,8 +2,9 @@
 
 import { motion, MotionValue } from "framer-motion";
 import { useLoadingStore } from "@/store/useLoadingStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import * as THREE from "three";
 
 const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
   ssr: false,
@@ -11,6 +12,7 @@ const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
 
 interface HeroImageSlideshowProps {
   imageOpacity: MotionValue<number>;
+  onTransitionChange?: (isTransitioning: boolean) => void;
 }
 
 // Immagini ottimizzate per desktop (landscape/panoramiche)
@@ -27,17 +29,95 @@ const MOBILE_IMAGES = [
   "/hero mob/jc-gellidon-ktME4-TLi1Q-unsplash.jpg",
 ];
 
-const SLIDE_INTERVAL = 7000; // 7 secondi
+const SLIDE_INTERVAL = 4000; // 4 secondi - per testare l'effetto più frequentemente
 
-export default function HeroImageSlideshow({ imageOpacity }: HeroImageSlideshowProps) {
+export default function HeroImageSlideshow({
+  imageOpacity,
+  onTransitionChange,
+}: HeroImageSlideshowProps) {
   const isLoading = useLoadingStore((state) => state.isLoading);
   const [visibleIndex, setVisibleIndex] = useState(0); // Immagine completamente visibile (canvas inferiore)
   const [animatingIndex, setAnimatingIndex] = useState(0); // Immagine che sta entrando (canvas superiore)
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Textures precaricate
+  const desktopTexturesRef = useRef<THREE.Texture[]>([]);
+  const mobileTexturesRef = useRef<THREE.Texture[]>([]);
+
   // Seleziona le immagini in base alla dimensione dello schermo
   const SLIDESHOW_IMAGES = isMobile ? MOBILE_IMAGES : DESKTOP_IMAGES;
+
+  // Preload tutte le texture (desktop e mobile) al mount
+  useEffect(() => {
+    console.log('[HeroSlideshow] Starting texture preload');
+    const loader = new THREE.TextureLoader();
+    let loadedCount = 0;
+    const totalTextures = DESKTOP_IMAGES.length + MOBILE_IMAGES.length;
+
+    // Copia i ref per il cleanup
+    const desktopTextures = desktopTexturesRef.current;
+    const mobileTextures = mobileTexturesRef.current;
+
+    const checkAllLoaded = () => {
+      loadedCount++;
+      console.log(`[HeroSlideshow] Loaded ${loadedCount}/${totalTextures} textures`);
+      if (loadedCount === totalTextures) {
+        console.log('[HeroSlideshow] All textures loaded successfully');
+      }
+    };
+
+    // Preload desktop images
+    DESKTOP_IMAGES.forEach((src, i) => {
+      loader.load(
+        src,
+        (texture) => {
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          desktopTextures[i] = texture;
+          console.log(`[HeroSlideshow] Desktop texture ${i} loaded:`, {
+            size: `${texture.image.width}x${texture.image.height}`,
+            src
+          });
+          checkAllLoaded();
+        },
+        undefined,
+        (error) => {
+          console.error(`[HeroSlideshow] Error loading desktop texture ${i}:`, error);
+          checkAllLoaded();
+        }
+      );
+    });
+
+    // Preload mobile images
+    MOBILE_IMAGES.forEach((src, i) => {
+      loader.load(
+        src,
+        (texture) => {
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          mobileTextures[i] = texture;
+          console.log(`[HeroSlideshow] Mobile texture ${i} loaded:`, {
+            size: `${texture.image.width}x${texture.image.height}`,
+            src
+          });
+          checkAllLoaded();
+        },
+        undefined,
+        (error) => {
+          console.error(`[HeroSlideshow] Error loading mobile texture ${i}:`, error);
+          checkAllLoaded();
+        }
+      );
+    });
+
+    // Cleanup: dispose textures al unmount
+    return () => {
+      console.log('[HeroSlideshow] Disposing all textures');
+      desktopTextures.forEach((texture) => texture?.dispose());
+      mobileTextures.forEach((texture) => texture?.dispose());
+    };
+  }, []); // Solo al mount
 
   // Detect mobile/desktop
   useEffect(() => {
@@ -57,6 +137,11 @@ export default function HeroImageSlideshow({ imageOpacity }: HeroImageSlideshowP
     setAnimatingIndex(0);
     setIsTransitioning(false);
   }, [isMobile]);
+
+  // Notifica il parent quando cambia lo stato di transizione
+  useEffect(() => {
+    onTransitionChange?.(isTransitioning);
+  }, [isTransitioning, onTransitionChange]);
 
   // Carosello automatico
   useEffect(() => {
@@ -80,8 +165,10 @@ export default function HeroImageSlideshow({ imageOpacity }: HeroImageSlideshowP
     return () => clearInterval(interval);
   }, [isLoading, SLIDESHOW_IMAGES.length, animatingIndex]);
 
-  const visibleImageSrc = SLIDESHOW_IMAGES[visibleIndex];
-  const animatingImageSrc = SLIDESHOW_IMAGES[animatingIndex];
+  // Seleziona le texture corrette in base a mobile/desktop
+  const currentTextures = isMobile ? mobileTexturesRef.current : desktopTexturesRef.current;
+  const visibleTexture = currentTextures[visibleIndex] || null;
+  const animatingTexture = currentTextures[animatingIndex] || null;
 
   return (
     <motion.div
@@ -91,25 +178,19 @@ export default function HeroImageSlideshow({ imageOpacity }: HeroImageSlideshowP
       transition={{ duration: 1.2, ease: "easeOut" }}
       style={{ opacity: imageOpacity }}
     >
-      {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (staticca) */}
-      <div
-        className="absolute inset-0 w-full h-full"
-        style={{ zIndex: 1 }}
-      >
+      {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (statica) */}
+      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
         <WaterRippleImage
-          imageSrc={visibleImageSrc}
+          texture={visibleTexture}
           isActive={false}
           isTransitioning={false}
         />
       </div>
 
       {/* Canvas superiore: esegue l'animazione della nuova immagine che entra */}
-      <div
-        className="absolute inset-0 w-full h-full"
-        style={{ zIndex: 2 }}
-      >
+      <div className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
         <WaterRippleImage
-          imageSrc={animatingImageSrc}
+          texture={animatingTexture}
           isActive={true}
           isTransitioning={isTransitioning}
         />

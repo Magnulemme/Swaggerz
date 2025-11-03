@@ -7,18 +7,19 @@ import {
   waterRippleFragmentShader,
 } from "./shaders/waterRippleShader";
 
+// Debug: conta i WebGL context attivi
+let activeContexts = 0;
+
 interface WaterRippleImageProps {
-  imageSrc: string;
+  texture: THREE.Texture | null;
   isActive: boolean;
   isTransitioning: boolean;
-  onLoadComplete?: () => void;
 }
 
 export default function WaterRippleImage({
-  imageSrc,
+  texture,
   isActive,
   isTransitioning,
-  onLoadComplete,
 }: WaterRippleImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -27,11 +28,9 @@ export default function WaterRippleImage({
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
-  const textureRef = useRef<THREE.Texture | null>(null);
-  const textureLoaderRef = useRef<THREE.TextureLoader>(new THREE.TextureLoader());
   const isActiveRef = useRef(isActive);
   const isTransitioningRef = useRef(isTransitioning);
-  const textureLoadedRef = useRef(false);
+  const animateFnRef = useRef<(() => void) | null>(null);
 
   // Aggiorna refs quando cambiano le props
   useEffect(() => {
@@ -47,6 +46,8 @@ export default function WaterRippleImage({
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
+    console.log('[WaterRipple] Creating WebGL context', { isActive, width, height });
+
     // Setup scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -58,12 +59,30 @@ export default function WaterRippleImage({
     // Setup renderer
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: true,
+      antialias: false, // Disabilitato per migliori performance
       premultipliedAlpha: true
     });
+
+    // Check if context was created successfully
+    const gl = renderer.getContext();
+    if (!gl) {
+      console.error('[WaterRipple] Failed to create WebGL context!');
+      return;
+    }
+
+    activeContexts++;
+    console.log('[WaterRipple] WebGL context created successfully', {
+      isActive,
+      activeContexts,
+      maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
+      maxRenderbufferSize: gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER)
+    });
+
     renderer.setClearColor(0x000000, 0); // Trasparente
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(1); // Ridotto a 1 per migliori performance
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.top = '0';
     renderer.domElement.style.left = '0';
@@ -100,9 +119,18 @@ export default function WaterRippleImage({
     const animate = () => {
       if (!materialRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) return;
 
+      let shouldContinue = false;
+
+      try {
+
       // Aggiorna progress basato sullo stato
-      if (isTransitioningRef.current && isActiveRef.current && textureLoadedRef.current) {
-        // In transizione e texture caricata: anima da 0 a 1
+      if (isTransitioningRef.current && isActiveRef.current) {
+        // Se il timer non è ancora partito (startTimeRef === 0), avvialo
+        if (startTimeRef.current === 0) {
+          startTimeRef.current = Date.now();
+        }
+
+        // In transizione: anima da 0 a 1
         const elapsed = (Date.now() - startTimeRef.current) / 1800; // 1.8s duration
         const progress = Math.min(elapsed, 1);
 
@@ -114,21 +142,34 @@ export default function WaterRippleImage({
 
         materialRef.current.uniforms.uProgress.value = easedProgress;
 
-        if (progress >= 1) {
+        if (progress < 1) {
+          shouldContinue = true; // Continua ad animare
+        } else {
           materialRef.current.uniforms.uProgress.value = 1;
         }
-      } else if (isTransitioningRef.current && isActiveRef.current && !textureLoadedRef.current) {
-        // In transizione ma texture non ancora caricata: resta trasparente
-        materialRef.current.uniforms.uProgress.value = 0;
       } else {
         // Non in transizione: mostra sempre immagine completa (sia attivo che background)
         materialRef.current.uniforms.uProgress.value = 1;
       }
 
-      rendererRef.current.render(sceneRef.current, cameraRef.current);
-      animationFrameRef.current = requestAnimationFrame(animate);
+        // Render frame
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      } catch (error) {
+        console.error('[WaterRipple] Error during render:', error);
+        // Ferma l'animazione in caso di errore
+        animationFrameRef.current = null;
+        return;
+      }
+
+      // Continua solo se necessario
+      if (shouldContinue) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        animationFrameRef.current = null;
+      }
     };
 
+    animateFnRef.current = animate;
     animate();
 
     // Handle resize
@@ -147,6 +188,8 @@ export default function WaterRippleImage({
     window.addEventListener("resize", handleResize);
 
     return () => {
+      activeContexts--;
+      console.log('[WaterRipple] Cleaning up WebGL context', { activeContexts });
       window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
@@ -157,58 +200,55 @@ export default function WaterRippleImage({
       renderer.dispose();
       geometry.dispose();
       material.dispose();
-      if (textureRef.current) {
-        textureRef.current.dispose();
-      }
+      // Texture disposal è gestito dal parent component
+      console.log('[WaterRipple] WebGL context disposed', { activeContexts });
     };
-  }, []); // Solo al mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo al mount - isActive è tracciato tramite ref
 
-  // Carica/aggiorna la texture quando cambia imageSrc
+  // Aggiorna la texture quando cambia la prop
   useEffect(() => {
-    if (!materialRef.current) return;
+    if (!materialRef.current || !containerRef.current || !texture) return;
 
-    // Segna texture come non caricata
-    textureLoadedRef.current = false;
-
-    // Dispose della vecchia texture
-    if (textureRef.current) {
-      textureRef.current.dispose();
-    }
-
-    const textureLoader = textureLoaderRef.current;
-    const texture = textureLoader.load(imageSrc, (loadedTexture) => {
-      if (!materialRef.current || !containerRef.current) return;
-
-      // Calculate aspect ratio to match object-fit: cover
-      const imageAspect = loadedTexture.image.width / loadedTexture.image.height;
-      const containerAspect = containerRef.current.offsetWidth / containerRef.current.offsetHeight;
-
-      // Aggiorna gli uniforms del materiale
-      materialRef.current.uniforms.uTexture.value = texture;
-      materialRef.current.uniforms.uImageAspect.value = imageAspect;
-      materialRef.current.uniforms.uContainerAspect.value = containerAspect;
-
-      // Segna texture come caricata
-      textureLoadedRef.current = true;
-
-      onLoadComplete?.();
+    console.log('[WaterRipple] Updating texture', {
+      textureSize: `${texture.image.width}x${texture.image.height}`,
+      hasImage: !!texture.image
     });
 
-    texture.minFilter = THREE.LinearFilter;
-    texture.magFilter = THREE.LinearFilter;
-    textureRef.current = texture;
+    // Calculate aspect ratio to match object-fit: cover
+    const imageAspect = texture.image.width / texture.image.height;
+    const containerAspect = containerRef.current.offsetWidth / containerRef.current.offsetHeight;
 
-  }, [imageSrc, onLoadComplete]);
+    // Aggiorna gli uniforms del materiale
+    materialRef.current.uniforms.uTexture.value = texture;
+    materialRef.current.uniforms.uImageAspect.value = imageAspect;
+    materialRef.current.uniforms.uContainerAspect.value = containerAspect;
+
+    // Renderizza un singolo frame per mostrare la nuova texture
+    if (rendererRef.current && sceneRef.current && cameraRef.current) {
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+    }
+  }, [texture]);
 
   // Update progress when transitioning starts
   useEffect(() => {
     if (isTransitioning && isActive) {
-      startTimeRef.current = Date.now();
+      console.log('[WaterRipple] Starting transition', { isActive });
+      // Reset timer to 0 - partirà nel loop animate
+      startTimeRef.current = 0;
       if (materialRef.current) {
         materialRef.current.uniforms.uProgress.value = 0;
       }
+
+      // Riavvia il loop di animazione se non è già in corso
+      if (!animationFrameRef.current && animateFnRef.current) {
+        console.log('[WaterRipple] Restarting animation loop');
+        animateFnRef.current();
+      }
+    } else if (!isTransitioning && isActive) {
+      console.log('[WaterRipple] Transition complete', { isActive });
     }
-  }, [isTransitioning, isActive, imageSrc]);
+  }, [isTransitioning, isActive]);
 
   return (
     <div

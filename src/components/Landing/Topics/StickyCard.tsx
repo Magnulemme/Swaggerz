@@ -14,7 +14,6 @@ interface StickyCardProps {
   progress: any;
   range: [number, number];
   targetScale: number;
-  isLast?: boolean;
 }
 
 export function StickyCard({
@@ -26,7 +25,6 @@ export function StickyCard({
   progress,
   range,
   targetScale,
-  isLast = false,
 }: StickyCardProps) {
   const container = useRef(null);
   const { scrollYProgress } = useScroll({
