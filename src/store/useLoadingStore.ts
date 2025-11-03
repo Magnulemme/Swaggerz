@@ -3,7 +3,6 @@ import { create } from "zustand";
 interface LoadingState {
   isLoading: boolean;
   componentsReady: {
-    video: boolean;
     shaderText: boolean;
   };
   setComponentReady: (component: keyof LoadingState['componentsReady']) => void;
@@ -14,7 +13,6 @@ interface LoadingState {
 export const useLoadingStore = create<LoadingState>((set, get) => ({
   isLoading: true,
   componentsReady: {
-    video: false,
     shaderText: false,
   },
   setComponentReady: (component) => {
@@ -35,7 +33,6 @@ export const useLoadingStore = create<LoadingState>((set, get) => ({
   resetLoading: () => set({
     isLoading: true,
     componentsReady: {
-      video: false,
       shaderText: false,
     },
   }),

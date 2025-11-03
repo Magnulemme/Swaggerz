@@ -5,59 +5,28 @@ import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import LiquidVideoShader from "./LiquidVideoShader";
+import Image from "next/image";
 
 export default function HeroVideoBanner() {
   const buttonRef = useRef<HTMLAnchorElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [shouldUseShader, setShouldUseShader] = useState(false);
   const [buttonOffset, setButtonOffset] = useState(0);
   const [scrollOffset, setScrollOffset] = useState(0);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const [isShaderTextVisible, setIsShaderTextVisible] = useState(false);
   const shaderTextRef = useRef<HTMLDivElement>(null);
-  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
   const isLoading = useLoadingStore((state) => state.isLoading);
 
-  // Fade out progressivo quando il video esce dal viewport (50% scroll)
+  // Fade out progressivo quando l'immagine esce dal viewport (50% scroll)
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
   // Opacity: 1 quando è visibile, fade out progressivo a partire dal 50%
-  const videoOpacity = useTransform(scrollYProgress, [0.5, 1], [1, 0]);
-
-  // Preload video con massima priorità
-  useEffect(() => {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "video";
-    link.href = "/videos/hero-video.webm";
-    link.type = "video/webm";
-    document.head.appendChild(link);
-
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, []);
-
-  useEffect(() => {
-    const checkShaderSupport = () => {
-      const isLargeScreen = window.innerWidth >= 1024;
-      const hasMouseSupport = window.matchMedia(
-        "(hover: hover) and (pointer: fine)"
-      ).matches;
-      setShouldUseShader(isLargeScreen && hasMouseSupport);
-    };
-
-    checkShaderSupport();
-    window.addEventListener("resize", checkShaderSupport);
-    return () => window.removeEventListener("resize", checkShaderSupport);
-  }, []);
+  const imageOpacity = useTransform(scrollYProgress, [0.5, 1], [1, 0]);
 
   useEffect(() => {
     const calculateOffsets = () => {
@@ -123,63 +92,30 @@ export default function HeroVideoBanner() {
     };
   }, []);
 
-  // Traccia quando il video è pronto
-  useEffect(() => {
-    const video = videoRef.current;
-
-    const handleVideoReady = () => {
-      console.log("✅ Video ready");
-      setComponentReady("video");
-    };
-
-    if (video) {
-      // Controlla se il video ha già dati caricati
-      if (video.readyState >= 3) {
-        handleVideoReady();
-      } else {
-        video.addEventListener("canplay", handleVideoReady);
-      }
-
-      return () => {
-        video.removeEventListener("canplay", handleVideoReady);
-      };
-    } else if (shouldUseShader) {
-      // Se usa shader invece del video normale, segna come pronto immediatamente
-      console.log("✅ Shader video ready");
-      setComponentReady("video");
-    }
-  }, [shouldUseShader, setComponentReady]);
 
   return (
     <div
       ref={containerRef}
       className="w-full h-dvh relative bg-black overflow-hidden"
     >
-      {/* Video Background - Fade in dopo il loader + Fade out scroll-based */}
+      {/* Image Background - Fade in dopo il loader + Fade out scroll-based */}
       <motion.div
         className="absolute inset-0 w-full h-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: isLoading ? 0 : 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
-        style={{ opacity: videoOpacity }}
+        style={{ opacity: imageOpacity }}
       >
-        {shouldUseShader && (
-          <LiquidVideoShader videoSrc="/videos/hero-video.webm" className="" />
-        )}
-
-        {!shouldUseShader && (
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/videos/hero-video.webm" type="video/webm" />
-          </video>
-        )}
+        <Image
+          src="/swaggerz-hero.jpg"
+          alt="Streetwear Fashion"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        {/* Overlay scuro per migliorare la leggibilità del testo */}
+        <div className="absolute inset-0 bg-black/40" />
       </motion.div>
 
       {/* Content Overlay - Animazioni entrata */}
