@@ -39,6 +39,7 @@ export function SectionTitle({
 }: SectionTitleProps) {
   const jostTitleRef = useRef<HTMLHeadingElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const shadowTextRef = useRef<HTMLDivElement>(null);
   const alignedFontSize = useJostAlignment(jostTitleRef);
 
   useEffect(() => {
@@ -84,21 +85,44 @@ export function SectionTitle({
       )}
 
       {/* Title */}
-      <div className="flex flex-wrap items-start justify-center gap-2 lg:gap-3">
+      <div className="flex flex-wrap items-baseline justify-center gap-2 lg:gap-3">
         <h3
           ref={jostTitleRef}
           className={`${sizeClasses[size].title} font-black text-light leading-none tracking-tight font-jost`}
         >
           {title}
         </h3>
-        <div className="">
-          <ShaderText
-            fontSize={alignedFontSize || sizeClasses[size].defaultFontSize}
-            fontWeight="900"
-            className="leading-none"
+        {/* Container con shadow text (per baseline) e ShaderText sovrapposto */}
+        <div ref={shadowTextRef} className="relative">
+          {/* Shadow text: invisibile ma con baseline corretto */}
+          <div
+            style={{
+              fontSize: alignedFontSize || sizeClasses[size].defaultFontSize,
+              fontFamily: "PastorOfMuppets, cursive",
+              fontWeight: 900,
+              lineHeight: 1,
+              visibility: "hidden",
+            }}
+            aria-hidden="true"
           >
             {shaderText}
-          </ShaderText>
+          </div>
+
+          {/* ShaderText posizionato esattamente sopra lo shadow text */}
+          <div
+            className="absolute inset-0"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ShaderText
+              fontSize={alignedFontSize || sizeClasses[size].defaultFontSize}
+            >
+              {shaderText}
+            </ShaderText>
+          </div>
         </div>
       </div>
 
