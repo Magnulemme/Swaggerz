@@ -7,9 +7,6 @@ import {
   waterRippleFragmentShader,
 } from "./shaders/waterRippleShader";
 
-// Debug: conta i WebGL context attivi
-let activeContexts = 0;
-
 interface WaterRippleImageProps {
   texture: THREE.Texture | null;
   isActive: boolean;
@@ -70,8 +67,6 @@ export default function WaterRippleImage({
       console.error('[WaterRipple] Failed to create WebGL context!');
       return;
     }
-
-    activeContexts++;
 
     renderer.setClearColor(0x000000, 0); // Trasparente
     renderer.setSize(width, height);
@@ -190,7 +185,6 @@ export default function WaterRippleImage({
     window.addEventListener("resize", handleResize);
 
     return () => {
-      activeContexts--;
       resizeObserver.disconnect();
       window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
@@ -204,7 +198,6 @@ export default function WaterRippleImage({
       material.dispose();
       // Texture disposal è gestito dal parent component
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo al mount - isActive è tracciato tramite ref
 
   // Aggiorna la texture quando cambia la prop

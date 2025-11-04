@@ -532,6 +532,20 @@
     animation-delay: 4s;
   }
 
+  /* Hue rotation for subtle color changes */
+  @keyframes hue-rotate-subtle {
+    0%, 100% {
+      filter: hue-rotate(0deg);
+    }
+    50% {
+      filter: hue-rotate(30deg);
+    }
+  }
+
+  .animate-hue-rotate-subtle {
+    animation: hue-rotate-subtle 10s ease-in-out infinite;
+  }
+
 }
 
 @theme inline {

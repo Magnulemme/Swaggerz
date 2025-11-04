@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, MotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
@@ -11,7 +11,6 @@ const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
 });
 
 interface HeroImageSlideshowProps {
-  imageOpacity: MotionValue<number>;
   onTransitionChange?: (isTransitioning: boolean) => void;
 }
 
@@ -32,7 +31,6 @@ const MOBILE_IMAGES = [
 const SLIDE_INTERVAL = 5000; // 5 secondi tra le transizioni
 
 export default function HeroImageSlideshow({
-  imageOpacity,
   onTransitionChange,
 }: HeroImageSlideshowProps) {
   const isLoading = useLoadingStore((state) => state.isLoading);

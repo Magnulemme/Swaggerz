@@ -2,15 +2,11 @@
 
 import React from "react";
 import HeroVideoBanner from "./Landing/Hero/HeroVideoBanner";
-import BannerAndFeaturedProductLg from "./Landing/BannerAndFeaturedProduct/BannerAndFeaturedProductLg";
-import BannerAndFeaturedProductMobile from "./Landing/BannerAndFeaturedProduct/BannerAndFeaturedProductMobile";
-import FeaturedProduct from "./Landing/BannerAndFeaturedProduct/FeaturedProduct";
 import TransitionBanner from "./Landing/TransitionBanner/TransitionBanner";
 import UnlockDesignsSection from "./Landing/UnlockDesigns/UnlockDesignsSection";
 import ReviewsSection from "./Landing/Reviews/ReviewsSection";
 import ShippingInfoSection from "./Landing/Shipping/ShippingInfoSection";
 import NewsletterBanner from "./Landing/Newsletter/NewsletterBanner";
-import { SectionTitle } from "./Landing/SectionTitle";
 import { StreetwearEssentials } from "./Landing/StreetwearEssentials";
 
 const Landing = () => {
