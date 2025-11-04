@@ -20,7 +20,7 @@ const sizeClasses = {
     defaultFontSize: "36px",
   },
   md: {
-    title: "text-2xl md:text-3xl lg:text-5xl",
+    title: "text-2xl md:text-3xl lg:text-6xl",
     defaultFontSize: "48px",
   },
   lg: {

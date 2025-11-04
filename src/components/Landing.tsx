@@ -26,33 +26,9 @@ const Landing = () => {
         {/* Streetwear Essentials - Contains Product Showcase, Collections, Categories */}
         <StreetwearEssentials />
 
-        {/* Collaborations Subtitle */}
-        <SectionTitle
-          eyebrow="Limited Edition"
-          title="Collaborazioni"
-          shaderText="Esclusive"
-          description="Drop limitati e partnership uniche con i migliori brand streetwear"
-          size="md"
-        />
-
         {/* Temporary Collection & Featured Products - Bento Grid Layout */}
-        <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 bg-zinc-950">
+        <div className="relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">
           <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 auto-rows-auto z-50">
-            {/* Desktop Layout (lg+) */}
-            <div className="hidden lg:contents">
-              <BannerAndFeaturedProductLg />
-            </div>
-
-            {/* Mobile/Tablet Layout (< lg) */}
-            <div className="lg:hidden contents">
-              <BannerAndFeaturedProductMobile />
-            </div>
-
-            {/* Featured Product - SOLO mobile */}
-            <div className="col-span-2 lg:hidden min-h-[300px] z-20">
-              <FeaturedProduct />
-            </div>
-
             {/* Transition Banner - Full width */}
             <div className="col-span-2 lg:col-span-4 z-20">
               <TransitionBanner />

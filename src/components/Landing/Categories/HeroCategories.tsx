@@ -90,33 +90,8 @@ export function HeroCategories({
 
   return (
     <div
-      className={`relative w-full py-2xl md:py-3xl lg:py-3xl px-md md:px-lg lg:px-xl xl:px-2xl  ${className}`}
+      className={`relative w-full px-md md:px-lg lg:px-xl xl:px-2xl  ${className}`}
     >
-      {/* Gradient Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 80% 50% at 50% 50%, rgba(234, 179, 8, 0.15), transparent 70%),
-              radial-gradient(ellipse 60% 40% at 30% 60%, rgba(239, 68, 68, 0.1), transparent 60%),
-              radial-gradient(ellipse 70% 45% at 70% 40%, rgba(249, 115, 22, 0.12), transparent 65%)
-            `,
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 75% 48% at 45% 55%, rgba(234, 179, 8, 0.18), transparent 68%),
-              radial-gradient(ellipse 65% 42% at 60% 45%, rgba(249, 115, 22, 0.14), transparent 63%)
-            `,
-            filter: "blur(80px)",
-            opacity: 0.4,
-          }}
-        />
-      </div>
-
       <div className="relative max-w-[1600px] mx-auto z-10">
         {/* Slider con controlli overlay */}
         <div className="relative">

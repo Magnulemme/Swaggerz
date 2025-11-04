@@ -328,7 +328,7 @@ const ProductShowcase = () => {
         {/* Desktop: Slider */}
         <div className="hidden md:block relative">
           {/* Navigation Arrows - Top Right */}
-          <div className="absolute -top-12 right-0 z-20 flex items-center gap-2">
+          <div className="absolute -top-xl right-0 z-20 flex items-center gap-2">
             <button
               onClick={scrollPrev}
               disabled={!canScrollPrev}

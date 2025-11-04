@@ -130,12 +130,10 @@ export function SwagLoader({
   useEffect(() => {
     if (!isPageLoader) return;
 
-    console.log('🔄 Page changed to:', pathname);
     setIsComplete(false);
 
     // Se non siamo sulla landing, non aspettare i componenti
     if (!needsComponentLoading) {
-      console.log('⚡ Non-landing page detected, skipping component loading');
       // Dai un breve delay per evitare flash
       const timer = setTimeout(() => {
         setIsComplete(true);
@@ -170,7 +168,6 @@ export function SwagLoader({
   useEffect(() => {
     if (!isPageLoader || !needsComponentLoading) return;
 
-    console.log('⏱️ Starting fallback timeout for landing page');
     const fallbackTimer = setTimeout(() => {
       if (isLoading) {
         console.warn('⚠️ Loading timeout reached, forcing completion');
@@ -186,25 +183,8 @@ export function SwagLoader({
   useEffect(() => {
     if (!isPageLoader || !needsComponentLoading) return;
 
-    // Log dello stato dei componenti
-    console.log('📊 [SwagLoader] Loading state:', {
-      shaderText: componentsReady.shaderText,
-      heroSlideshow: componentsReady.heroSlideshow,
-      isLoading,
-      viewport: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        body: {
-          scrollHeight: document.body.scrollHeight,
-          offsetHeight: document.body.offsetHeight
-        }
-      },
-      timestamp: performance.now()
-    });
-
     // Quando tutti i componenti sono pronti, nascondi immediatamente
     if (!isLoading) {
-      console.log('🎉 [SwagLoader] All components ready! Hiding loader...');
       setIsComplete(true);
       onLoadComplete?.();
     }
