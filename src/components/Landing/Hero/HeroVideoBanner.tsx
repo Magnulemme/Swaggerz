@@ -3,7 +3,7 @@
 import ShaderText from "@/components/ShaderText";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { useLoadingStore } from "@/store/useLoadingStore";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import HeroImageSlideshow from "./HeroImageSlideshow";
 
@@ -19,15 +19,6 @@ export default function HeroVideoBanner() {
   const [isImageTransitioning, setIsImageTransitioning] = useState(false);
   const shaderTextRef = useRef<HTMLDivElement>(null);
   const isLoading = useLoadingStore((state) => state.isLoading);
-
-  // Fade out progressivo quando l'immagine esce dal viewport (50% scroll)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-
-  // Opacity: 1 quando è visibile, fade out progressivo a partire dal 50%
-  const imageOpacity = useTransform(scrollYProgress, [0.5, 1], [1, 0]);
 
   useEffect(() => {
     const calculateOffsets = () => {
@@ -100,7 +91,6 @@ export default function HeroVideoBanner() {
     >
       {/* Image Background - Fade in dopo il loader + Fade out scroll-based */}
       <HeroImageSlideshow
-        imageOpacity={imageOpacity}
         onTransitionChange={setIsImageTransitioning}
       />
 
