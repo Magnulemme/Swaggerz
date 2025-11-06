@@ -5,7 +5,7 @@ import { SectionTitle } from "./SectionTitle";
 import ProductShowcase from "./ProductShowcase/ProductShowcase";
 import { CollectionsSection } from "./Topics/CollectionsSection";
 import { HeroCategories } from "./Categories/HeroCategories";
-import { ScrollingGradientBlobs } from "./StreetwearEssentials/ScrollingGradientBlobs";
+import { LazyScrollingGradientBlobs } from "./StreetwearEssentials/LazyScrollingGradientBlobs";
 import BannerAndFeaturedProductLg from "./BannerAndFeaturedProduct/BannerAndFeaturedProductLg";
 import BannerAndFeaturedProductMobile from "./BannerAndFeaturedProduct/BannerAndFeaturedProductMobile";
 import FeaturedProduct from "./BannerAndFeaturedProduct/FeaturedProduct";
@@ -13,8 +13,8 @@ import FeaturedProduct from "./BannerAndFeaturedProduct/FeaturedProduct";
 export function StreetwearEssentials() {
   return (
     <div className="relative h-full w-full bg-zinc-950 pt-xl">
-      {/* Animated Gradient Blobs Background */}
-      <ScrollingGradientBlobs />
+      {/* Animated Gradient Blobs Background - Lazy loaded */}
+      <LazyScrollingGradientBlobs />
 
       {/* Section Title */}
       <SectionTitle

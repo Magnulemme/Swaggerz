@@ -5,6 +5,7 @@ import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import * as THREE from "three";
+import Image from "next/image";
 
 const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
   ssr: false,
@@ -41,6 +42,8 @@ export default function HeroImageSlideshow({
   const [isMobile, setIsMobile] = useState<boolean | null>(null); // null = non ancora rilevato
   const [texturesReady, setTexturesReady] = useState(false);
   const [firstImageReady, setFirstImageReady] = useState(false);
+  const [staticImageLoaded, setStaticImageLoaded] = useState(false);
+  const [shaderReady, setShaderReady] = useState(false);
 
   // Textures precaricate
   const desktopTexturesRef = useRef<THREE.Texture[]>([]);
@@ -183,12 +186,22 @@ export default function HeroImageSlideshow({
     return () => clearInterval(interval);
   }, [isLoading, SLIDESHOW_IMAGES.length, animatingIndex]);
 
-  // Notifica il loader quando tutto è pronto
+  // Notifica il loader quando l'immagine statica è caricata (priorità assoluta)
   useEffect(() => {
-    if (texturesReady && firstImageReady) {
+    if (staticImageLoaded) {
       setComponentReady("heroSlideshow");
     }
-  }, [texturesReady, firstImageReady, isLoading, setComponentReady]);
+  }, [staticImageLoaded, setComponentReady]);
+
+  // Una volta che lo shader è pronto, inizia il crossfade
+  useEffect(() => {
+    if (texturesReady && firstImageReady) {
+      // Aspetta un frame per essere sicuri che il canvas sia renderizzato
+      requestAnimationFrame(() => {
+        setShaderReady(true);
+      });
+    }
+  }, [texturesReady, firstImageReady]);
 
   // Seleziona le texture corrette in base a mobile/desktop
   const currentTextures = isMobile
@@ -204,9 +217,35 @@ export default function HeroImageSlideshow({
       animate={{ opacity: isLoading ? 0 : 1 }}
       transition={{ duration: 1.2, ease: "easeOut" }}
     >
-      {/* Renderizza i canvas SOLO quando la prima texture è pronta */}
+      {/* Immagine statica - Caricamento immediato (priorità assoluta) */}
+      {isMobile !== null && (
+        <motion.div
+          className="absolute inset-0 w-full h-full"
+          style={{ zIndex: 1 }}
+          animate={{ opacity: shaderReady ? 0 : 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+          <Image
+            src={SLIDESHOW_IMAGES[0]}
+            alt="Hero background"
+            fill
+            priority
+            quality={95}
+            className="object-cover"
+            onLoad={() => setStaticImageLoaded(true)}
+          />
+        </motion.div>
+      )}
+
+      {/* Canvas shader - Caricato in background e fade in quando pronto */}
       {visibleTexture && (
-        <>
+        <motion.div
+          className="absolute inset-0 w-full h-full"
+          style={{ zIndex: 2 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: shaderReady ? 1 : 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
           {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (statica) */}
           <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
             <WaterRippleImage
@@ -225,7 +264,7 @@ export default function HeroImageSlideshow({
               isTransitioning={isTransitioning}
             />
           </div>
-        </>
+        </motion.div>
       )}
 
       {/* Overlay scuro per migliorare la leggibilità del testo */}
