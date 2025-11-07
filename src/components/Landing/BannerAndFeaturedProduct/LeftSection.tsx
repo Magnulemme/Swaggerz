@@ -1,5 +1,3 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { Collection } from "./types";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";

@@ -12,21 +12,7 @@ interface FeaturedCollectionBannerProps {
 export default function FeaturedCollectionBanner({
   section,
 }: FeaturedCollectionBannerProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const collection = collections[selectedIndex];
-
-  const scrollPrev = () => {
-    setSelectedIndex((prev) =>
-      prev === 0 ? collections.length - 1 : prev - 1
-    );
-  };
-
-  const scrollNext = () => {
-    setSelectedIndex((prev) =>
-      prev === collections.length - 1 ? 0 : prev + 1
-    );
-  };
+  const collection = collections[0];
 
   // Render Left Section (Titolo + Immagini)
   if (section === "left") {
@@ -35,13 +21,7 @@ export default function FeaturedCollectionBanner({
 
   // Render Right Section (Descrizione + CTA)
   if (section === "right") {
-    return (
-      <RightSection
-        collection={collection}
-        onPrevious={scrollPrev}
-        onNext={scrollNext}
-      />
-    );
+    return <RightSection collection={collection} />;
   }
 
   return null;

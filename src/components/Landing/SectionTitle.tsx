@@ -66,8 +66,8 @@ export function SectionTitle({
       className="relative text-center py-md md:py-2xl md:pt-3xl space-y-md px-md md:px-lg z-50"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+      viewport={{ once: true, margin: "100px" }}
+      transition={{ duration: 0.65, ease: "easeOut" }}
     >
       {/* Eyebrow */}
       {eyebrow && (
@@ -75,7 +75,7 @@ export function SectionTitle({
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.2, delay: 0.05 }}
           className="inline-block"
         >
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-light-subtle/50 bg-dark-elevated/50 text-light-tertiary text-[10px] font-semibold uppercase tracking-wider backdrop-blur-sm">

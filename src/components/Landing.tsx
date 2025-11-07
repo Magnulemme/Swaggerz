@@ -1,19 +1,22 @@
-import HeroVideoBanner from "./Landing/Hero/HeroVideoBanner";
-import TransitionBanner from "./Landing/TransitionBanner/TransitionBanner";
-import UnlockDesignsSection from "./Landing/UnlockDesigns/UnlockDesignsSection";
-import ReviewsSection from "./Landing/Reviews/ReviewsSection";
-import ShippingInfoSection from "./Landing/Shipping/ShippingInfoSection";
-import NewsletterBanner from "./Landing/Newsletter/NewsletterBanner";
+import dynamic from "next/dynamic";
+import Hero from "./Landing/Hero/Hero";
 import { StreetwearEssentials } from "./Landing/StreetwearEssentials";
+
+// Lazy load below-the-fold sections for better initial bundle size
+const TransitionBanner = dynamic(() => import("./Landing/TransitionBanner/TransitionBanner"));
+const UnlockDesignsSection = dynamic(() => import("./Landing/UnlockDesigns/UnlockDesignsSection"));
+const ReviewsSection = dynamic(() => import("./Landing/Reviews/ReviewsSection"));
+const ShippingInfoSection = dynamic(() => import("./Landing/Shipping/ShippingInfoSection"));
+const NewsletterBanner = dynamic(() => import("./Landing/Newsletter/NewsletterBanner"));
 
 const Landing = () => {
   return (
     <section className="relative bg-zinc-950 font-jost min-h-screen ">
       {/* Main content container */}
       <div className="relative z-50 w-full">
-        {/* Hero Video Banner */}
+        {/* Hero */}
         <div className="relative w-full z-50">
-          <HeroVideoBanner />
+          <Hero />
         </div>
 
         {/* Streetwear Essentials - Contains Product Showcase, Collections, Categories */}

@@ -1,11 +1,13 @@
-import HeroImageSlideshow from "./HeroImageSlideshow";
-import HeroContent from "./HeroContent";
+import dynamic from "next/dynamic";
 import Image from "next/image";
+import HeroContent from "./HeroContent";
+
+const HeroImageSlideshow = dynamic(() => import("./HeroImageSlideshow"));
 
 const DESKTOP_IMAGE = "/hero desk/swaggerz-hero.avif";
 const MOBILE_IMAGE = "/hero mob/hero-streetwear-1.avif";
 
-export default function HeroVideoBanner() {
+export default function Hero() {
   return (
     <div className="w-full h-dvh relative bg-black overflow-hidden">
       {/* Static server-rendered first image - Available immediately */}

@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
+import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import Image from "next/image";
 import { Collection } from "./types";
-import { Check } from "lucide-react";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
 interface RightSectionProps {
   collection: Collection;
@@ -14,8 +13,6 @@ interface RightSectionProps {
 }
 
 export default function RightSection({ collection }: RightSectionProps) {
-  const [isHovered, setIsHovered] = React.useState(false);
-
   return (
     <div className="relative w-full h-full overflow-hidden z-0 rounded-r-3xl">
       <div className="relative z-50 flex flex-col h-full py-8 lg:py-10 gap-6 lg:gap-7 px-6 lg:pr-10">
@@ -169,21 +166,7 @@ export default function RightSection({ collection }: RightSectionProps) {
                 className="relative w-24 md:w-full lg:w-32 xl:w-full flex-shrink-0 aspect-square md:aspect-[16/9] lg:aspect-square xl:aspect-[16/9] rounded-lg overflow-hidden group cursor-pointer"
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.3 }}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
               >
-                {/* Glow effect */}
-                <motion.div
-                  className="absolute -inset-1 rounded-lg blur-lg"
-                  style={{
-                    background: `radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.25), transparent 60%)`,
-                  }}
-                  animate={{
-                    opacity: isHovered ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-
                 <div className="relative w-full h-full rounded-xl">
                   <Image
                     src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?w=800&h=800&fit=crop"

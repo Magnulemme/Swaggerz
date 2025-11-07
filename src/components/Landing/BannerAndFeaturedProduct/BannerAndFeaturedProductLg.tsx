@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import BannerSectionLeft from "./BannerSectionLeft";
 import BannerSectionRight from "./BannerSectionRight";

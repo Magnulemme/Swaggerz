@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { SectionTitle } from "./SectionTitle";
 import ProductShowcase from "./ProductShowcase/ProductShowcase";
