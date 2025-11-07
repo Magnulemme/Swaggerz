@@ -10,14 +10,12 @@ import {
 interface WaterRippleImageProps {
   texture: THREE.Texture | null;
   isActive: boolean;
-  isTransitioning: boolean;
   onReady?: () => void;
 }
 
 export default function WaterRippleImage({
   texture,
   isActive,
-  isTransitioning,
   onReady,
 }: WaterRippleImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,15 +26,13 @@ export default function WaterRippleImage({
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const isActiveRef = useRef(isActive);
-  const isTransitioningRef = useRef(isTransitioning);
   const animateFnRef = useRef<(() => void) | null>(null);
   const hasNotifiedReady = useRef(false);
 
   // Aggiorna refs quando cambiano le props
   useEffect(() => {
     isActiveRef.current = isActive;
-    isTransitioningRef.current = isTransitioning;
-  }, [isActive, isTransitioning]);
+  }, [isActive]);
 
   // Setup iniziale del canvas (una sola volta)
   useEffect(() => {
@@ -113,12 +109,7 @@ export default function WaterRippleImage({
       try {
 
       // Aggiorna progress basato sullo stato
-      if (isTransitioningRef.current && isActiveRef.current) {
-        // Se il timer non è ancora partito (startTimeRef === 0), avvialo
-        if (startTimeRef.current === 0) {
-          startTimeRef.current = Date.now();
-        }
-
+      if (isActiveRef.current && startTimeRef.current > 0) {
         // In transizione: anima da 0 a 1
         const elapsed = (Date.now() - startTimeRef.current) / 1800; // 1.8s duration
         const progress = Math.min(elapsed, 1);
@@ -135,6 +126,7 @@ export default function WaterRippleImage({
           shouldContinue = true; // Continua ad animare
         } else {
           materialRef.current.uniforms.uProgress.value = 1;
+          startTimeRef.current = 0; // Reset per la prossima animazione
         }
       } else {
         // Non in transizione: mostra sempre immagine completa (sia attivo che background)
@@ -213,6 +205,20 @@ export default function WaterRippleImage({
     materialRef.current.uniforms.uImageAspect.value = imageAspect;
     materialRef.current.uniforms.uContainerAspect.value = containerAspect;
 
+    // Se isActive, avvia l'animazione
+    if (isActive) {
+      // Reset progress a 0 e avvia il timer
+      startTimeRef.current = Date.now();
+      if (materialRef.current) {
+        materialRef.current.uniforms.uProgress.value = 0;
+      }
+
+      // Riavvia il loop di animazione se non è già in corso
+      if (!animationFrameRef.current && animateFnRef.current) {
+        animateFnRef.current();
+      }
+    }
+
     // Renderizza un singolo frame per mostrare la nuova texture
     if (rendererRef.current && sceneRef.current && cameraRef.current) {
       rendererRef.current.render(sceneRef.current, cameraRef.current);
@@ -230,23 +236,7 @@ export default function WaterRippleImage({
         });
       }
     }
-  }, [texture, onReady]);
-
-  // Update progress when transitioning starts
-  useEffect(() => {
-    if (isTransitioning && isActive) {
-      // Reset timer to 0 - partirà nel loop animate
-      startTimeRef.current = 0;
-      if (materialRef.current) {
-        materialRef.current.uniforms.uProgress.value = 0;
-      }
-
-      // Riavvia il loop di animazione se non è già in corso
-      if (!animationFrameRef.current && animateFnRef.current) {
-        animateFnRef.current();
-      }
-    }
-  }, [isTransitioning, isActive]);
+  }, [texture, onReady, isActive]);
 
   return (
     <div

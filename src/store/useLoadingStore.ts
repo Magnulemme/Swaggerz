@@ -4,7 +4,6 @@ interface LoadingState {
   isLoading: boolean;
   componentsReady: {
     shaderText: boolean;
-    heroSlideshow: boolean;
   };
   setComponentReady: (component: keyof LoadingState['componentsReady']) => void;
   resetLoading: () => void;
@@ -15,7 +14,6 @@ export const useLoadingStore = create<LoadingState>((set, get) => ({
   isLoading: true,
   componentsReady: {
     shaderText: false,
-    heroSlideshow: false,
   },
   setComponentReady: (component) => {
     set((state) => ({
@@ -36,7 +34,6 @@ export const useLoadingStore = create<LoadingState>((set, get) => ({
     isLoading: true,
     componentsReady: {
       shaderText: false,
-      heroSlideshow: false,
     },
   }),
   isAllReady: () => {

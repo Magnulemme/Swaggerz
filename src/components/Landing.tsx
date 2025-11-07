@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import HeroVideoBanner from "./Landing/Hero/HeroVideoBanner";
 import TransitionBanner from "./Landing/TransitionBanner/TransitionBanner";
 import UnlockDesignsSection from "./Landing/UnlockDesigns/UnlockDesignsSection";

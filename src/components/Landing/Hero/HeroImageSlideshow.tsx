@@ -1,19 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import * as THREE from "three";
-import Image from "next/image";
 
 const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
   ssr: false,
 });
-
-interface HeroImageSlideshowProps {
-  onTransitionChange?: (isTransitioning: boolean) => void;
-}
 
 // Immagini ottimizzate per desktop (landscape/panoramiche)
 const DESKTOP_IMAGES = [
@@ -31,19 +25,13 @@ const MOBILE_IMAGES = [
 
 const SLIDE_INTERVAL = 5000; // 5 secondi tra le transizioni
 
-export default function HeroImageSlideshow({
-  onTransitionChange,
-}: HeroImageSlideshowProps) {
+export default function HeroImageSlideshow() {
   const isLoading = useLoadingStore((state) => state.isLoading);
-  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
-  const [visibleIndex, setVisibleIndex] = useState(0); // Immagine completamente visibile (canvas inferiore)
-  const [animatingIndex, setAnimatingIndex] = useState(0); // Immagine che sta entrando (canvas superiore)
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isMobile, setIsMobile] = useState<boolean | null>(null); // null = non ancora rilevato
+  const [visibleIndex, setVisibleIndex] = useState<number | null>(null); // Inizialmente null, l'immagine statica è già sotto
+  const [animatingIndex, setAnimatingIndex] = useState(1); // Parte dalla seconda immagine con effetto
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [texturesReady, setTexturesReady] = useState(false);
-  const [firstImageReady, setFirstImageReady] = useState(false);
-  const [staticImageLoaded, setStaticImageLoaded] = useState(false);
-  const [shaderReady, setShaderReady] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false); // Per far partire la prima transizione una sola volta
 
   // Textures precaricate
   const desktopTexturesRef = useRef<THREE.Texture[]>([]);
@@ -86,14 +74,13 @@ export default function HeroImageSlideshow({
     };
   }, [isMobile, isLoading]);
 
-  // SECONDO: Progressive loading - carica PRIMA la prima immagine, poi le altre
+  // Carica tutte le texture
   useEffect(() => {
     // Aspetta che il device sia stato rilevato
     if (isMobile === null) return;
 
     // Reset stati quando cambia device
     setTexturesReady(false);
-    setFirstImageReady(false);
 
     const imagesToLoad = isMobile ? MOBILE_IMAGES : DESKTOP_IMAGES;
     const targetTextures = isMobile
@@ -101,50 +88,29 @@ export default function HeroImageSlideshow({
       : desktopTexturesRef.current;
 
     const loader = new THREE.TextureLoader();
+    let loadedCount = 0;
 
-    // STEP 1: Carica SOLO la prima immagine (priorità massima)
-    loader.load(
-      imagesToLoad[0],
-      (texture) => {
-        texture.minFilter = THREE.LinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-        targetTextures[0] = texture;
+    // Carica tutte le texture
+    imagesToLoad.forEach((src, index) => {
+      loader.load(
+        src,
+        (texture) => {
+          texture.minFilter = THREE.LinearFilter;
+          texture.magFilter = THREE.LinearFilter;
+          targetTextures[index] = texture;
 
-        // ✅ Texture caricata - imposta texturesReady
-        setTexturesReady(true);
-
-        // Ora aspetta che WaterRippleImage la renderizzi
-        // (onReady callback setterà firstImageReady)
-        // Il loader si nasconderà solo quando ENTRAMBI sono true
-
-        // STEP 2: Carica le altre immagini in background (bassa priorità)
-        imagesToLoad.slice(1).forEach((src, i) => {
-          const actualIndex = i + 1; // Perché slice(1) inizia da index 1
-
-          loader.load(
-            src,
-            (bgTexture) => {
-              bgTexture.minFilter = THREE.LinearFilter;
-              bgTexture.magFilter = THREE.LinearFilter;
-              targetTextures[actualIndex] = bgTexture;
-            },
-            undefined,
-            (error) => {
-              console.error(
-                `[HeroSlideshow] Error loading background texture ${actualIndex}:`,
-                error
-              );
-            }
-          );
-        });
-      },
-      undefined,
-      (error) => {
-        console.error("[HeroSlideshow] Error loading first texture:", error);
-        // Fallback: prova a caricare tutte in parallelo
-        setTexturesReady(true);
-      }
-    );
+          loadedCount++;
+          // Quando tutte sono caricate, imposta texturesReady
+          if (loadedCount === imagesToLoad.length) {
+            setTexturesReady(true);
+          }
+        },
+        undefined,
+        (error) => {
+          console.error(`[HeroSlideshow] Error loading texture ${index}:`, error);
+        }
+      );
+    });
 
     // Cleanup: dispose textures al unmount
     return () => {
@@ -154,19 +120,37 @@ export default function HeroImageSlideshow({
 
   // Reset degli indici quando cambiano le immagini (mobile/desktop switch)
   useEffect(() => {
-    setVisibleIndex(0);
-    setAnimatingIndex(0);
-    setIsTransitioning(false);
+    setVisibleIndex(null); // Null, l'immagine statica è già sotto
+    setAnimatingIndex(1); // Parte dalla seconda
+    setHasStarted(false); // Reset per far ripartire la prima transizione
   }, [isMobile]);
 
-  // Notifica il parent quando cambia lo stato di transizione
+  // Avvia la prima transizione quando tutto è pronto
   useEffect(() => {
-    onTransitionChange?.(isTransitioning);
-  }, [isTransitioning, onTransitionChange]);
+    if (isLoading || !texturesReady || hasStarted) {
+      return;
+    }
+
+    // Avvia la prima transizione shader 5 secondi dopo che il loader è svanito
+    const timeout = setTimeout(() => {
+      setHasStarted(true);
+
+      // Dopo l'animazione, aggiorna il canvas inferiore
+      setTimeout(() => {
+        setVisibleIndex(1);
+      }, 1800);
+    }, 5000); // 5 secondi dopo che il loader è sparito
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [isLoading, texturesReady, hasStarted]);
 
   // Carosello automatico
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !texturesReady || !hasStarted) {
+      return;
+    }
 
     const interval = setInterval(() => {
       // Calcola il prossimo indice
@@ -174,101 +158,51 @@ export default function HeroImageSlideshow({
 
       // Inizia la transizione: il canvas superiore carica la nuova immagine
       setAnimatingIndex(nextIndex);
-      setIsTransitioning(true);
 
       // Dopo l'animazione: aggiorna il canvas inferiore con l'immagine appena mostrata
       setTimeout(() => {
         setVisibleIndex(nextIndex);
-        setIsTransitioning(false);
       }, 1800); // Deve corrispondere alla durata dell'animazione in WaterRippleImage
     }, SLIDE_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [isLoading, SLIDESHOW_IMAGES.length, animatingIndex]);
-
-  // Notifica il loader quando l'immagine statica è caricata (priorità assoluta)
-  useEffect(() => {
-    if (staticImageLoaded) {
-      setComponentReady("heroSlideshow");
-    }
-  }, [staticImageLoaded, setComponentReady]);
-
-  // Una volta che lo shader è pronto, inizia il crossfade
-  useEffect(() => {
-    if (texturesReady && firstImageReady) {
-      // Aspetta un frame per essere sicuri che il canvas sia renderizzato
-      requestAnimationFrame(() => {
-        setShaderReady(true);
-      });
-    }
-  }, [texturesReady, firstImageReady]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isLoading, texturesReady, hasStarted, SLIDESHOW_IMAGES.length, animatingIndex]);
 
   // Seleziona le texture corrette in base a mobile/desktop
   const currentTextures = isMobile
     ? mobileTexturesRef.current
     : desktopTexturesRef.current;
-  const visibleTexture = currentTextures[visibleIndex] || null;
+  const visibleTexture = visibleIndex !== null ? currentTextures[visibleIndex] || null : null;
   const animatingTexture = currentTextures[animatingIndex] || null;
 
+  // Non renderizzare nulla finché le texture non sono pronte
+  if (!texturesReady || !animatingTexture) {
+    return null;
+  }
+
   return (
-    <motion.div
-      className="absolute inset-0 w-full h-full"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isLoading ? 0 : 1 }}
-      transition={{ duration: 1.2, ease: "easeOut" }}
-    >
-      {/* Immagine statica - Caricamento immediato (priorità assoluta) */}
-      {isMobile !== null && (
-        <motion.div
-          className="absolute inset-0 w-full h-full"
-          style={{ zIndex: 1 }}
-          animate={{ opacity: shaderReady ? 0 : 1 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-        >
-          <Image
-            src={SLIDESHOW_IMAGES[0]}
-            alt="Hero background"
-            fill
-            priority
-            quality={95}
-            className="object-cover"
-            onLoad={() => setStaticImageLoaded(true)}
-          />
-        </motion.div>
-      )}
-
-      {/* Canvas shader - Caricato in background e fade in quando pronto */}
+    <div className="absolute inset-0 w-full h-full z-10">
+      {/* Canvas inferiore: mostra l'immagine completamente visibile dopo la prima transizione */}
       {visibleTexture && (
-        <motion.div
-          className="absolute inset-0 w-full h-full"
-          style={{ zIndex: 2 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: shaderReady ? 1 : 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-        >
-          {/* Canvas inferiore: mostra sempre l'immagine completamente visibile (statica) */}
-          <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
-            <WaterRippleImage
-              texture={visibleTexture}
-              isActive={false}
-              isTransitioning={false}
-              onReady={() => setFirstImageReady(true)}
-            />
-          </div>
-
-          {/* Canvas superiore: esegue l'animazione della nuova immagine che entra */}
-          <div className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
-            <WaterRippleImage
-              texture={animatingTexture}
-              isActive={true}
-              isTransitioning={isTransitioning}
-            />
-          </div>
-        </motion.div>
+        <div className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>
+          <WaterRippleImage
+            texture={visibleTexture}
+            isActive={false}
+          />
+        </div>
       )}
 
-      {/* Overlay scuro per migliorare la leggibilità del testo */}
-      <div className="absolute inset-0 bg-black/40 z-10" />
-    </motion.div>
+      {/* Canvas superiore: esegue l'animazione della nuova immagine che entra */}
+      {hasStarted && (
+        <div className="absolute inset-0 w-full h-full" style={{ zIndex: 2 }}>
+          <WaterRippleImage
+            texture={animatingTexture}
+            isActive={true}
+          />
+        </div>
+      )}
+    </div>
   );
 }
