@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback, useId } from "react";
-import * as THREE from "three";
+import { Scene, OrthographicCamera, ShaderMaterial, PlaneGeometry, Mesh } from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { shaderTextRenderer } from "@/lib/shaderTextRenderer";
 import { useLoadingStore } from "@/store/useLoadingStore";
@@ -42,10 +42,10 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const hiddenTextRef = useRef<SVGTextElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
-  const geometryRef = useRef<THREE.PlaneGeometry | null>(null);
+  const sceneRef = useRef<Scene | null>(null);
+  const cameraRef = useRef<OrthographicCamera | null>(null);
+  const materialRef = useRef<ShaderMaterial | null>(null);
+  const geometryRef = useRef<PlaneGeometry | null>(null);
   const stopAnimationRef = useRef<(() => void) | null>(null);
   const [dataUrl, setDataUrl] = useState<string>("");
   const [textDimensions, setTextDimensions] = useState<TextDimensions>({
@@ -160,8 +160,8 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     if (textDimensions.width === 0 || textDimensions.height === 0) return;
 
     // Setup Three.js
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const scene = new Scene();
+    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
     // Imposta dimensioni canvas
     canvas.width = textDimensions.width;
@@ -169,7 +169,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
 
     // Usa risorse condivise
     const { material, geometry } = shaderTextRenderer.getResources();
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new Mesh(geometry, material);
     scene.add(mesh);
 
     // Salva i riferimenti
