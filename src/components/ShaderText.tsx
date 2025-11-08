@@ -17,7 +17,6 @@ import {
 } from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { shaderTextRenderer } from "@/lib/shaderTextRenderer";
-import { useLoadingStore } from "@/store/useLoadingStore";
 
 interface ShaderTextProps {
   children?: string;
@@ -68,8 +67,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
     y: 0,
   });
   const [isReady, setIsReady] = useState<boolean>(false);
-  const setComponentReady = useLoadingStore((state) => state.setComponentReady);
-  const hasReportedReady = useRef<boolean>(false);
 
   // Usa il fontSize come fornito, senza cap automatici
   const scaledFontSize = useMemo(() => {
@@ -233,14 +230,6 @@ const ShaderText: React.FC<ShaderTextProps> = ({
       cameraRef.current = null;
     };
   }, [taskId, textDimensions, isReady, shouldRender, shouldAnimate]);
-
-  // Notifica quando lo ShaderText è completamente pronto
-  useEffect(() => {
-    if (isReady && dataUrl && !hasReportedReady.current) {
-      setComponentReady("shaderText");
-      hasReportedReady.current = true;
-    }
-  }, [isReady, dataUrl, setComponentReady]);
 
   // Handle resize
   useEffect(() => {

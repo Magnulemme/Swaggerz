@@ -1,6 +1,5 @@
 "use client";
 
-import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Texture, TextureLoader, LinearFilter } from "three";
@@ -26,7 +25,6 @@ const MOBILE_IMAGES = [
 const SLIDE_INTERVAL = 5000; // 5 secondi tra le transizioni
 
 export default function HeroImageSlideshow() {
-  const isLoading = useLoadingStore((state) => state.isLoading);
   const [visibleIndex, setVisibleIndex] = useState<number | null>(null); // Inizialmente null, l'immagine statica è già sotto
   const [animatingIndex, setAnimatingIndex] = useState(1); // Parte dalla seconda immagine con effetto
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
@@ -62,17 +60,13 @@ export default function HeroImageSlideshow() {
     };
 
     checkMobile(); // Rileva subito al mount
-
-    // Solo dopo il loading iniziale, ascolta i resize
-    if (!isLoading) {
-      window.addEventListener("resize", debouncedCheckMobile);
-    }
+    window.addEventListener("resize", debouncedCheckMobile);
 
     return () => {
       clearTimeout(resizeTimeout);
       window.removeEventListener("resize", debouncedCheckMobile);
     };
-  }, [isMobile, isLoading]);
+  }, [isMobile]);
 
   // Carica tutte le texture
   useEffect(() => {
@@ -127,11 +121,11 @@ export default function HeroImageSlideshow() {
 
   // Avvia la prima transizione quando tutto è pronto
   useEffect(() => {
-    if (isLoading || !texturesReady || hasStarted) {
+    if (!texturesReady || hasStarted) {
       return;
     }
 
-    // Avvia la prima transizione shader 5 secondi dopo che il loader è svanito
+    // Avvia la prima transizione shader 5 secondi dopo il mount
     const timeout = setTimeout(() => {
       setHasStarted(true);
 
@@ -139,16 +133,16 @@ export default function HeroImageSlideshow() {
       setTimeout(() => {
         setVisibleIndex(1);
       }, 1800);
-    }, 5000); // 5 secondi dopo che il loader è sparito
+    }, 5000); // 5 secondi dopo il mount
 
     return () => {
       clearTimeout(timeout);
     };
-  }, [isLoading, texturesReady, hasStarted]);
+  }, [texturesReady, hasStarted]);
 
   // Carosello automatico
   useEffect(() => {
-    if (isLoading || !texturesReady || !hasStarted) {
+    if (!texturesReady || !hasStarted) {
       return;
     }
 
@@ -168,7 +162,7 @@ export default function HeroImageSlideshow() {
     return () => {
       clearInterval(interval);
     };
-  }, [isLoading, texturesReady, hasStarted, SLIDESHOW_IMAGES.length, animatingIndex]);
+  }, [texturesReady, hasStarted, SLIDESHOW_IMAGES.length, animatingIndex]);
 
   // Seleziona le texture corrette in base a mobile/desktop
   const currentTextures = isMobile

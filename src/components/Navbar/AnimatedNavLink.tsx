@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, cloneElement, isValidElement } from "react";
 import {
   NavigationMenuContent,
   NavigationMenuItem,
@@ -34,26 +34,19 @@ function AnimatedText({
   const whiteIconRef = useRef<HTMLSpanElement>(null);
   const orangeIconRef = useRef<HTMLSpanElement>(null);
 
-  // Forza i colori delle icone con !important per sovrascrivere l'eredità del parent
+  // Forza i colori delle icone SVG
   useEffect(() => {
     if (whiteIconRef.current) {
-      whiteIconRef.current.style.setProperty(
-        "color",
-        "rgb(255 255 255)",
-        "important"
-      );
       const svg = whiteIconRef.current.querySelector("svg");
       if (svg) {
-        svg.style.setProperty("color", "rgb(255 255 255)", "important");
+        svg.style.setProperty("color", "currentColor", "important");
       }
     }
 
     if (orangeIconRef.current) {
-      const color = isActive ? "rgb(249 115 22)" : "rgb(251 146 60)";
-      orangeIconRef.current.style.setProperty("color", color, "important");
       const svg = orangeIconRef.current.querySelector("svg");
       if (svg) {
-        svg.style.setProperty("color", color, "important");
+        svg.style.setProperty("color", "currentColor", "important");
       }
     }
   }, [isActive, isSemiActive]);
@@ -65,7 +58,8 @@ function AnimatedText({
         {/* Icona bianca - esce verso l'alto */}
         <motion.span
           ref={whiteIconRef}
-          className="absolute inset-0 flex items-center justify-center"
+          className="absolute inset-0 flex items-center justify-center text-light-primary"
+          style={{ opacity: 1 }}
           animate={{
             y: isActive || isSemiActive ? "-150%" : "0%",
             opacity: isActive || isSemiActive ? 0 : 1,
@@ -76,13 +70,14 @@ function AnimatedText({
             opacity: { duration: 0.15, ease: "easeOut" },
           }}
         >
-          {icon}
+          {isValidElement(icon) ? cloneElement(icon, { className: "text-light-primary" } as any) : icon}
         </motion.span>
 
         {/* Icona arancione - entra dal basso */}
         <motion.span
           ref={orangeIconRef}
-          className="absolute inset-0 flex items-center justify-center"
+          className="absolute inset-0 flex items-center justify-center text-orange-500"
+          style={{ transform: "translateY(150%)", opacity: 0 }}
           animate={{
             y: isActive || isSemiActive ? "0%" : "150%",
             opacity: isActive || isSemiActive ? 1 : 0,
@@ -93,7 +88,7 @@ function AnimatedText({
             opacity: { duration: 0.15, ease: "easeIn" },
           }}
         >
-          {icon}
+          {isValidElement(icon) ? cloneElement(icon, { className: "text-orange-500" } as any) : icon}
         </motion.span>
       </span>
 
@@ -102,6 +97,7 @@ function AnimatedText({
         {/* Testo bianco - esce verso l'alto */}
         <motion.span
           className="text-sm font-medium text-light-primary whitespace-nowrap leading-relaxed"
+          style={{ opacity: 1 }}
           animate={{
             y: isActive || isSemiActive ? "-150%" : "0%",
             opacity: isActive || isSemiActive ? 0 : 1,
@@ -120,6 +116,8 @@ function AnimatedText({
           className="absolute top-0 text-sm font-medium whitespace-nowrap leading-relaxed"
           style={{
             color: isActive ? "rgb(249 115 22)" : "rgb(251 146 60)",
+            transform: "translateY(100%)",
+            opacity: 0,
           }}
           animate={{
             y: isActive || isSemiActive ? "0%" : "100%",

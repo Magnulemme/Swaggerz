@@ -2,16 +2,12 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import type { Swiper as SwiperType } from "swiper";
+import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { SectionTitle } from "../SectionTitle";
-
-// Lazy load Swiper components
-const Swiper = dynamic(() => import("swiper/react").then((mod) => ({ default: mod.Swiper })), { ssr: false });
-const SwiperSlide = dynamic(() => import("swiper/react").then((mod) => ({ default: mod.SwiperSlide })), { ssr: false });
 
 interface Product {
   id: number;

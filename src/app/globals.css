@@ -3,6 +3,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Default announcement bar height - verrà sovrascritto da JS quando il componente si monta */
+:root {
+  --announcement-bar-height: 44px;
+}
+
 /* Utility per nascondere scrollbar */
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
