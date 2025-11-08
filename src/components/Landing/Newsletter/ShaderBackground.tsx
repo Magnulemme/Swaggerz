@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from 'react';
-import * as THREE from 'three';
+import { Scene, OrthographicCamera, ShaderMaterial, PlaneGeometry, Mesh } from 'three';
 import { useSharedRenderer } from '@/hooks/useSharedRenderer';
 import { vertexShader, darkFragmentShader } from '@/constants/shaders';
 
@@ -14,10 +14,10 @@ export default function ShaderBackground({ className = '' }: ShaderBackgroundPro
 
   // Setup Three.js scene
   const setup = useCallback(() => {
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const scene = new Scene();
+    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-    const material = new THREE.ShaderMaterial({
+    const material = new ShaderMaterial({
       vertexShader,
       fragmentShader: darkFragmentShader,
       uniforms: {
@@ -26,8 +26,8 @@ export default function ShaderBackground({ className = '' }: ShaderBackgroundPro
       transparent: false
     });
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const mesh = new THREE.Mesh(geometry, material);
+    const geometry = new PlaneGeometry(2, 2);
+    const mesh = new Mesh(geometry, material);
     scene.add(mesh);
 
     return { scene, camera, material, geometry };

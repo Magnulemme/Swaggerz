@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { ShaderMaterial, PlaneGeometry } from 'three';
 import { vertexShader, fragmentShader } from '@/constants/shaders';
 
 /**
@@ -6,14 +6,14 @@ import { vertexShader, fragmentShader } from '@/constants/shaders';
  * Riduce overhead GPU e memoria
  */
 class ShaderTextRenderer {
-  private material: THREE.ShaderMaterial | null = null;
-  private geometry: THREE.PlaneGeometry | null = null;
+  private material: ShaderMaterial | null = null;
+  private geometry: PlaneGeometry | null = null;
   private refCount = 0;
 
   private initialize(): void {
     if (this.material) return;
 
-    this.material = new THREE.ShaderMaterial({
+    this.material = new ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
@@ -22,7 +22,7 @@ class ShaderTextRenderer {
       transparent: true
     });
 
-    this.geometry = new THREE.PlaneGeometry(2, 2);
+    this.geometry = new PlaneGeometry(2, 2);
     console.log('✅ ShaderTextRenderer initialized');
   }
 

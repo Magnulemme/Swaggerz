@@ -8,13 +8,13 @@
  * 4. ✅ Target FPS per throttling intelligente
  */
 
-import * as THREE from "three";
+import { Scene, Camera, WebGLRenderer } from "three";
 import { shaderTextRenderer } from "./shaderTextRenderer";
 
 interface RenderTask {
   id: string;
-  scene: THREE.Scene;
-  camera: THREE.Camera;
+  scene: Scene;
+  camera: Camera;
   canvas: HTMLCanvasElement;
   enabled: boolean;
   priority: number; // 0 = highest
@@ -24,7 +24,7 @@ interface RenderTask {
 }
 
 class SharedRendererManager {
-  private renderer: THREE.WebGLRenderer | null = null;
+  private renderer: WebGLRenderer | null = null;
   private tasks: Map<string, RenderTask> = new Map();
   private animationId: number | null = null;
   private isRunning = false;
@@ -36,7 +36,7 @@ class SharedRendererManager {
   /**
    * Inizializza il renderer condiviso con pre-warm
    */
-  initialize(): THREE.WebGLRenderer {
+  initialize(): WebGLRenderer {
     if (this.renderer) return this.renderer;
 
     if (typeof window !== "undefined") {
@@ -44,7 +44,7 @@ class SharedRendererManager {
       this.canvas.style.display = "none";
       document.body.appendChild(this.canvas);
 
-      this.renderer = new THREE.WebGLRenderer({
+      this.renderer = new WebGLRenderer({
         canvas: this.canvas,
         alpha: true,
         antialias: false,
@@ -63,8 +63,8 @@ class SharedRendererManager {
         typeof (this.canvas as any).transferToImageBitmap === "function";
 
       // ✅ Pre-warm: primo render dummy per eliminare stutter
-      const dummyScene = new THREE.Scene();
-      const dummyCamera = new THREE.Camera();
+      const dummyScene = new Scene();
+      const dummyCamera = new Camera();
       this.renderer.render(dummyScene, dummyCamera);
 
       console.log("✅ SharedRenderer initialized", {
@@ -81,8 +81,8 @@ class SharedRendererManager {
    */
   registerTask(
     id: string,
-    scene: THREE.Scene,
-    camera: THREE.Camera,
+    scene: Scene,
+    camera: Camera,
     canvas: HTMLCanvasElement,
     options: { priority?: number; targetFPS?: number; visible?: boolean } = {}
   ): void {

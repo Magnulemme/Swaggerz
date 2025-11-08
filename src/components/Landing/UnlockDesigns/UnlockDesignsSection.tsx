@@ -6,7 +6,7 @@ import ShaderText from "@/components/ShaderText";
 import CircularDiagram from "./CircularDiagram";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import { exclusiveNFTs } from "@/constants/nftCollections";
-import * as THREE from "three";
+import { Scene, OrthographicCamera, ShaderMaterial, PlaneGeometry, Mesh } from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { vertexShader, fragmentShader } from "@/constants/shaders";
 import { useJostAlignment } from "@/hooks/useAlignedFontSize";
@@ -19,7 +19,7 @@ export default function UnlockDesignsSection() {
   const canvasRef1 = useRef<HTMLCanvasElement>(null);
   const canvasRef2 = useRef<HTMLCanvasElement>(null);
   const canvasRefs = useMemo(() => [canvasRef0, canvasRef1, canvasRef2], []);
-  const materialsRef = useRef<THREE.ShaderMaterial[]>([]);
+  const materialsRef = useRef<ShaderMaterial[]>([]);
   const timeRefs = useRef<number[]>([0, 1, 2]); // Offset iniziali diversi
 
   // Ref e hook per allineamento font Jost -> ShaderText
@@ -28,8 +28,8 @@ export default function UnlockDesignsSection() {
 
   // Setup Three.js con sharedRenderer per tutti i cerchi
   useEffect(() => {
-    const geometries: THREE.PlaneGeometry[] = [];
-    const materials: THREE.ShaderMaterial[] = [];
+    const geometries: PlaneGeometry[] = [];
+    const materials: ShaderMaterial[] = [];
     const taskIds: string[] = [];
 
     // Setup per ogni canvas con sharedRenderer
@@ -40,13 +40,13 @@ export default function UnlockDesignsSection() {
       const taskId = `unlock-circle-${uniqueId.replace(/:/g, "-")}-${index}`;
       taskIds.push(taskId);
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      const scene = new Scene();
+      const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
       canvas.width = 48;
       canvas.height = 48;
 
-      const material = new THREE.ShaderMaterial({
+      const material = new ShaderMaterial({
         vertexShader,
         fragmentShader,
         uniforms: {
@@ -55,8 +55,8 @@ export default function UnlockDesignsSection() {
         transparent: true,
       });
 
-      const geometry = new THREE.PlaneGeometry(2, 2);
-      const mesh = new THREE.Mesh(geometry, material);
+      const geometry = new PlaneGeometry(2, 2);
+      const mesh = new Mesh(geometry, material);
       scene.add(mesh);
 
       materialsRef.current[index] = material;
