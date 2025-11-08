@@ -39,5 +39,10 @@ export function LazyScrollingGradientBlobs() {
     };
   }, []);
 
-  return shouldLoad ? <ScrollingGradientBlobs /> : null;
+  // Always render placeholder to prevent layout shift
+  return shouldLoad ? (
+    <ScrollingGradientBlobs />
+  ) : (
+    <div className="absolute inset-0 pointer-events-none z-0" />
+  );
 }

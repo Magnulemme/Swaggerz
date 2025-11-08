@@ -46,6 +46,15 @@ export function AnimatedButton({
   borderColor = "#f97316",
 }: AnimatedButtonProps) {
   const [isHovered, setIsHovered] = React.useState(false);
+  const [isReady, setIsReady] = React.useState(false);
+
+  // Pre-warm il blur layer
+  React.useEffect(() => {
+    // Force reflow per attivare il blur
+    requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+  }, []);
 
   const Component = motion[as] as typeof motion.a | typeof motion.button;
 
@@ -58,10 +67,13 @@ export function AnimatedButton({
     <Component
       ref={buttonRef as any}
       className={cn(
-        "group relative inline-flex rounded-full p-[3px] overflow-hidden w-fit",
+        "group relative inline-flex rounded-full p-[3px] w-fit",
         className
       )}
-      style={style}
+      style={{
+        ...style,
+        overflow: "hidden", // Force overflow hidden to contain gradient
+      }}
       whileTap={{ scale: 0.98 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -86,12 +98,26 @@ export function AnimatedButton({
         />
       </div>
 
-      {/* Button content - transparent with backdrop blur */}
+      {/* Button content - background + blur overlay */}
       <div
         className={cn(
-          "relative z-10 flex h-full w-full items-center justify-center rounded-full uppercase tracking-[0.3em] font-semibold backdrop-blur-md transition-all duration-300",
+          "relative z-10 flex h-full w-full items-center justify-center rounded-full uppercase tracking-[0.3em] font-semibold transition-all duration-300",
           sizeVariants[size]
         )}
+        style={{
+          willChange: "backdrop-filter",
+          transform: "translateZ(0)",
+          WebkitBackdropFilter: "blur(8px)",
+          backdropFilter: "blur(8px)",
+          isolation: "isolate",
+          // Forza il layer anche quando opacity 0
+          backfaceVisibility: "hidden",
+          perspective: 1000,
+          contain: "layout style paint",
+          // Inizia trasparente se non ready
+          opacity: isReady ? 1 : 0,
+          transition: isReady ? "opacity 0.15s ease-out" : "none",
+        }}
       >
         {/* Text and content container with slide animation */}
         <span className="relative inline-flex items-center gap-xs md:gap-sm">

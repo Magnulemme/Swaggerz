@@ -100,7 +100,7 @@ export function ScrollingGradientBlobs() {
       {/* Wrapper absolute - fuori dal flow, non occupa spazio */}
       <div className="absolute inset-0 pointer-events-none z-0">
         {/* Sticky container - segue lo scroll con h-screen per movimento Y */}
-        <div className="sticky top-0 w-full h-screen overflow-x-clip">
+        <div className="sticky top-0 w-full h-screen">
           {blobPatterns.map((pattern, index) => (
             <AnimatedBlob
               key={index}
