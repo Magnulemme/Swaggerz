@@ -3,7 +3,7 @@
 import { useLoadingStore } from "@/store/useLoadingStore";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import * as THREE from "three";
+import { Texture, TextureLoader, LinearFilter } from "three";
 
 const WaterRippleImage = dynamic(() => import("./WaterRippleImage"), {
   ssr: false,
@@ -34,8 +34,8 @@ export default function HeroImageSlideshow() {
   const [hasStarted, setHasStarted] = useState(false); // Per far partire la prima transizione una sola volta
 
   // Textures precaricate
-  const desktopTexturesRef = useRef<THREE.Texture[]>([]);
-  const mobileTexturesRef = useRef<THREE.Texture[]>([]);
+  const desktopTexturesRef = useRef<Texture[]>([]);
+  const mobileTexturesRef = useRef<Texture[]>([]);
 
   // Seleziona le immagini in base alla dimensione dello schermo
   const SLIDESHOW_IMAGES = isMobile ? MOBILE_IMAGES : DESKTOP_IMAGES;
@@ -87,7 +87,7 @@ export default function HeroImageSlideshow() {
       ? mobileTexturesRef.current
       : desktopTexturesRef.current;
 
-    const loader = new THREE.TextureLoader();
+    const loader = new TextureLoader();
     let loadedCount = 0;
 
     // Carica tutte le texture
@@ -95,8 +95,8 @@ export default function HeroImageSlideshow() {
       loader.load(
         src,
         (texture) => {
-          texture.minFilter = THREE.LinearFilter;
-          texture.magFilter = THREE.LinearFilter;
+          texture.minFilter = LinearFilter;
+          texture.magFilter = LinearFilter;
           targetTextures[index] = texture;
 
           loadedCount++;
