@@ -9,6 +9,8 @@ import "./globals.css";
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const pastorOfMuppets = localFont({
@@ -31,12 +33,26 @@ export default function RootLayout({
   return (
     <html lang="it">
       <head>
-        {/* Preload video critico - inizia il download SUBITO */}
+        {/* Preconnect to Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* Preload critical hero images - Desktop */}
         <link
           rel="preload"
-          href="/videos/hero-video-hq.mp4"
-          as="video"
-          type="video/mp4"
+          as="image"
+          href="/hero desk/swaggerz-hero.avif"
+          type="image/avif"
+          media="(min-width: 1024px)"
+        />
+
+        {/* Preload critical hero images - Mobile */}
+        <link
+          rel="preload"
+          as="image"
+          href="/hero mob/hero-streetwear-1.avif"
+          type="image/avif"
+          media="(max-width: 1023px)"
         />
 
         {/* Preload font Pastor of Muppets */}
@@ -48,7 +64,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
-        {/* Preconnect a domini esterni per immagini */}
+        {/* Preconnect to external image domains */}
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
 

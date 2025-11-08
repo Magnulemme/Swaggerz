@@ -7,6 +7,7 @@ import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
+import { SectionTitle } from "../SectionTitle";
 
 interface Product {
   id: number;
@@ -315,7 +316,15 @@ const ProductShowcase = () => {
   const scrollNext = () => swiperInstance?.slideNext();
 
   return (
-    <div className="w-full pb-xl">
+    <div className="w-full pb-xl relative z-50 max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">
+      {/* Section Title */}
+      <SectionTitle
+        eyebrow="Collezione 2025"
+        title="Streetwear"
+        shaderText="Essentials"
+        description="Scopri le categorie, le nostre collezioni e le collaborazioni esclusive"
+        size="lg"
+      />
       {/* Product Slider - Desktop only, Grid on mobile */}
       <div className="mb-lg md:mb-xl">
         {/* Mobile: Grid */}

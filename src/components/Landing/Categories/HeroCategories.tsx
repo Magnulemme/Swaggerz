@@ -7,6 +7,7 @@ import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import { CategoryCard } from "./CategoryCard";
+import { SectionTitle } from "../SectionTitle";
 
 interface ImageConfig {
   url: string;
@@ -92,6 +93,13 @@ export function HeroCategories({
     <div
       className={`relative w-full px-md md:px-lg lg:px-xl xl:px-2xl  ${className}`}
     >
+      {/* Categories Title */}
+      <SectionTitle
+        title="Esplora le"
+        shaderText="Categorie"
+        description="Trova il tuo stile perfetto tra le nostre categorie curate"
+        size="md"
+      />
       <div className="relative max-w-[1600px] mx-auto z-10">
         {/* Slider con controlli overlay */}
         <div className="relative">
