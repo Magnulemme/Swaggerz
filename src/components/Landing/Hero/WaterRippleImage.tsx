@@ -1,14 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as THREE from "three";
+import {
+  Scene,
+  OrthographicCamera,
+  WebGLRenderer,
+  ShaderMaterial,
+  Vector2,
+  PlaneGeometry,
+  Mesh,
+  type Texture
+} from "three";
 import {
   waterRippleVertexShader,
   waterRippleFragmentShader,
 } from "./shaders/waterRippleShader";
 
 interface WaterRippleImageProps {
-  texture: THREE.Texture | null;
+  texture: Texture | null;
   isActive: boolean;
   onReady?: () => void;
 }
@@ -19,10 +28,10 @@ export default function WaterRippleImage({
   onReady,
 }: WaterRippleImageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.OrthographicCamera | null>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+  const sceneRef = useRef<Scene | null>(null);
+  const cameraRef = useRef<OrthographicCamera | null>(null);
+  const rendererRef = useRef<WebGLRenderer | null>(null);
+  const materialRef = useRef<ShaderMaterial | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const isActiveRef = useRef(isActive);
@@ -43,15 +52,15 @@ export default function WaterRippleImage({
     const height = container.offsetHeight;
 
     // Setup scene
-    const scene = new THREE.Scene();
+    const scene = new Scene();
     sceneRef.current = scene;
 
     // Setup camera
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     cameraRef.current = camera;
 
     // Setup renderer
-    const renderer = new THREE.WebGLRenderer({
+    const renderer = new WebGLRenderer({
       alpha: true,
       antialias: false, // Disabilitato per migliori performance
       premultipliedAlpha: true
@@ -78,14 +87,14 @@ export default function WaterRippleImage({
     rendererRef.current = renderer;
 
     // Create shader material (senza texture inizialmente)
-    const material = new THREE.ShaderMaterial({
+    const material = new ShaderMaterial({
       uniforms: {
         uTexture: { value: null },
         uProgress: { value: 0 },
         uResolution: {
-          value: new THREE.Vector2(width, height),
+          value: new Vector2(width, height),
         },
-        uCenter: { value: new THREE.Vector2(0.5, 0.5) },
+        uCenter: { value: new Vector2(0.5, 0.5) },
         uImageAspect: { value: 1.0 },
         uContainerAspect: { value: width / height },
       },
@@ -96,8 +105,8 @@ export default function WaterRippleImage({
     materialRef.current = material;
 
     // Create plane geometry
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const mesh = new THREE.Mesh(geometry, material);
+    const geometry = new PlaneGeometry(2, 2);
+    const mesh = new Mesh(geometry, material);
     scene.add(mesh);
 
     // Animation loop
