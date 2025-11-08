@@ -1,7 +1,20 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback, useId } from "react";
-import { Scene, OrthographicCamera, ShaderMaterial, PlaneGeometry, Mesh } from "three";
+import {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useId,
+  useMemo,
+} from "react";
+import {
+  Scene,
+  OrthographicCamera,
+  ShaderMaterial,
+  PlaneGeometry,
+  Mesh,
+} from "three";
 import { sharedRenderer } from "@/lib/sharedRenderer";
 import { shaderTextRenderer } from "@/lib/shaderTextRenderer";
 import { useLoadingStore } from "@/store/useLoadingStore";
@@ -59,7 +72,7 @@ const ShaderText: React.FC<ShaderTextProps> = ({
   const hasReportedReady = useRef<boolean>(false);
 
   // Usa il fontSize come fornito, senza cap automatici
-  const scaledFontSize = React.useMemo(() => {
+  const scaledFontSize = useMemo(() => {
     // Se maxFontSize è specificato, applicalo
     if (maxFontSize) {
       const fontSizeMatch = fontSize.match(/([\d.]+)px\)?$/);
