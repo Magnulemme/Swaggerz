@@ -32,6 +32,7 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.15",
     "keen-slider": "^6.8.6",
+    "lenis": "^1.3.14",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "nodemailer": "^7.0.6",
