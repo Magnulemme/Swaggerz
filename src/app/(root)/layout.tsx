@@ -9,8 +9,8 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Rebkon",
-  description: "Rebkon - An e-commerce for clothes, stickers and digital art to add style and personality to your spaces.",
+  title: "SwaggerZ - Streetwear & Digital Art",
+  description: "SwaggerZ - Premium streetwear e-commerce con design esclusivi, arte digitale e NFT. Scopri le nostre collezioni Essentials, Generative Art e Retrò.",
 };
 
 export default function RootLayout({

@@ -39,7 +39,7 @@ export default function RightSection({ collection }: RightSectionProps) {
                 <div className="absolute inset-0 bg-orange-500/20 rounded-full blur-md" />
                 <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 border border-orange-400/30 flex items-center justify-center text-white text-sm shadow-lg">
                   <span className="font-[family-name:var(--font-pastor-of-muppets)] text-base">
-                    R
+                    Z
                   </span>
                 </div>
                 {/* Verified badge */}
@@ -50,10 +50,10 @@ export default function RightSection({ collection }: RightSectionProps) {
 
               {/* Artist Name & Speciality */}
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-white font-black text-lg">Rebkon</h3>
+                <h3 className="text-white font-black text-lg">SwaggerZ</h3>
                 <span className="text-zinc-600">•</span>
                 <span className="text-orange-400 text-sm font-bold">
-                  Street Artist
+                  Digital Artist
                 </span>
               </div>
             </div>
@@ -65,10 +65,10 @@ export default function RightSection({ collection }: RightSectionProps) {
             >
               {/* Artist Description - flows automatically */}
               <p className="text-zinc-400 text-sm leading-relaxed mb-4">
-                Pioniere dell&apos;arte urbana italiana, Rebkon fonde graffiti
-                tradizionali con elementi digitali. Le sue opere esplorano il
-                confine tra street culture e alta moda, creando pezzi unici che
-                ridefiniscono lo streetwear contemporaneo.
+                SwaggerZ fonde arte digitale con elementi streetwear contemporanei.
+                Le nostre collezioni esplorano il confine tra street culture e design
+                innovativo, creando pezzi unici che ridefiniscono lo streetwear moderno
+                con tecnologia NFT e arte generativa.
               </p>
 
               {/* Additional Info - Essential Artist Data */}

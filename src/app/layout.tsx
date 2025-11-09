@@ -19,9 +19,9 @@ const pastorOfMuppets = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Swaggerz Collective - Streetwear Autentico",
-  description: "Abbigliamento che unisce cultura della strada e arte contemporanea. Espressione autentica per chi vive la città.",
-  keywords: ["streetwear", "moda urbana", "limited edition", "street culture", "Milano"],
+  title: "SwaggerZ - Streetwear & Digital Art",
+  description: "SwaggerZ - Premium streetwear e-commerce con design esclusivi, arte digitale e NFT. Scopri le collezioni Essentials, Generative Art e Retrò.",
+  keywords: ["streetwear", "digital art", "NFT", "essentials", "generative art", "retro", "vintage", "limited edition", "e-commerce"],
 };
 
 export default function RootLayout({

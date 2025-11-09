@@ -1,7 +1,7 @@
 "use client";
 
-import { StickyCardsContainer } from "./StickyCardsContainer";
+import { CollectionsShowcase } from "./CollectionsShowcase";
 
 export function CollectionsSection() {
-  return <StickyCardsContainer />;
+  return <CollectionsShowcase />;
 }

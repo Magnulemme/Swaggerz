@@ -18,14 +18,14 @@ export default function LeftSection({ collection }: LeftSectionProps) {
         <div className="flex items-start justify-between gap-2 md:gap-3 lg:gap-4 pb-3 md:pb-5">
           <CollaborationHeader
             brand1={{
-              name: "Swaggerz",
+              name: "SwaggerZ",
               letter: "S",
               bgColor: "#ffffff",
               textColor: "#f59e0b",
             }}
             brand2={{
-              name: "Rebkon",
-              letter: "R",
+              name: "SwaggerZ",
+              letter: "Z",
               bgColor: "#f59e0b",
               textColor: "#ffffff",
               verified: true,
@@ -62,7 +62,7 @@ export default function LeftSection({ collection }: LeftSectionProps) {
         {/* 2. Collection Info */}
         <CollectionInfo
           title={collection.title}
-          description="Un'esclusiva fusione tra street culture italiana e design contemporaneo. Ogni pezzo racconta la visione unica di Rebkon: graffiti urbani incontrano l'eleganza dello streetwear premium. Una collezione limitata che celebra l'autenticità dell'arte di strada."
+          description="Un'esclusiva fusione tra street culture e design contemporaneo. Ogni pezzo racconta la visione unica di SwaggerZ: arte urbana incontra l'eleganza dello streetwear premium. Una collezione limitata che celebra l'autenticità e lo stile digitale."
         />
 
         {/* 3. Gallery Grid - Takes remaining space */}

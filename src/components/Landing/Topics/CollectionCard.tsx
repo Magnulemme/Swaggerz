@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
 import Image from "next/image";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
-interface StickyCardProps {
+interface CollectionCardProps {
   title: string;
   subtitle?: string;
   imageUrl: string;
@@ -16,7 +15,7 @@ interface StickyCardProps {
   targetScale: number;
 }
 
-export function StickyCard({
+export function CollectionCard({
   title,
   subtitle,
   imageUrl,
@@ -25,14 +24,7 @@ export function StickyCard({
   progress,
   range,
   targetScale,
-}: StickyCardProps) {
-  const container = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: container,
-    offset: ["start end", "start start"],
-  });
-
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1.2, 1]);
+}: CollectionCardProps) {
   const scale = useTransform(progress, range, [1, targetScale]);
 
   // Alterna layout: indici pari = immagine a destra
@@ -40,7 +32,6 @@ export function StickyCard({
 
   return (
     <div
-      ref={container}
       className="flex items-start justify-start sticky px-8 md:px-12 lg:px-16 z-10 mb-12"
       style={{
         top: `${100 + index * 25}px`,
@@ -49,7 +40,12 @@ export function StickyCard({
     >
       <motion.div
         style={{ scale }}
-        className="relative flex h-[500px] w-full max-w-[1400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle hover:border-brand-subtle hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500"
+        className="relative flex h-[500px] w-full max-w-[1400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+        whileHover={{
+          borderColor: "rgb(251 146 60 / 0.3)",
+          boxShadow: "0 25px 50px -12px rgb(249 115 22 / 0.2)",
+        }}
+        transition={{ duration: 0.3 }}
       >
         {/* Content - 50% - Ordine dinamico */}
         <div
@@ -105,10 +101,7 @@ export function StickyCard({
             isImageRight ? "order-2" : "order-1"
           }`}
         >
-          <motion.div
-            className="absolute inset-0"
-            style={{ scale: imageScale }}
-          >
+          <div className="absolute inset-0">
             <Image
               src={imageUrl}
               alt={title}
@@ -116,7 +109,7 @@ export function StickyCard({
               className="object-cover"
               sizes="50vw"
             />
-          </motion.div>
+          </div>
           {/* Overlay Gradient - Direzione adattiva */}
           <div
             className={`absolute inset-0 ${
