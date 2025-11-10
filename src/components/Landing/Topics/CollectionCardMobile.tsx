@@ -13,6 +13,7 @@ interface CollectionCardMobileProps {
   progress: any;
   range: [number, number];
   targetScale: number;
+  totalCards: number;
 }
 
 export function CollectionCardMobile({
@@ -23,6 +24,7 @@ export function CollectionCardMobile({
   progress,
   range,
   targetScale,
+  totalCards,
 }: CollectionCardMobileProps) {
   const container = useRef(null);
 
@@ -38,20 +40,28 @@ export function CollectionCardMobile({
   // Scale della card basato sul progress globale
   const scale = useTransform(progress, range, [1, targetScale]);
 
+  // Calcola altezza base (senza min per ora)
+  const maxHeight = `100dvh - 100px - ${totalCards * 25}px`;
+
+  // Aggiungi lo stack dinamico per ogni card
+  const dynamicStack = (totalCards - 1 - index) * 25;
+  const containerHeight = `calc(${maxHeight} + ${dynamicStack}px)`;
+
   return (
     <div
       ref={container}
       className="flex items-center justify-center sticky"
       style={{
-        top: `calc(150px + ${index * 25}px)`, // Offset per navbar + stack progressivo
-        height: "calc(75vh + 48px)", // Altezza card + margine
+        top: `calc(100px + ${index * 25}px)`,
+        height: containerHeight,
       }}
     >
       <motion.div
         style={{
           scale,
+          height: "100%",
         }}
-        className="relative flex flex-col w-[90%] max-w-[400px] h-[75vh] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+        className="relative flex flex-col w-[90%] max-w-[400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
       >
         {/* Image Section - Max 350px */}
         <div className="relative flex-1 min-h-0 w-full overflow-hidden">

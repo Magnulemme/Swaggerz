@@ -107,7 +107,7 @@ export function CollectionsShowcase({
           />
         </div>
 
-        <div className="flex flex-col space-y-24">
+        <div className="flex flex-col">
           {collections.map((collection, i) => {
             const isLast = i === collections.length - 1;
             const cardsToScale = collections.length - 1;
@@ -124,9 +124,11 @@ export function CollectionsShowcase({
                 progress={scrollYProgress}
                 range={[start, end]}
                 targetScale={targetScale}
+                totalCards={collections.length}
               />
             );
           })}
+          <div style={{ height: "50px" }} />
         </div>
       </div>
     );
