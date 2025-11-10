@@ -31,7 +31,7 @@ export function CollectionCard({
   return (
     <motion.div
       style={{ scale }}
-      className="relative flex h-[400px] w-full max-w-[1400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+      className="relative flex h-[500px] w-full max-w-[1400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
       whileHover={{
         borderColor: "rgb(251 146 60 / 0.3)",
         boxShadow: "0 25px 50px -12px rgb(249 115 22 / 0.2)",
@@ -40,7 +40,7 @@ export function CollectionCard({
     >
       {/* Content - 50% - Ordine dinamico */}
       <div
-        className={`w-1/2 flex flex-col justify-center px-12 lg:px-16 bg-black ${
+        className={`w-1/2 flex flex-col justify-center px-12 lg:px-16 ${
           isImageRight ? "order-1" : "order-2"
         }`}
       >

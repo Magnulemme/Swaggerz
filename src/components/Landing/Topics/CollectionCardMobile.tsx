@@ -13,7 +13,7 @@ interface CollectionCardMobileProps {
   progress: any;
   range: [number, number];
   targetScale: number;
-  totalCards: number;
+  stickyHeight: number;
 }
 
 export function CollectionCardMobile({
@@ -24,7 +24,7 @@ export function CollectionCardMobile({
   progress,
   range,
   targetScale,
-  totalCards,
+  stickyHeight,
 }: CollectionCardMobileProps) {
   const container = useRef(null);
 
@@ -40,28 +40,25 @@ export function CollectionCardMobile({
   // Scale della card basato sul progress globale
   const scale = useTransform(progress, range, [1, targetScale]);
 
-  // Calcola altezza base (senza min per ora)
-  const maxHeight = `100dvh - 100px - ${totalCards * 25}px`;
-
-  // Aggiungi lo stack dinamico per ogni card
-  const dynamicStack = (totalCards - 1 - index) * 25;
-  const containerHeight = `calc(${maxHeight} + ${dynamicStack}px)`;
+  // Offset per posizione sticky
+  const MOBILE_OFFSET = 25;
+  const MOBILE_TOP_BASE = 100;
+  const topPosition = MOBILE_TOP_BASE + index * MOBILE_OFFSET;
 
   return (
     <div
       ref={container}
-      className="flex items-center justify-center sticky"
+      className="flex items-start justify-center sticky"
       style={{
-        top: `calc(100px + ${index * 25}px)`,
-        height: containerHeight,
+        top: `${topPosition}px`,
+        height: `${stickyHeight}px`,
       }}
     >
       <motion.div
         style={{
           scale,
-          height: "100%",
         }}
-        className="relative flex flex-col w-[90%] max-w-[400px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+        className="relative flex flex-col w-[90%] max-w-[400px] h-[calc(100dvh-200px)] max-h-[600px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
       >
         {/* Image Section - Max 350px */}
         <div className="relative flex-1 min-h-0 w-full overflow-hidden">
@@ -82,7 +79,7 @@ export function CollectionCardMobile({
         </div>
 
         {/* Content Section - Testo sotto */}
-        <div className="flex flex-col justify-center px-6 py-6 bg-black flex-shrink-0">
+        <div className="flex flex-col justify-center px-6 py-6 flex-shrink-0">
           {/* Badge per il mood */}
           {subtitle && (
             <div className="mb-4">
