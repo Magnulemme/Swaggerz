@@ -248,8 +248,6 @@ export function CollectionsShowcase({
           </React.Fragment>
         );
       })}
-      {/* Compensazione per il margin negativo dell'ultima card */}
-      Dobbiamo r{" "}
     </div>
   );
 }
