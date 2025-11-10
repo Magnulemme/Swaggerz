@@ -82,7 +82,10 @@ export function CollectionsShowcase({
 
   // Constants per mobile
   const MOBILE_OFFSET = 25;
-  const MOBILE_BASE_HEIGHT = 600;
+  const MOBILE_BASE_HEIGHT = Math.min(
+    typeof window !== "undefined" ? window.innerHeight - 200 : 600,
+    600
+  ); // Dinamico come la card
   const MOBILE_DESIRED_MARGIN = 100;
   const MOBILE_TOP_BASE = 100;
 
@@ -110,9 +113,7 @@ export function CollectionsShowcase({
   return (
     <div
       ref={container}
-      className={`relative w-full h-full flex flex-col items-center justify-center ${
-        isMobile ? "py-12" : ""
-      }`}
+      className="relative w-full h-full flex flex-col items-center justify-center"
     >
       {/* Title - Mobile: sempre in alto, Desktop: condizionale */}
       {isMobile ? (
@@ -159,9 +160,7 @@ export function CollectionsShowcase({
           const stickyHeight = isMobile
             ? CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET
             : !isMobile && isTitleSticky && isFirstCard
-            ? titleHeight +
-              CARD_MIN_HEIGHT +
-              (totalCards - 1 - i) * CARD_OFFSET
+            ? titleHeight + CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET
             : CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET;
 
           // Top position
