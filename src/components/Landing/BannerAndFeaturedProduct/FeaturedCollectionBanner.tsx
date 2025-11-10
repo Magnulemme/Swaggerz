@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { collections } from "./collectionsData";
 import LeftSection from "./LeftSection";
 import RightSection from "./RightSection";

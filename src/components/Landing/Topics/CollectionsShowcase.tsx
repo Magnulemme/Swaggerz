@@ -208,7 +208,6 @@ export function CollectionsShowcase({
 
             <CollectionCard
               index={i}
-              totalCards={totalCards}
               {...collection}
               progress={scrollYProgress}
               range={[start, end]}

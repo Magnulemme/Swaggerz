@@ -9,7 +9,6 @@ interface CollectionCardProps {
   subtitle?: string;
   imageUrl: string;
   index: number;
-  totalCards: number;
   progress: any;
   range: [number, number];
   targetScale: number;
@@ -20,7 +19,6 @@ export function CollectionCard({
   subtitle,
   imageUrl,
   index,
-  totalCards,
   progress,
   range,
   targetScale,
