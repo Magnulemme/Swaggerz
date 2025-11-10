@@ -2,8 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { useScroll } from "framer-motion";
-import { CollectionCard } from "./CollectionCard";
-import { CollectionCardMobile } from "./CollectionCardMobile";
+import { CollectionCardWrapper } from "./CollectionCardWrapper";
 import { SectionTitle } from "../SectionTitle";
 import { useAdaptiveLayout } from "@/hooks/useAdaptiveLayout";
 
@@ -41,6 +40,7 @@ export function CollectionsShowcase({
   const [titleHeight, setTitleHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Global scroll progress
   const { scrollYProgress } = useScroll({
     target: container,
     offset: ["start start", "end end"],
@@ -57,10 +57,6 @@ export function CollectionsShowcase({
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  // Positioning constants
-  const CARD_OFFSET = 50;
-  const CARD_MIN_HEIGHT = 500;
 
   // Measure title height
   useEffect(() => {
@@ -79,25 +75,47 @@ export function CollectionsShowcase({
     }
   }, []);
 
-  // Check if we have enough space to make title sticky
+  // Constants per desktop
+  const DESKTOP_OFFSET = 50;
+  const DESKTOP_MIN_HEIGHT = 500;
+  const DESKTOP_DESIRED_MARGIN = 150;
+
+  // Constants per mobile
+  const MOBILE_OFFSET = 25;
+  const MOBILE_BASE_HEIGHT = 600;
+  const MOBILE_DESIRED_MARGIN = 100;
+  const MOBILE_TOP_BASE = 100;
+
+  // Check if we have enough space to make title sticky (solo desktop)
   const { isTitleSticky } = useAdaptiveLayout({
     titleHeight,
-    cardMinHeight: CARD_MIN_HEIGHT,
+    cardMinHeight: DESKTOP_MIN_HEIGHT,
     navbarHeight: 70,
     safetyMargin: 100,
   });
 
-  // Dynamic top offset based on title sticky state
+  // Dynamic top offset based on title sticky state (solo desktop)
   const dynamicTopOffset = isTitleSticky ? 50 : 150;
 
-  // Render mobile version
-  if (isMobile) {
-    return (
-      <div
-        ref={container}
-        className="relative w-full flex flex-col items-center justify-center py-12"
-      >
-        {/* Mobile Title - Always at the top */}
+  // Valori responsive
+  const CARD_OFFSET = isMobile ? MOBILE_OFFSET : DESKTOP_OFFSET;
+  const CARD_MIN_HEIGHT = isMobile ? MOBILE_BASE_HEIGHT : DESKTOP_MIN_HEIGHT;
+  const DESIRED_MARGIN = isMobile
+    ? MOBILE_DESIRED_MARGIN
+    : DESKTOP_DESIRED_MARGIN;
+  const TOP_BASE = isMobile ? MOBILE_TOP_BASE : dynamicTopOffset;
+
+  const totalCards = collections.length;
+
+  return (
+    <div
+      ref={container}
+      className={`relative w-full h-full flex flex-col items-center justify-center ${
+        isMobile ? "py-12" : ""
+      }`}
+    >
+      {/* Title - Mobile: sempre in alto, Desktop: condizionale */}
+      {isMobile ? (
         <div className="w-full flex items-center justify-center pointer-events-none px-8 mb-12">
           <SectionTitle
             title="Esplora le"
@@ -106,148 +124,88 @@ export function CollectionsShowcase({
             size="md"
           />
         </div>
-
-        <div className="flex flex-col">
-          {collections.map((collection, i) => {
-            const isLast = i === collections.length - 1;
-            const cardsToScale = collections.length - 1;
-            const targetScale = isLast ? 1 : 1 - (cardsToScale - i) * 0.05;
-            const totalCards = collections.length;
-
-            const start = i * (1 / collections.length);
-            const end = Math.min(start + 1 / collections.length, 1);
-
-            // Mobile constants
-            const MOBILE_OFFSET = 25;
-            const MOBILE_BASE_HEIGHT = 600;
-            const MOBILE_DESIRED_MARGIN = 100;
-
-            // Calcola margine intrinseco
-            const intrinsicMargin = (totalCards - 1 - i) * MOBILE_OFFSET;
-
-            // Spacer compensato
-            const compensatedSpacer = MOBILE_DESIRED_MARGIN - intrinsicMargin;
-
-            // StickyHeight dinamico per ogni card
-            const stickyHeight =
-              MOBILE_BASE_HEIGHT + (totalCards - 1 - i) * MOBILE_OFFSET;
-
-            return (
-              <React.Fragment key={`mobile_fragment_${i}`}>
-                <CollectionCardMobile
-                  key={`collection_mobile_${i}`}
-                  index={i}
-                  {...collection}
-                  progress={scrollYProgress}
-                  range={[start, end]}
-                  targetScale={targetScale}
-                  stickyHeight={stickyHeight}
-                />
-                {!isLast && (
-                  <div style={{ height: `${compensatedSpacer}px` }} />
-                )}
-              </React.Fragment>
-            );
-          })}
-          <div style={{ height: "50px" }} />
-        </div>
-      </div>
-    );
-  }
-
-  // Render desktop version
-  return (
-    <div
-      ref={container}
-      className="relative w-full h-full flex flex-col items-center justify-center"
-    >
-      {/* Title - Rendered outside sticky wrapper if not enough space */}
-      {!isTitleSticky && (
-        <div
-          ref={titleRef}
-          className="w-full flex items-center justify-center pointer-events-none px-8 md:px-12 lg:px-16"
-        >
-          <SectionTitle
-            title="Esplora le Collezioni"
-            description="Raccolte di stile, scelte esclusivamente per te"
-          />
-        </div>
+      ) : (
+        !isTitleSticky && (
+          <div
+            ref={titleRef}
+            className="w-full flex items-center justify-center pointer-events-none px-8 md:px-12 lg:px-16"
+          >
+            <SectionTitle
+              title="Esplora le Collezioni"
+              description="Raccolte di stile, scelte esclusivamente per te"
+            />
+          </div>
+        )
       )}
-      {collections.map((collection, i) => {
-        const isLast = i === collections.length - 1;
-        const cardsToScale = collections.length - 1;
-        const targetScale = isLast ? 1 : 1 - (cardsToScale - i) * 0.05;
-        const totalCards = collections.length;
 
-        // Ogni card scala solo nel suo range specifico, non oltre
-        const start = i * (1 / collections.length);
-        const end = Math.min(start + 1 / collections.length, 1); // Scala solo per il suo segmento
+      {/* Cards wrapper */}
+      <div className={isMobile ? "flex flex-col" : "contents"}>
+        {collections.map((collection, i) => {
+          const isLast = i === collections.length - 1;
+          const isFirstCard = i === 0;
+          const cardsToScale = collections.length - 1;
+          const targetScale =
+            i === collections.length - 1 ? 1 : 1 - (cardsToScale - i) * 0.05;
 
-        const isFirstCard = i === 0;
+          // Range per scale animation
+          const start = i * (1 / collections.length);
+          const end = Math.min(start + 1 / collections.length, 1);
 
-        // If title is sticky, include it in first card's height and positioning
-        // Otherwise, cards start from the top
-        const stickyHeight =
-          isTitleSticky && isFirstCard
-            ? `${
-                titleHeight +
-                CARD_MIN_HEIGHT +
-                (totalCards - 1 - i) * CARD_OFFSET
-              }px`
-            : `${CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET}px`;
+          // Calcoli per sticky positioning
+          const intrinsicMargin = (totalCards - 1 - i) * CARD_OFFSET;
+          const compensatedSpacer = DESIRED_MARGIN - intrinsicMargin;
 
-        // Top position: all cards have equal CARD_OFFSET spacing
-        const topPosition = isTitleSticky
-          ? isFirstCard
-            ? `${dynamicTopOffset}px`
-            : `${dynamicTopOffset + i * CARD_OFFSET}px`
-          : `${dynamicTopOffset + i * CARD_OFFSET}px`;
+          // Sticky height
+          const stickyHeight = isMobile
+            ? CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET
+            : !isMobile && isTitleSticky && isFirstCard
+            ? titleHeight +
+              CARD_MIN_HEIGHT +
+              (totalCards - 1 - i) * CARD_OFFSET
+            : CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET;
 
-        // Calcola margine intrinseco (dalla formula stickyHeight)
-        const intrinsicMargin = (totalCards - 1 - i) * CARD_OFFSET;
+          // Top position
+          const topPosition = isMobile
+            ? TOP_BASE + i * CARD_OFFSET
+            : !isMobile && isTitleSticky
+            ? isFirstCard
+              ? TOP_BASE
+              : TOP_BASE + i * CARD_OFFSET
+            : TOP_BASE + i * CARD_OFFSET;
 
-        // Margine totale desiderato tra le card
-        const DESIRED_MARGIN = 150;
+          // Title element for desktop first card with sticky title
+          const titleElement =
+            !isMobile && isTitleSticky && isFirstCard ? (
+              <div
+                ref={titleRef}
+                className="w-full flex items-center justify-center pointer-events-none"
+              >
+                <SectionTitle
+                  title="Esplora le Collezioni"
+                  description="Raccolte di stile, scelte esclusivamente per te"
+                />
+              </div>
+            ) : undefined;
 
-        // Spacer compensato = margine desiderato - margine intrinseco
-        const compensatedSpacer = DESIRED_MARGIN - intrinsicMargin;
-
-        return (
-          <React.Fragment key={`card_fragment_${i}`}>
-            <div
-              key={`sticky_wrapper_${i}`}
-              className="flex flex-col items-center justify-start sticky px-8 md:px-12 lg:px-16 z-10"
-              style={{
-                top: topPosition,
-                height: stickyHeight,
-              }}
-            >
-              {/* Section Title - Only on first card if title is sticky */}
-              {isTitleSticky && isFirstCard && (
-                <div
-                  ref={titleRef}
-                  className="w-full flex items-center justify-center pointer-events-none"
-                >
-                  <SectionTitle
-                    title="Esplora le Collezioni"
-                    description="Raccolte di stile, scelte esclusivamente per te"
-                  />
-                </div>
-              )}
-
-              <CollectionCard
-                index={i}
-                {...collection}
-                progress={scrollYProgress}
-                range={[start, end]}
-                targetScale={targetScale}
-              />
-            </div>
-            {/* Spacer compensato per margine uniforme */}
-            {!isLast && <div style={{ height: `${compensatedSpacer}px` }} />}
-          </React.Fragment>
-        );
-      })}
+          return (
+            <CollectionCardWrapper
+              key={`card_${i}`}
+              {...collection}
+              index={i}
+              isLast={isLast}
+              isFirstCard={isFirstCard}
+              layout={isMobile ? "mobile" : "desktop"}
+              globalScrollProgress={scrollYProgress}
+              range={[start, end]}
+              targetScale={targetScale}
+              stickyHeight={stickyHeight}
+              topPosition={topPosition}
+              compensatedSpacer={compensatedSpacer}
+              titleElement={titleElement}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
