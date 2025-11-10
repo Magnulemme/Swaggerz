@@ -8,7 +8,7 @@ import { useJostAlignment } from "@/hooks/useAlignedFontSize";
 interface SectionTitleProps {
   eyebrow?: string;
   title: string;
-  shaderText: string;
+  shaderText?: string;
   description?: string;
   size?: "sm" | "md" | "lg";
   onHeightChange?: (height: number) => void;

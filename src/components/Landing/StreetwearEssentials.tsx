@@ -4,9 +4,19 @@ import ProductShowcase from "./ProductShowcase/ProductShowcase";
 import { LazyScrollingGradientBlobs } from "./StreetwearEssentials/LazyScrollingGradientBlobs";
 
 // Lazy load below-fold sections
-const CollectionsSection = dynamic(() => import("./Topics/CollectionsSection").then(mod => ({ default: mod.CollectionsSection })));
-const HeroCategories = dynamic(() => import("./Categories/HeroCategories").then(mod => ({ default: mod.HeroCategories })));
-const BannerAndFeaturedProductWithTitle = dynamic(() => import("./BannerAndFeaturedProduct/BannerAndFeaturedProductWithTitle"));
+const CollectionsSection = dynamic(() =>
+  import("./Topics/CollectionsSection").then((mod) => ({
+    default: mod.CollectionsSection,
+  }))
+);
+const HeroCategories = dynamic(() =>
+  import("./Categories/HeroCategories").then((mod) => ({
+    default: mod.HeroCategories,
+  }))
+);
+const BannerAndFeaturedProductWithTitle = dynamic(
+  () => import("./BannerAndFeaturedProduct/BannerAndFeaturedProductWithTitle")
+);
 
 export function StreetwearEssentials() {
   return (

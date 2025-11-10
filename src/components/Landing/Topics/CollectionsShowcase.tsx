@@ -100,7 +100,8 @@ export function CollectionsShowcase({
         {/* Mobile Title - Always at the top */}
         <div className="w-full flex items-center justify-center pointer-events-none px-8 mb-12">
           <SectionTitle
-            title="Esplora le Collezioni"
+            title="Esplora le"
+            shaderText="Collezioni"
             description="Raccolte di stile, scelte esclusivamente per te"
             size="md"
           />
@@ -142,7 +143,9 @@ export function CollectionsShowcase({
                   targetScale={targetScale}
                   stickyHeight={stickyHeight}
                 />
-                {!isLast && <div style={{ height: `${compensatedSpacer}px` }} />}
+                {!isLast && (
+                  <div style={{ height: `${compensatedSpacer}px` }} />
+                )}
               </React.Fragment>
             );
           })}
@@ -170,7 +173,6 @@ export function CollectionsShowcase({
           />
         </div>
       )}
-
       {collections.map((collection, i) => {
         const isLast = i === collections.length - 1;
         const cardsToScale = collections.length - 1;
@@ -247,6 +249,7 @@ export function CollectionsShowcase({
         );
       })}
       {/* Compensazione per il margin negativo dell'ultima card */}
+      Dobbiamo r{" "}
     </div>
   );
 }
