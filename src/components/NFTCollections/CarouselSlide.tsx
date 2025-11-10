@@ -30,6 +30,10 @@ const colorMap = {
     shadow: "rgba(168, 85, 247, 0.6)",
     gradient: "from-purple-500 via-violet-600 to-fuchsia-500",
   },
+  slate: {
+    shadow: "rgba(100, 116, 139, 0.6)",
+    gradient: "from-slate-500 via-gray-600 to-zinc-500",
+  },
 };
 
 export default function CarouselSlide({ collection }: CarouselSlideProps) {

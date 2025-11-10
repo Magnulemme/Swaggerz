@@ -1,7 +1,7 @@
 export interface Collection {
   id: number;
   badge: string;
-  badgeColor: "emerald" | "cyan" | "orange" | "purple";
+  badgeColor: "emerald" | "cyan" | "orange" | "purple" | "slate";
   title: string;
   subtitle: string;
   description: string;

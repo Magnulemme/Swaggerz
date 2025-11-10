@@ -6,7 +6,7 @@ const BannerAndFeaturedProductMobile = () => {
   return (
     <>
       {/* Banner Sections Wrapper - Single border around both */}
-      <div className="col-span-2 border border-zinc-700/50 rounded-xl lg:border-0 lg:rounded-none overflow-hidden relative">
+      <div className="col-span-2 border border-zinc-700/50 rounded-xl lg:border-0 lg:rounded-none overflow-hidden relative bg-black">
         {/* Gradient Background - Only on mobile/tablet */}
         <div className="absolute inset-0 pointer-events-none lg:hidden">
           <div

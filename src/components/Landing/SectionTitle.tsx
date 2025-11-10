@@ -16,15 +16,15 @@ interface SectionTitleProps {
 
 const sizeClasses = {
   sm: {
-    title: "text-xl md:text-2xl lg:text-4xl",
+    title: "text-2xl md:text-3xl lg:text-4xl",
     defaultFontSize: "36px",
   },
   md: {
-    title: "text-2xl md:text-3xl lg:text-7xl",
+    title: "text-4xl md:text-5xl lg:text-7xl",
     defaultFontSize: "48px",
   },
   lg: {
-    title: "text-4xl md:text-5xl lg:text-8xl",
+    title: "text-5xl md:text-6xl lg:text-8xl",
     defaultFontSize: "72px",
   },
 };

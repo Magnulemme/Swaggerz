@@ -101,7 +101,7 @@ export function AnimatedButton({
       {/* Button content - background + blur overlay */}
       <div
         className={cn(
-          "relative z-10 flex h-full w-full items-center justify-center rounded-full uppercase tracking-[0.3em] font-semibold transition-all duration-300",
+          "relative z-10 flex h-full w-full items-center justify-center rounded-full uppercase tracking-[0.3em] font-semibold transition-all duration-300 cursor-pointer",
           sizeVariants[size]
         )}
         style={{

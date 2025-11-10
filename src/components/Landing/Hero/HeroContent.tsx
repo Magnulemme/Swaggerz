@@ -72,12 +72,11 @@ export default function HeroContent() {
             href="#collection"
             buttonRef={buttonRef}
             className="transition-transform"
-            size="md"
+            size="lg"
           >
-            <span className="hidden md:flex">Scopri la Collezione</span>
+            <span className="hidden md:flex">Shop Now</span>
             <span className="flex md:hidden flex-col text-center leading-tight gap-2xs">
-              <span>Scopri</span>
-              <span>la Collezione</span>
+              Shop Now
             </span>
             <svg
               className="w-5 h-5 md:w-6 md:h-6 transition-transform duration-300 group-hover:translate-x-1.5 group-hover:scale-110"
