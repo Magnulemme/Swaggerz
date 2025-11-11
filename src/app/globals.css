@@ -681,11 +681,22 @@
   }
   body {
     @apply bg-background text-foreground;
-    overflow-x: clip;
-    max-width: 100vw;
   }
   html {
-    overflow-x: clip;
-    max-width: 100vw;
   }
+}
+
+/* Categories Coverflow Effects */
+.categories-coverflow .swiper-slide {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.categories-coverflow .swiper-slide:not(.swiper-slide-active) {
+  filter: blur(4px);
+  opacity: 0.6;
+}
+
+.categories-coverflow .swiper-slide-active {
+  filter: blur(0);
+  opacity: 1;
 }

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, EffectCoverflow, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-import "swiper/css";
-import "swiper/css/navigation";
+import "swiper/css/bundle";
+import "swiper/css/effect-coverflow";
 import { CategoryCard } from "./CategoryCard";
 import { SectionTitle } from "../SectionTitle";
 
@@ -72,31 +72,32 @@ export function HeroCategories({
   images = defaultImages,
   className = "",
 }: HeroCategoriesProps) {
+  // Duplicate images for better loop performance with coverflow
+  const duplicatedImages = [...images, ...images, ...images];
+
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [slidesPerView, setSlidesPerView] = useState(1.15);
-
-  // Update slides per view on resize
-  // Con centeredSlides, questi valori mostrano peek su entrambi i lati
-  useEffect(() => {
-    const updateSlidesPerView = () => {
-      const width = window.innerWidth;
-      if (width >= 1536) setSlidesPerView(2.5);
-      else if (width >= 1280) setSlidesPerView(2.2);
-      else if (width >= 1024) setSlidesPerView(1.8);
-      else if (width >= 640) setSlidesPerView(1.4);
-      else setSlidesPerView(1.2);
-    };
-
-    updateSlidesPerView();
-    window.addEventListener("resize", updateSlidesPerView);
-    return () => window.removeEventListener("resize", updateSlidesPerView);
-  }, []);
+  const [isReady, setIsReady] = useState(false);
 
   const scrollPrev = () => swiperInstance?.slidePrev();
   const scrollNext = () => swiperInstance?.slideNext();
+
+  // Force update on mount to fix initial loop rendering
+  useEffect(() => {
+    if (swiperInstance) {
+      // First update immediately
+      swiperInstance.update();
+
+      // Second update after a delay to fix loop positioning
+      setTimeout(() => {
+        swiperInstance.update();
+        swiperInstance.slideToLoop(0, 0); // Force to first slide without animation
+        setIsReady(true);
+      }, 200);
+    }
+  }, [swiperInstance]);
 
   return (
     <div className={`relative w-full ${className}`}>
@@ -110,8 +111,23 @@ export function HeroCategories({
         />
       </div>
 
-      {/* Controlli navigazione - nascosti su mobile */}
-      <div className="hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6">
+      {/* Griglia statica - visibile solo su desktop grande quando ci sono <= 4 card */}
+      {images.length <= 4 && (
+        <div className="hidden xl:grid grid-cols-4 gap-6 px-md md:px-lg lg:px-xl xl:px-2xl mt-8">
+          {images.map((image) => (
+            <div key={image.url} className="w-full max-w-[380px] mx-auto">
+              <CategoryCard image={image} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Controlli navigazione - nascosti su mobile e su desktop se griglia statica */}
+      <div
+        className={`${
+          images.length <= 4 ? "xl:hidden" : ""
+        } hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6`}
+      >
         <button
           onClick={scrollPrev}
           disabled={!canScrollPrev}
@@ -155,13 +171,46 @@ export function HeroCategories({
         </button>
       </div>
 
-      <div className="relative max-w-[1600px] mx-auto z-10 px-md md:px-lg lg:px-xl xl:px-2xl">
-        {/* Swiper con effetto peek e scale */}
+      {/* Slider Container - nascosto solo su desktop XL se ci sono <= 4 card */}
+      <div
+        className={`${
+          images.length <= 4 ? "xl:hidden" : ""
+        } relative w-full transition-opacity duration-300 ${
+          !isReady ? "opacity-0" : "opacity-100"
+        }`}
+        data-lenis-prevent
+      >
         <Swiper
-          modules={[Navigation]}
-          spaceBetween={32}
-          slidesPerView={slidesPerView}
+          modules={[Navigation, EffectCoverflow, Autoplay]}
+          effect="coverflow"
+          loop={true}
+          initialSlide={0}
+          observer={true}
+          observeParents={true}
+          watchSlidesProgress={true}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+          spaceBetween={30}
+          coverflowEffect={{
+            rotate: 5,
+            stretch: 0,
+            depth: 150,
+            modifier: 1,
+            slideShadows: false,
+            scale: 0.85,
+          }}
+          slidesPerView={1.5}
           centeredSlides={true}
+          grabCursor={true}
+          threshold={5}
+          breakpoints={{
+            768: {
+              slidesPerView: 2,
+            },
+          }}
           onSwiper={setSwiperInstance}
           onSlideChange={(swiper) => {
             setCanScrollPrev(!swiper.isBeginning);
@@ -173,22 +222,15 @@ export function HeroCategories({
             setCanScrollNext(!swiper.isEnd);
             setActiveIndex(swiper.activeIndex);
           }}
+          className="py-8 categories-coverflow"
         >
-          {images.map((image, index) => {
-            const isActive = index === activeIndex;
-            const scale = isActive ? 1 : 0.5;
-
-            return (
-              <SwiperSlide key={image.url}>
-                <div
-                  className="transition-transform duration-500 ease-out origin-center"
-                  style={{ transform: `scale(${scale})` }}
-                >
-                  <CategoryCard image={image} />
-                </div>
-              </SwiperSlide>
-            );
-          })}
+          {duplicatedImages.map((image, index) => (
+            <SwiperSlide key={`${image.url}-${index}`}>
+              <div className="max-w-[380px] mx-auto">
+                <CategoryCard image={image} />
+              </div>
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </div>
