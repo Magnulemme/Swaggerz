@@ -26,65 +26,56 @@ export function CollectionCard({
   // Alterna layout: indici pari = immagine a destra (solo desktop)
   const isImageRight = index % 2 === 0;
 
-  // Mobile layout
+  // Mobile layout - Hero Card
   if (layout === "mobile") {
     return (
-      <motion.div
-        style={{ scale }}
-        className="relative flex flex-col w-[90%] max-w-[400px] h-[calc(100dvh-200px)] max-h-[600px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
-      >
-        {/* Image Section */}
-        <div className="relative flex-1 min-h-0 w-full overflow-hidden">
-          <motion.div
-            className="absolute inset-0"
-            style={{ scale: imageScale }}
-          >
-            <Image
-              src={imageUrl}
-              alt={title}
-              fill
-              className="object-cover object-top"
-              sizes="90vw"
-            />
-          </motion.div>
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
-        </div>
+      <div className="w-screen flex justify-center">
+        <motion.div
+          style={{ scale }}
+          className="relative w-[90%] max-w-[400px] h-[calc(100dvh-200px)] max-h-[600px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+        >
+          {/* Image Section - Full background */}
+          <div className="absolute inset-0 overflow-hidden">
+            <motion.div
+              className="absolute inset-0"
+              style={{ scale: imageScale }}
+            >
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="object-cover object-center"
+                sizes="90vw"
+              />
+            </motion.div>
+            {/* Overlay gradient più deciso per contrasto */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60" />
+          </div>
 
-        {/* Content Section */}
-        <div className="flex flex-col justify-center px-6 py-6 flex-shrink-0">
-          {subtitle && (
-            <div className="mb-4">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand/30 bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+          {/* Content Section - Centrato */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-8 text-center">
+            {/* Subtitle badge con brand color */}
+            {subtitle && (
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand/30 bg-brand/10 text-brand text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
                 {subtitle}
               </span>
-            </div>
-          )}
+            )}
 
-          <h2 className="text-4xl font-black text-white tracking-tight leading-tight font-jost mb-4">
-            {title}
-          </h2>
+            {/* Title - Hero size */}
+            <h2 className="text-6xl md:text-7xl font-black text-white tracking-tight leading-none font-jost">
+              {title}
+            </h2>
 
-          <p className="text-zinc-400 text-sm mb-5 leading-relaxed line-clamp-3">
-            Una collezione esclusiva che unisce street culture e design
-            contemporaneo. Pezzi limitati per chi vive la città con stile
-            autentico.
-          </p>
-
-          <div className="relative">
-            <div className="absolute inset-0 bg-brand/20 blur-xl rounded-full" />
+            {/* CTA Button con brand color */}
             <AnimatedButton
               as="button"
-              size="md"
+              size="lg"
               borderColor="#f97316"
-              className="relative shadow-lg shadow-brand/30"
-              style={{
-                background: "rgba(0, 0, 0, 0.4)",
-              }}
+              className="mt-4"
             >
-              Scopri Ora
+              Esplora
               <svg
-                className="w-4 h-4"
+                className="w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -98,8 +89,8 @@ export function CollectionCard({
               </svg>
             </AnimatedButton>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 

@@ -55,7 +55,7 @@ export function CollectionCardWrapper({
         ref={layout === "mobile" ? cardRef : undefined}
         className={`flex ${
           layout === "mobile"
-            ? "items-start justify-center"
+            ? "w-full items-start justify-center"
             : "flex-col items-center justify-start"
         } sticky ${layout === "mobile" ? "" : "px-8 md:px-12 lg:px-16 z-10"}`}
         style={{

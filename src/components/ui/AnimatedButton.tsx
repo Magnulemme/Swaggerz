@@ -47,6 +47,20 @@ export function AnimatedButton({
 }: AnimatedButtonProps) {
   const [isHovered, setIsHovered] = React.useState(false);
   const [isReady, setIsReady] = React.useState(false);
+  const [hasHoverCapability, setHasHoverCapability] = React.useState(true);
+
+  // Detect if device has hover capability
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover)");
+    setHasHoverCapability(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setHasHoverCapability(e.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   // Pre-warm il blur layer
   React.useEffect(() => {
@@ -75,8 +89,8 @@ export function AnimatedButton({
         overflow: "hidden", // Force overflow hidden to contain gradient
       }}
       whileTap={{ scale: 0.98 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => hasHoverCapability && setIsHovered(true)}
+      onMouseLeave={() => hasHoverCapability && setIsHovered(false)}
       {...props}
     >
       {/* Gradient border with CSS mask to show only ring */}
