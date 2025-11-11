@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -72,111 +72,124 @@ export function HeroCategories({
   images = defaultImages,
   className = "",
 }: HeroCategoriesProps) {
-  const imageCount = images.length;
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [slidesPerView, setSlidesPerView] = useState(1.15);
 
-  // Configura slidesPerView dinamicamente
-  const getSlidesPerView = (breakpoint: number) => {
-    if (breakpoint >= 6 && imageCount >= 6) return 6;
-    if (breakpoint >= 4 && imageCount >= 4) return 4;
-    if (breakpoint >= 3 && imageCount >= 3) return 3;
-    if (breakpoint >= 2 && imageCount >= 2) return 2;
-    return 1;
-  };
+  // Update slides per view on resize
+  // Con centeredSlides, questi valori mostrano peek su entrambi i lati
+  useEffect(() => {
+    const updateSlidesPerView = () => {
+      const width = window.innerWidth;
+      if (width >= 1536) setSlidesPerView(2.5);
+      else if (width >= 1280) setSlidesPerView(2.2);
+      else if (width >= 1024) setSlidesPerView(1.8);
+      else if (width >= 640) setSlidesPerView(1.4);
+      else setSlidesPerView(1.2);
+    };
+
+    updateSlidesPerView();
+    window.addEventListener("resize", updateSlidesPerView);
+    return () => window.removeEventListener("resize", updateSlidesPerView);
+  }, []);
 
   const scrollPrev = () => swiperInstance?.slidePrev();
   const scrollNext = () => swiperInstance?.slideNext();
 
   return (
-    <div
-      className={`relative w-full px-md md:px-lg lg:px-xl xl:px-2xl  ${className}`}
-    >
-      {/* Categories Title */}
-      <SectionTitle
-        title="Esplora le"
-        shaderText="Categorie"
-        description="Trova il tuo stile perfetto tra le nostre categorie curate"
-        size="md"
-      />
-      <div className="relative max-w-[1600px] mx-auto z-10">
-        {/* Slider con controlli overlay */}
-        <div className="relative">
-          {/* Freccia Sinistra - Overlay */}
-          {canScrollPrev && (
-            <button
-              onClick={scrollPrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
-              aria-label="Previous slides"
-            >
-              <svg
-                className="size-icon text-light-primary group-hover:text-brand transition-all duration-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                />
-              </svg>
-            </button>
-          )}
+    <div className={`relative w-full ${className}`}>
+      {/* Title */}
+      <div className="px-md md:px-lg lg:px-xl xl:px-2xl">
+        <SectionTitle
+          title="Esplora le"
+          shaderText="Categorie"
+          description="Trova il tuo stile perfetto tra le nostre categorie curate"
+          size="md"
+        />
+      </div>
 
-          {/* Swiper - dimensioni automatiche */}
-          <Swiper
-            modules={[Navigation]}
-            spaceBetween={24}
-            slidesPerView={getSlidesPerView(1)}
-            breakpoints={{
-              640: { slidesPerView: getSlidesPerView(2) },
-              1024: { slidesPerView: getSlidesPerView(3) },
-              1280: { slidesPerView: getSlidesPerView(4) },
-              1536: { slidesPerView: getSlidesPerView(6) },
-            }}
-            onSwiper={setSwiperInstance}
-            onSlideChange={(swiper) => {
-              setCanScrollPrev(!swiper.isBeginning);
-              setCanScrollNext(!swiper.isEnd);
-            }}
-            onInit={(swiper) => {
-              setCanScrollPrev(!swiper.isBeginning);
-              setCanScrollNext(!swiper.isEnd);
-            }}
+      {/* Controlli navigazione - nascosti su mobile */}
+      <div className="hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6">
+        <button
+          onClick={scrollPrev}
+          disabled={!canScrollPrev}
+          className="flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10"
+          aria-label="Previous slides"
+        >
+          <svg
+            className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 group-disabled:group-hover:text-light-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
           >
-            {images.map((image) => (
-              <SwiperSlide key={image.url}>
-                <CategoryCard image={image} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7 16l-4-4m0 0l4-4m-4 4h18"
+            />
+          </svg>
+        </button>
 
-          {/* Freccia Destra - Overlay */}
-          {canScrollNext && (
-            <button
-              onClick={scrollNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer"
-              aria-label="Next slides"
-            >
-              <svg
-                className="size-icon text-light-primary group-hover:text-brand transition-all duration-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
-              </svg>
-            </button>
-          )}
-        </div>
+        <button
+          onClick={scrollNext}
+          disabled={!canScrollNext}
+          className="flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10"
+          aria-label="Next slides"
+        >
+          <svg
+            className="size-icon text-light-primary group-hover:text-brand transition-all duration-500 group-disabled:group-hover:text-light-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div className="relative max-w-[1600px] mx-auto z-10 px-md md:px-lg lg:px-xl xl:px-2xl">
+        {/* Swiper con effetto peek e scale */}
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={32}
+          slidesPerView={slidesPerView}
+          centeredSlides={true}
+          onSwiper={setSwiperInstance}
+          onSlideChange={(swiper) => {
+            setCanScrollPrev(!swiper.isBeginning);
+            setCanScrollNext(!swiper.isEnd);
+            setActiveIndex(swiper.activeIndex);
+          }}
+          onInit={(swiper) => {
+            setCanScrollPrev(!swiper.isBeginning);
+            setCanScrollNext(!swiper.isEnd);
+            setActiveIndex(swiper.activeIndex);
+          }}
+        >
+          {images.map((image, index) => {
+            const isActive = index === activeIndex;
+            const scale = isActive ? 1 : 0.5;
+
+            return (
+              <SwiperSlide key={image.url}>
+                <div
+                  className="transition-transform duration-500 ease-out origin-center"
+                  style={{ transform: `scale(${scale})` }}
+                >
+                  <CategoryCard image={image} />
+                </div>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
       </div>
     </div>
   );
