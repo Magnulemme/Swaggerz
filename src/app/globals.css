@@ -16,12 +16,12 @@
 
 /* Utility per nascondere scrollbar */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none; /* Chrome, Safari and Opera */
 }
 
 /* Stili personalizzati per Turnstile */
@@ -78,7 +78,8 @@
 }
 
 @keyframes turnstile-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -121,7 +122,7 @@
 
 /* Indicatore di stato personalizzato */
 .turnstile-container::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -2px;
   left: -2px;
@@ -135,7 +136,11 @@
 
 /* Indicatore per stato verificato */
 .cf-turnstile.verified + .turnstile-container::after {
-  background: linear-gradient(45deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+  background: linear-gradient(
+    45deg,
+    rgba(34, 197, 94, 0.1),
+    rgba(34, 197, 94, 0.05)
+  );
 }
 
 @theme {
@@ -145,33 +150,33 @@
      Usage: p-2xs, p-xs, p-sm, p-md, p-lg, p-xl, p-2xl, p-3xl
      Equivale a: p-1, p-2, p-4, p-6, p-8, p-12, p-16, p-20
      ============================================== */
-  --spacing-2xs: 0.25rem;   /* 4px   (equivale a p-1)  */
-  --spacing-xs: 0.5rem;     /* 8px   (equivale a p-2)  */
-  --spacing-sm: 1rem;       /* 16px  (equivale a p-4)  */
-  --spacing-md: 1.5rem;     /* 24px  (equivale a p-6)  */
-  --spacing-lg: 2rem;       /* 32px  (equivale a p-8)  */
-  --spacing-xl: 3rem;       /* 48px  (equivale a p-12) */
-  --spacing-2xl: 4rem;      /* 64px  (equivale a p-16) */
-  --spacing-3xl: 5rem;      /* 80px  (equivale a p-20) */
+  --spacing-2xs: 0.25rem; /* 4px   (equivale a p-1)  */
+  --spacing-xs: 0.5rem; /* 8px   (equivale a p-2)  */
+  --spacing-sm: 1rem; /* 16px  (equivale a p-4)  */
+  --spacing-md: 1.5rem; /* 24px  (equivale a p-6)  */
+  --spacing-lg: 2rem; /* 32px  (equivale a p-8)  */
+  --spacing-xl: 3rem; /* 48px  (equivale a p-12) */
+  --spacing-2xl: 4rem; /* 64px  (equivale a p-16) */
+  --spacing-3xl: 5rem; /* 80px  (equivale a p-20) */
 
   /* ==============================================
      MAX-WIDTH READABLE (Leggibilità testo)
      Basato su lunghezza ottimale di lettura
      Usage: max-w-prose-sm, max-w-prose, max-w-prose-lg, max-w-title
      ============================================== */
-  --max-width-prose-sm: 24rem;   /* 384px - Testo breve/didascalie (40-50 caratteri) */
-  --max-width-prose: 32rem;      /* 512px - Testo medio (50-60 caratteri) */
-  --max-width-prose-lg: 42rem;   /* 672px - Testo lungo/paragrafi (60-70 caratteri) */
-  --max-width-title: 48rem;      /* 768px - Titoli/headline */
+  --max-width-prose-sm: 24rem; /* 384px - Testo breve/didascalie (40-50 caratteri) */
+  --max-width-prose: 32rem; /* 512px - Testo medio (50-60 caratteri) */
+  --max-width-prose-lg: 42rem; /* 672px - Testo lungo/paragrafi (60-70 caratteri) */
+  --max-width-title: 48rem; /* 768px - Titoli/headline */
 
   /* ==============================================
      ICON SIZES (Icone)
      Dimensioni standardizzate per icone
      Usage: size-icon-sm, size-icon, size-icon-lg
      ============================================== */
-  --size-icon-sm: 1rem;          /* 16px */
-  --size-icon: 1.125rem;         /* 18px */
-  --size-icon-lg: 1.25rem;       /* 20px */
+  --size-icon-sm: 1rem; /* 16px */
+  --size-icon: 1.125rem; /* 18px */
+  --size-icon-lg: 1.25rem; /* 20px */
 
   /* ==============================================
      TYPOGRAPHY & COLORS
@@ -186,23 +191,23 @@
      ============================================== */
 
   /* Backgrounds - Dark Mode */
-  --color-dark: 9 9 11;                    /* zinc-950 - Base surface */
-  --color-dark-elevated: 0 0 0;            /* black - Elevated elements (navbar pill, overlay) */
-  --color-dark-element: 24 24 27;          /* zinc-900 - Elements (cards, icons, buttons) */
-  --color-dark-element-hover: 39 39 42;    /* zinc-800 - Hover state for elements */
+  --color-dark: 9 9 11; /* zinc-950 - Base surface */
+  --color-dark-elevated: 0 0 0; /* black - Elevated elements (navbar pill, overlay) */
+  --color-dark-element: 24 24 27; /* zinc-900 - Elements (cards, icons, buttons) */
+  --color-dark-element-hover: 39 39 42; /* zinc-800 - Hover state for elements */
 
   /* Text - On Dark Backgrounds */
-  --color-light: 255 255 255;              /* white - Primary text */
-  --color-light-secondary: 212 212 216;    /* zinc-300 - Secondary text (sottotitoli) */
-  --color-light-tertiary: 161 161 170;     /* zinc-400 - Tertiary text (descrizioni card) */
+  --color-light: 255 255 255; /* white - Primary text */
+  --color-light-secondary: 212 212 216; /* zinc-300 - Secondary text (sottotitoli) */
+  --color-light-tertiary: 161 161 170; /* zinc-400 - Tertiary text (descrizioni card) */
 
   /* Brand Colors */
-  --color-brand: 249 115 22;               /* orange-500 - Primary brand */
-  --color-brand-light: 251 146 60;         /* orange-400 - Lighter brand for hover */
+  --color-brand: 249 115 22; /* orange-500 - Primary brand */
+  --color-brand-light: 251 146 60; /* orange-400 - Lighter brand for hover */
 
   /* Borders */
-  --color-border-light: 255 255 255;       /* white - for opacity usage (white/10) */
-  --color-border-brand: 249 115 22;        /* orange-500 - Brand borders */
+  --color-border-light: 255 255 255; /* white - for opacity usage (white/10) */
+  --color-border-brand: 249 115 22; /* orange-500 - Brand borders */
 
   /* ==============================================
      OLD VARIABLES (Deprecated - To be migrated)
@@ -268,7 +273,6 @@
 }
 
 @layer utilities {
-
   /* ==============================================
      SIZE UTILITIES - Semantico
      ============================================== */
@@ -350,7 +354,12 @@
   }
 
   .border-brand-subtle {
-    border-color: rgba(249, 115, 22, 0.4); /* orange-500/40 - Interactive hover */
+    border-color: rgba(
+      249,
+      115,
+      22,
+      0.4
+    ); /* orange-500/40 - Interactive hover */
   }
 
   .border-brand {
@@ -391,12 +400,22 @@
      ============================================== */
 
   .bg-gradient-brand {
-    background-image: linear-gradient(to right, rgb(239 68 68), rgb(249 115 22), rgb(250 204 21));
+    background-image: linear-gradient(
+      to right,
+      rgb(239 68 68),
+      rgb(249 115 22),
+      rgb(250 204 21)
+    );
   }
 
   /* Per uso con bg-clip-text */
   .text-gradient-brand {
-    background-image: linear-gradient(to right, rgb(239 68 68), rgb(249 115 22), rgb(250 204 21));
+    background-image: linear-gradient(
+      to right,
+      rgb(239 68 68),
+      rgb(249 115 22),
+      rgb(250 204 21)
+    );
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
@@ -415,9 +434,18 @@
   }
 
   @keyframes gradient {
-    0%, 20%   { background-position: 0% 50%; }
-    45%, 55%  { background-position: 100% 50%; }
-    80%, 100% { background-position: 0% 50%; }
+    0%,
+    20% {
+      background-position: 0% 50%;
+    }
+    45%,
+    55% {
+      background-position: 100% 50%;
+    }
+    80%,
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   .animate-gradient {
@@ -425,13 +453,14 @@
   }
 
   @keyframes swaggerDotPulse {
-    0%, 100% {
-       opacity: 0.4;
+    0%,
+    100% {
+      opacity: 0.4;
       transform: scale(0.8);
       box-shadow: 0 0 0 rgba(251, 146, 60, 0);
     }
     50% {
-       opacity: 1;
+      opacity: 1;
       transform: scale(1.2);
       box-shadow: 0 0 8px rgba(251, 146, 60, 0.3);
     }
@@ -439,7 +468,9 @@
 
   /* NUOVE ANIMAZIONI SEQUENZIALI */
   @keyframes sequentialScale {
-    0%, 80%, 100% {
+    0%,
+    80%,
+    100% {
       transform: scale(1);
       opacity: 0.6;
     }
@@ -465,21 +496,21 @@
 
   /* Glow effect for CTA button */
   @keyframes glow {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 5px rgba(249, 115, 22, 0.4),
-                  0 0 10px rgba(249, 115, 22, 0.2),
-                  0 0 15px rgba(249, 115, 22, 0.1);
+        0 0 10px rgba(249, 115, 22, 0.2), 0 0 15px rgba(249, 115, 22, 0.1);
     }
     50% {
       box-shadow: 0 0 10px rgba(249, 115, 22, 0.6),
-                  0 0 20px rgba(249, 115, 22, 0.4),
-                  0 0 30px rgba(249, 115, 22, 0.2);
+        0 0 20px rgba(249, 115, 22, 0.4), 0 0 30px rgba(249, 115, 22, 0.2);
     }
   }
 
   /* Blob animations */
   @keyframes blob {
-    0%, 100% {
+    0%,
+    100% {
       transform: translate(0, 0) scale(1);
       border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     }
@@ -494,7 +525,8 @@
   }
 
   @keyframes blob-fast {
-    0%, 100% {
+    0%,
+    100% {
       transform: translate(0, 0) scale(1);
       border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     }
@@ -505,7 +537,8 @@
   }
 
   @keyframes pulse-slow {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.3;
       transform: scale(0.95);
     }
@@ -545,7 +578,8 @@
 
   /* Hue rotation for subtle color changes */
   @keyframes hue-rotate-subtle {
-    0%, 100% {
+    0%,
+    100% {
       filter: hue-rotate(0deg);
     }
     50% {
@@ -557,6 +591,17 @@
     animation: hue-rotate-subtle 10s ease-in-out infinite;
   }
 
+  /* Fade in from top animation for hero titles */
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 @theme inline {
@@ -597,7 +642,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Infinite scroll animation */
-  --animate-scroll: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+  --animate-scroll: scroll var(--animation-duration, 40s)
+    var(--animation-direction, forwards) linear infinite;
 
   @keyframes scroll {
     to {
@@ -688,7 +734,7 @@
 
 /* Categories Coverflow Effects */
 .categories-coverflow .swiper-slide {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 1.5s cubic-bezier(0.42, 0, 1, 1);
 }
 
 .categories-coverflow .swiper-slide:not(.swiper-slide-active) {
@@ -699,4 +745,40 @@
 .categories-coverflow .swiper-slide-active {
   filter: blur(0);
   opacity: 1;
+}
+
+/* Effetto rotazione 90° sulle slide laterali - da orizzontale a verticale */
+.categories-coverflow .swiper-slide-prev,
+.categories-coverflow .swiper-slide-next {
+  transform: rotateZ(90deg) scale(0.7) !important;
+}
+
+/* Fade out per le card in uscita */
+.categories-coverflow .swiper-slide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.categories-coverflow .swiper-slide-active,
+.categories-coverflow .swiper-slide-prev,
+.categories-coverflow .swiper-slide-next {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.categories-coverflow .swiper-slide-active {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+/* Card in uscita: solo fade, nessuno scorrimento */
+.categories-coverflow
+  .swiper-slide:not(.swiper-slide-active):not(.swiper-slide-prev):not(
+    .swiper-slide-next
+  ) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: scale(0.7) !important;
+  transition: opacity 0.6s ease-out, visibility 0.6s !important;
+  pointer-events: none !important;
 }

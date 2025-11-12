@@ -1,11 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, EffectCoverflow, Autoplay } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
-import "swiper/css/bundle";
-import "swiper/css/effect-coverflow";
 import { CategoryCard } from "./CategoryCard";
 import { SectionTitle } from "../SectionTitle";
 
@@ -72,32 +67,127 @@ export function HeroCategories({
   images = defaultImages,
   className = "",
 }: HeroCategoriesProps) {
-  // Duplicate images for better loop performance with coverflow
-  const duplicatedImages = [...images, ...images, ...images];
-
-  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isReady, setIsReady] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [autoplayEnabled, setAutoplayEnabled] = useState(true);
+  const [autoplayKey, setAutoplayKey] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const scrollPrev = () => swiperInstance?.slidePrev();
-  const scrollNext = () => swiperInstance?.slideNext();
+  // Test con 5 card colorate
+  const testCards = [
+    { id: 0, color: 'bg-red-500', label: 'Card 0' },
+    { id: 1, color: 'bg-blue-500', label: 'Card 1' },
+    { id: 2, color: 'bg-green-500', label: 'Card 2' },
+    { id: 3, color: 'bg-yellow-500', label: 'Card 3' },
+    { id: 4, color: 'bg-purple-500', label: 'Card 4' },
+  ];
 
-  // Force update on mount to fix initial loop rendering
-  useEffect(() => {
-    if (swiperInstance) {
-      // First update immediately
-      swiperInstance.update();
+  const goToPrev = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setAutoplayEnabled(false);
+    setActiveIndex((prev) => (prev === 0 ? testCards.length - 1 : prev - 1));
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setAutoplayEnabled(true);
+      setAutoplayKey((prev) => prev + 1); // Reset autoplay timer
+    }, 1500);
+  };
 
-      // Second update after a delay to fix loop positioning
-      setTimeout(() => {
-        swiperInstance.update();
-        swiperInstance.slideToLoop(0, 0); // Force to first slide without animation
-        setIsReady(true);
-      }, 200);
+  const goToNext = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setAutoplayEnabled(false);
+    setActiveIndex((prev) => (prev === testCards.length - 1 ? 0 : prev + 1));
+    setTimeout(() => {
+      setIsTransitioning(false);
+      setAutoplayEnabled(true);
+      setAutoplayKey((prev) => prev + 1); // Reset autoplay timer
+    }, 1500);
+  };
+
+  // Swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (isTransitioning) return;
+    setTouchStart(e.touches[0].clientX);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart || isTransitioning || !isDragging) return;
+    setTouchEnd(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd || isTransitioning) return;
+
+    const diff = touchEnd - touchStart;
+
+    setTouchStart(null);
+    setTouchEnd(null);
+    setIsDragging(false);
+
+    // Swipe right (positive diff) = go prev
+    // Swipe left (negative diff) = go next
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToPrev();
+      } else {
+        goToNext();
+      }
     }
-  }, [swiperInstance]);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isTransitioning) return;
+    setTouchStart(e.clientX);
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!touchStart || isTransitioning || !isDragging) return;
+    setTouchEnd(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    if (!touchStart || !touchEnd || isTransitioning) return;
+
+    const diff = touchStart - touchEnd;
+
+    setTouchStart(null);
+    setTouchEnd(null);
+    setIsDragging(false);
+
+    // Mouse: left drag (positive diff) = go next
+    // Mouse: right drag (negative diff) = go prev
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goToNext();
+      } else {
+        goToPrev();
+      }
+    }
+  };
+
+  // Autoplay
+  useEffect(() => {
+    if (!autoplayEnabled) return;
+
+    const interval = setInterval(() => {
+      if (!document.hidden && !isTransitioning) {
+        setIsTransitioning(true);
+        setActiveIndex((prev) => (prev === testCards.length - 1 ? 0 : prev + 1));
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setAutoplayKey((prev) => prev + 1); // Reset autoplay timer after autoplay transition
+        }, 1500);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [autoplayEnabled, isTransitioning, testCards.length, autoplayKey]);
 
   return (
     <div className={`relative w-full ${className}`}>
@@ -111,26 +201,11 @@ export function HeroCategories({
         />
       </div>
 
-      {/* Griglia statica - visibile solo su desktop grande quando ci sono <= 4 card */}
-      {images.length <= 4 && (
-        <div className="hidden xl:grid grid-cols-4 gap-6 px-md md:px-lg lg:px-xl xl:px-2xl mt-8">
-          {images.map((image) => (
-            <div key={image.url} className="w-full max-w-[380px] mx-auto">
-              <CategoryCard image={image} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Controlli navigazione - nascosti su mobile e su desktop se griglia statica */}
-      <div
-        className={`${
-          images.length <= 4 ? "xl:hidden" : ""
-        } hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6`}
-      >
+      {/* Controlli navigazione - nascosti solo su mobile */}
+      <div className="hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6">
         <button
-          onClick={scrollPrev}
-          disabled={!canScrollPrev}
+          onClick={goToNext}
+          disabled={isTransitioning}
           className="flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10"
           aria-label="Previous slides"
         >
@@ -150,8 +225,8 @@ export function HeroCategories({
         </button>
 
         <button
-          onClick={scrollNext}
-          disabled={!canScrollNext}
+          onClick={goToPrev}
+          disabled={isTransitioning}
           className="flex group p-sm rounded-full items-center justify-center border border-white/10 hover:border-brand-subtle transition-all duration-500 bg-dark-elevated cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10"
           aria-label="Next slides"
         >
@@ -171,67 +246,90 @@ export function HeroCategories({
         </button>
       </div>
 
-      {/* Slider Container - nascosto solo su desktop XL se ci sono <= 4 card */}
+      {/* Custom Carousel - Universale per tutti i dispositivi */}
       <div
-        className={`${
-          images.length <= 4 ? "xl:hidden" : ""
-        } relative w-full transition-opacity duration-300 ${
-          !isReady ? "opacity-0" : "opacity-100"
-        }`}
+        className="relative w-full overflow-hidden py-8"
         data-lenis-prevent
       >
-        <Swiper
-          modules={[Navigation, EffectCoverflow, Autoplay]}
-          effect="coverflow"
-          loop={true}
-          initialSlide={0}
-          observer={true}
-          observeParents={true}
-          watchSlidesProgress={true}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: true,
-          }}
-          spaceBetween={30}
-          coverflowEffect={{
-            rotate: 5,
-            stretch: 0,
-            depth: 150,
-            modifier: 1,
-            slideShadows: false,
-            scale: 0.85,
-          }}
-          slidesPerView={1.5}
-          centeredSlides={true}
-          grabCursor={true}
-          threshold={5}
-          breakpoints={{
-            768: {
-              slidesPerView: 2,
-            },
-          }}
-          onSwiper={setSwiperInstance}
-          onSlideChange={(swiper) => {
-            setCanScrollPrev(!swiper.isBeginning);
-            setCanScrollNext(!swiper.isEnd);
-            setActiveIndex(swiper.activeIndex);
-          }}
-          onInit={(swiper) => {
-            setCanScrollPrev(!swiper.isBeginning);
-            setCanScrollNext(!swiper.isEnd);
-            setActiveIndex(swiper.activeIndex);
-          }}
-          className="py-8 categories-coverflow"
+        {/* Background parallax blur - solo desktop */}
+        <div className="absolute inset-0 hidden md:flex items-center justify-center pointer-events-none overflow-hidden">
+          <div
+            className={`w-[50vw] h-[60vh] transition-all duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${testCards[activeIndex].color} rounded-full`}
+            style={{
+              filter: 'blur(80px) brightness(0.3)',
+              opacity: 0.25,
+            }}
+          />
+        </div>
+
+        <div
+          className="relative flex items-center justify-center gap-8 h-[80vh] max-h-[500px] cursor-grab active:cursor-grabbing"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
         >
-          {duplicatedImages.map((image, index) => (
-            <SwiperSlide key={`${image.url}-${index}`}>
-              <div className="max-w-[380px] mx-auto">
-                <CategoryCard image={image} />
+          {/* Render all cards, each calculates its position relative to activeIndex */}
+          {testCards.map((card, index) => {
+            // Calculate relative position to activeIndex
+            const diff = (index - activeIndex + testCards.length) % testCards.length;
+
+            // Determine which slot this card belongs to
+            let slotClasses = '';
+            if (diff === 0) {
+              // This is the active card (center)
+              slotClasses = 'left-1/2 -translate-x-1/2 rotate-0 scale-100 opacity-100';
+            } else if (diff === testCards.length - 1 || diff === -1) {
+              // This is prev (left visible) - responsive positioning, completamente visibile su desktop
+              slotClasses = 'left-[-25%] md:left-[5%] lg:left-[15%] -translate-x-1/2 rotate-90 scale-[0.6] md:scale-[0.65] lg:scale-[0.7] opacity-60 md:opacity-80 lg:opacity-100';
+            } else if (diff === 1) {
+              // This is next (right visible) - USING LEFT INSTEAD OF RIGHT for smooth transitions
+              slotClasses = 'left-[125%] md:left-[95%] lg:left-[85%] -translate-x-1/2 rotate-90 scale-[0.6] md:scale-[0.65] lg:scale-[0.7] opacity-60 md:opacity-80 lg:opacity-100';
+            } else if (diff === testCards.length - 2 || diff === -2) {
+              // This is prevPrev (hidden left) - same position/rotation as prev, only invisible
+              slotClasses = 'left-[-25%] md:left-[5%] lg:left-[15%] -translate-x-1/2 rotate-90 scale-[0.6] md:scale-[0.65] lg:scale-[0.7] opacity-0';
+            } else if (diff === 2) {
+              // This is nextNext (hidden right) - USING LEFT INSTEAD OF RIGHT for smooth transitions
+              slotClasses = 'left-[125%] md:left-[95%] lg:left-[85%] -translate-x-1/2 rotate-90 scale-[0.6] md:scale-[0.65] lg:scale-[0.7] opacity-0';
+            } else {
+              // Hidden cards (should not show)
+              slotClasses = 'left-1/2 -translate-x-1/2 opacity-0 invisible';
+            }
+
+            // Determine if this card is clickable (prev or next)
+            const isClickable = diff === testCards.length - 1 || diff === 1;
+            const handleCardClick = () => {
+              if (!isClickable || isTransitioning) return;
+              if (diff === testCards.length - 1) {
+                goToPrev();
+              } else if (diff === 1) {
+                goToNext();
+              }
+            };
+
+            return (
+              <div
+                key={index}
+                className={`absolute w-[70vw] max-w-[350px] h-[70vh] max-h-[450px] transition-all duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${slotClasses} ${
+                  isClickable ? 'cursor-pointer' : ''
+                }`}
+                onClick={handleCardClick}
+              >
+                <div className={`relative w-full h-full ${card.color} rounded-2xl flex flex-col gap-4 items-center justify-center text-white font-bold overflow-visible`}>
+                  {/* Title - mobile inside card, desktop centered */}
+                  <div className="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black drop-shadow-2xl tracking-tight leading-none">
+                    {card.label}
+                  </div>
+                  <div className="text-8xl bg-black/70 px-8 py-4 rounded-xl">
+                    {diff}
+                  </div>
+                </div>
               </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
