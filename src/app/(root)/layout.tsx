@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "../globals.css";
 import StickyFooter from "@/components/StickyFooter";
-import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
+// import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
 
 const jost = Jost({
   variable: "--font-jost",
@@ -20,11 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SmoothScrollProvider>
+    // <SmoothScrollProvider>
       <div className={`${jost.variable} antialiased min-h-screen bg-dark-900 text-white`}>
         {children}
         <StickyFooter />
       </div>
-    </SmoothScrollProvider>
+    // </SmoothScrollProvider>
   );
 }
