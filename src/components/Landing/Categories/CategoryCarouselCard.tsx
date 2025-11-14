@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface CategoryCarouselCardProps {
   image: string;
@@ -31,6 +31,22 @@ export function CategoryCarouselCard({
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
   );
+  const [showLabel, setShowLabel] = useState(false); // Always start hidden, show after delay
+  const cardRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
+
+  // Handle label visibility with proper timing - reset and restart on every isActive change
+  useEffect(() => {
+    // Always reset to false first
+    setShowLabel(false);
+
+    if (!isActive && isClickable) {
+      // Show label AFTER animation completes (1400ms)
+      // This applies both for first render AND when moving from center to side
+      const timer = setTimeout(() => setShowLabel(true), 1400);
+      return () => clearTimeout(timer);
+    }
+  }, [isActive, isClickable]);
 
   // Track viewport changes
   useEffect(() => {
@@ -40,6 +56,48 @@ export function CategoryCarouselCard({
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
+
+  // Custom hover detection using mouse coordinates - check BOTH card and label
+  useEffect(() => {
+    if (!isClickable) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      // Check if mouse is within card bounding box
+      let isInsideCard = false;
+      if (cardRef.current) {
+        const cardRect = cardRef.current.getBoundingClientRect();
+        isInsideCard =
+          mouseX >= cardRect.left &&
+          mouseX <= cardRect.right &&
+          mouseY >= cardRect.top &&
+          mouseY <= cardRect.bottom;
+      }
+
+      // Check if mouse is within label bounding box
+      let isInsideLabel = false;
+      if (labelRef.current && showLabel) {
+        const labelRect = labelRef.current.getBoundingClientRect();
+        isInsideLabel =
+          mouseX >= labelRect.left &&
+          mouseX <= labelRect.right &&
+          mouseY >= labelRect.top &&
+          mouseY <= labelRect.bottom;
+      }
+
+      // Set hovered if inside either card OR label
+      setIsHovered(isInsideCard || isInsideLabel);
+    };
+
+    // Add listener to document to track mouse globally
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isClickable, showLabel]);
 
   // Hide active card until gridPosition is calculated (prevents flash)
   const shouldHide = isActive && !gridPosition && isFirstRender;
@@ -71,11 +129,9 @@ export function CategoryCarouselCard({
         }),
       }}
       onClick={onClick}
-      onMouseEnter={() => isClickable && setIsHovered(true)}
-      onMouseLeave={() => isClickable && setIsHovered(false)}
     >
-      {/* Wrapper for rounded corners and overflow */}
-      <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+      {/* BOX 1: Card image wrapper with ref for hover detection */}
+      <div ref={cardRef} className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
         {/* Image layer with 3D effect */}
         <div
           className={`absolute inset-0 ${!isFirstRender ? "transition-all duration-[1400ms]" : ""}`}
@@ -91,12 +147,20 @@ export function CategoryCarouselCard({
         />
       </div>
 
-      {/* Label below card - visible only on side cards (lg+) with luxury styling */}
-      {!isActive && isClickable && (
+      {/* BOX 2: Label below card with ref for hover detection */}
+      {isClickable && (
         <div
-          className={`hidden lg:flex absolute -bottom-16 left-0 right-0 items-center justify-between pointer-events-none opacity-0 animate-[fadeIn_0.5s_ease-out_1.4s_forwards] transition-all duration-300 ${
-            isHovered ? "translate-x-2" : ""
-          }`}
+          ref={labelRef}
+          className="hidden lg:flex absolute -bottom-16 left-0 right-0 items-center justify-between transition-all duration-700 ease-out"
+          style={{
+            opacity: showLabel && !isActive ? 1 : 0,
+            transform: showLabel && !isActive
+              ? isHovered
+                ? "translateX(0.5rem)"
+                : "translateX(0)"
+              : "translateX(3rem)", // Slide from right - works for both entry scenarios
+            pointerEvents: showLabel && !isActive ? "auto" : "none",
+          }}
         >
           <h3
             className={`font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg transition-colors duration-300 ${
