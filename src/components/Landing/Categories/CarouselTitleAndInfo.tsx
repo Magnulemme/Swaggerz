@@ -25,7 +25,7 @@ interface CharWithLine {
  */
 function AnimatedText({
   text,
-  animationKey,
+  animationKey: _animationKey, // Used as React key for forced re-renders
   isExiting = false,
   className,
   as: Component = "p",
@@ -136,13 +136,12 @@ export function CarouselTitleAndInfo({
   onCardPositionCalculated,
   cardsContainerRef,
 }: CarouselTitleAndInfoProps) {
-  const fakeCardRef = React.useRef<HTMLDivElement>(null);
-
   // Ref condiviso per mobile e desktop
   const mobileCardRef = useRef<HTMLDivElement>(null);
   const desktopCardRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  // Use useLayoutEffect to calculate position BEFORE paint (sync)
+  React.useLayoutEffect(() => {
     if (!cardsContainerRef.current || !onCardPositionCalculated) return;
 
     const updatePosition = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CategoryCarouselCardProps {
   image: string;
@@ -11,6 +11,7 @@ interface CategoryCarouselCardProps {
   isActive: boolean;
   onClick: () => void;
   gridPosition?: { left: number; top: number } | null;
+  isFirstRender?: boolean;
 }
 
 export function CategoryCarouselCard({
@@ -24,24 +25,43 @@ export function CategoryCarouselCard({
   isActive,
   onClick,
   gridPosition,
+  isFirstRender = false,
 }: CategoryCarouselCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
+  );
+
+  // Track viewport changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 1024px)');
+    const handleChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Hide active card until gridPosition is calculated (prevents flash)
+  const shouldHide = isActive && !gridPosition && isFirstRender;
 
   return (
     <div
-      className={`absolute transition-all duration-[1400ms] ${slotClasses} ${
+      className={`absolute ${!isFirstRender ? "transition-all duration-[1400ms]" : ""} ${slotClasses} ${
         isClickable ? "cursor-pointer" : ""
-      }`}
+      } ${shouldHide ? "opacity-0 invisible" : ""}`}
       style={{
         zIndex,
         transform: `rotateY(${rotateY}deg)`,
         transformStyle: "preserve-3d",
-        transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+        ...(!isFirstRender && {
+          transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+        }),
         // Swap width/height based on orientation + 3D rotation
         // On mobile, limit horizontal cards to vertical card max width
         width: isHorizontal ? "min(70vh, 70vw)" : "70vw",
         maxWidth: isHorizontal ? "350px" : "350px", // Same max-width for both orientations
-        height: isHorizontal ? "70vw" : "50vh", // Ridotto da 70vh a 50vh per mobile
+        // Height: 50vh on mobile (< lg), 70vh on desktop (>= lg)
+        height: isHorizontal ? "70vw" : isDesktop ? "70vh" : "50vh",
         maxHeight: isHorizontal ? "350px" : "450px",
         // Use grid position if available (for active card)
         ...(gridPosition && {
@@ -58,13 +78,15 @@ export function CategoryCarouselCard({
       <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
         {/* Image layer with 3D effect */}
         <div
-          className="absolute inset-0 transition-all duration-[1400ms]"
+          className={`absolute inset-0 ${!isFirstRender ? "transition-all duration-[1400ms]" : ""}`}
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${image})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter: isActive ? "blur(0)" : "blur(2px)",
-            transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+            ...(!isFirstRender && {
+              transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+            }),
           }}
         />
       </div>
