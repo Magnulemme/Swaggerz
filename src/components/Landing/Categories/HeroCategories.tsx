@@ -6,7 +6,6 @@ import { CarouselControls } from "./CarouselControls";
 import { CarouselBackground } from "./CarouselBackground";
 import { CarouselTitleAndInfo } from "./CarouselTitleAndInfo";
 import { SectionTitle } from "../SectionTitle";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
 import {
   CATEGORY_CARDS,
   CAROUSEL_TIMINGS,
@@ -31,6 +30,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     left: number;
     top: number;
   } | null>(null);
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   const goToPrev = () => {
@@ -126,6 +126,15 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     }
   };
 
+  // Disable first render flag after mount
+  useEffect(() => {
+    // Enable transitions after first render
+    const timer = setTimeout(() => {
+      setIsFirstRender(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Autoplay
   useEffect(() => {
     if (!autoplayEnabled) return;
@@ -159,7 +168,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
         />
       </div>
 
-      {/* Controlli navigazione - nascosti solo su mobile */}
+      {/* Controlli navigazione */}
       <CarouselControls
         onNext={goToNext}
         onPrev={goToPrev}
@@ -167,14 +176,14 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
       />
 
       {/* Custom Carousel - Universale per tutti i dispositivi */}
-      <div className="relative w-full overflow-hidden py-8" data-lenis-prevent>
+      <div className="relative w-full py-8 overflow-hidden" data-lenis-prevent>
         {/* Background parallax blur - solo desktop */}
         <CarouselBackground imageUrl={CATEGORY_CARDS[activeIndex].image} />
 
         {/* Cards container with 3D context */}
         <div
           ref={cardsContainerRef}
-          className="relative flex items-center justify-center gap-8 h-[80vh] max-h-[500px] cursor-grab active:cursor-grabbing"
+          className="relative flex items-center justify-center gap-8 h-auto min-h-[80vh] lg:h-[80vh] lg:max-h-[500px] cursor-grab active:cursor-grabbing"
           style={{
             perspective: "2000px",
             transformStyle: "preserve-3d",
@@ -265,6 +274,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
                 isActive={diff === 0}
                 onClick={handleCardClick}
                 gridPosition={diff === 0 ? gridCardPosition : null}
+                isFirstRender={isFirstRender}
               />
             );
           })}
@@ -280,23 +290,15 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
           }
           isTransitioning={isTransitioning}
           collection={CATEGORY_CARDS[activeIndex]}
+          previousCollection={
+            isTransitioning && previousIndex !== activeIndex
+              ? CATEGORY_CARDS[previousIndex]
+              : undefined
+          }
           onCardPositionCalculated={setGridCardPosition}
           cardsContainerRef={cardsContainerRef}
+          isFirstRender={isFirstRender}
         />
-
-        {/* Animated button - centered on card */}
-        {/* <div className="absolute left-[45%] lg:left-[40%] xl:left-[38%] -translate-x-1/2 bottom-20 md:bottom-24 lg:bottom-28 pointer-events-auto">
-          <AnimatedButton
-            as="button"
-            size="sm"
-            onClick={() => {
-              // Add navigation logic here
-              console.log("Category selected:", CATEGORY_CARDS[activeIndex].label);
-            }}
-          >
-            Scopri
-          </AnimatedButton>
-        </div> */}
       </div>
     </div>
   );

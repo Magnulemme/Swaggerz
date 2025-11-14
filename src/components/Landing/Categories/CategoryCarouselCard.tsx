@@ -38,9 +38,10 @@ export function CategoryCarouselCard({
         transformStyle: "preserve-3d",
         transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
         // Swap width/height based on orientation + 3D rotation
-        width: isHorizontal ? "70vh" : "70vw",
-        maxWidth: isHorizontal ? "450px" : "350px",
-        height: isHorizontal ? "70vw" : "70vh",
+        // On mobile, limit horizontal cards to vertical card max width
+        width: isHorizontal ? "min(70vh, 70vw)" : "70vw",
+        maxWidth: isHorizontal ? "350px" : "350px", // Same max-width for both orientations
+        height: isHorizontal ? "70vw" : "50vh", // Ridotto da 70vh a 50vh per mobile
         maxHeight: isHorizontal ? "350px" : "450px",
         // Use grid position if available (for active card)
         ...(gridPosition && {
