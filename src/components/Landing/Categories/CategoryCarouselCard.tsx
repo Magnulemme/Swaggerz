@@ -12,6 +12,8 @@ interface CategoryCarouselCardProps {
   onClick: () => void;
   gridPosition?: { left: number; top: number } | null;
   isFirstRender?: boolean;
+  onMainCardHoverChange?: (isHovered: boolean) => void;
+  onSideCardHoverChange?: (isHovered: boolean) => void;
 }
 
 export function CategoryCarouselCard({
@@ -26,10 +28,17 @@ export function CategoryCarouselCard({
   onClick,
   gridPosition,
   isFirstRender = false,
+  onMainCardHoverChange,
+  onSideCardHoverChange,
 }: CategoryCarouselCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDesktop, setIsDesktop] = useState(
-    typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches
+    typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 1024px)").matches
+  );
+  const [isXL, setIsXL] = useState(
+    typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 1280px)").matches
   );
   const [showLabel, setShowLabel] = useState(false); // Always start hidden, show after delay
   const cardRef = useRef<HTMLDivElement>(null);
@@ -50,16 +59,26 @@ export function CategoryCarouselCard({
 
   // Track viewport changes
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
-    const handleChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    const lgMediaQuery = window.matchMedia("(min-width: 1024px)");
+    const xlMediaQuery = window.matchMedia("(min-width: 1280px)");
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    const handleLgChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    const handleXlChange = (e: MediaQueryListEvent) => setIsXL(e.matches);
+
+    lgMediaQuery.addEventListener("change", handleLgChange);
+    xlMediaQuery.addEventListener("change", handleXlChange);
+
+    return () => {
+      lgMediaQuery.removeEventListener("change", handleLgChange);
+      xlMediaQuery.removeEventListener("change", handleXlChange);
+    };
   }, []);
 
-  // Custom hover detection using mouse coordinates - check BOTH card and label
+  // Custom hover detection using mouse coordinates
+  // For side cards: check card AND label
+  // For main card: check only card (to avoid conflicts with overlaid elements)
   useEffect(() => {
-    if (!isClickable) return;
+    if (!isClickable && !isActive) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const mouseX = e.clientX;
@@ -76,9 +95,9 @@ export function CategoryCarouselCard({
           mouseY <= cardRect.bottom;
       }
 
-      // Check if mouse is within label bounding box
+      // Check if mouse is within label bounding box (only for side cards)
       let isInsideLabel = false;
-      if (labelRef.current && showLabel) {
+      if (labelRef.current && showLabel && isClickable) {
         const labelRect = labelRef.current.getBoundingClientRect();
         isInsideLabel =
           mouseX >= labelRect.left &&
@@ -92,21 +111,35 @@ export function CategoryCarouselCard({
     };
 
     // Add listener to document to track mouse globally
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [isClickable, showLabel]);
+  }, [isClickable, isActive, showLabel]);
+
+  // Notify parent about hover state changes
+  useEffect(() => {
+    // For side cards
+    if (isClickable && onSideCardHoverChange) {
+      onSideCardHoverChange(isHovered);
+    }
+    // For main card
+    if (isActive && onMainCardHoverChange) {
+      onMainCardHoverChange(isHovered);
+    }
+  }, [isHovered, isClickable, isActive, onSideCardHoverChange, onMainCardHoverChange]);
 
   // Hide active card until gridPosition is calculated (prevents flash)
   const shouldHide = isActive && !gridPosition && isFirstRender;
 
   return (
     <div
-      className={`absolute ${!isFirstRender ? "transition-all duration-[1400ms]" : ""} ${slotClasses} ${
-        isClickable ? "cursor-pointer" : ""
-      } ${shouldHide ? "opacity-0 invisible" : ""}`}
+      className={`absolute ${
+        !isFirstRender ? "transition-all duration-[1400ms]" : ""
+      } ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
+        shouldHide ? "opacity-0 invisible" : ""
+      }`}
       style={{
         zIndex,
         transform: `rotateY(${rotateY}deg)`,
@@ -117,7 +150,12 @@ export function CategoryCarouselCard({
         // Swap width/height based on orientation + 3D rotation
         // On mobile, limit horizontal cards to vertical card max width
         width: isHorizontal ? "min(70vh, 70vw)" : "70vw",
-        maxWidth: isHorizontal ? "350px" : "350px", // Same max-width for both orientations
+        // Active card: lg=300px, xl=350px; Side cards: always 350px
+        maxWidth: isHorizontal
+          ? "350px"
+          : isActive && isDesktop && !isXL
+          ? "300px"
+          : "350px",
         // Height: 50vh on mobile (< lg), 70vh on desktop (>= lg)
         height: isHorizontal ? "70vw" : isDesktop ? "70vh" : "50vh",
         maxHeight: isHorizontal ? "350px" : "450px",
@@ -131,15 +169,20 @@ export function CategoryCarouselCard({
       onClick={onClick}
     >
       {/* BOX 1: Card image wrapper with ref for hover detection */}
-      <div ref={cardRef} className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
+      <div
+        ref={cardRef}
+        className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl"
+      >
         {/* Image layer with 3D effect */}
         <div
-          className={`absolute inset-0 ${!isFirstRender ? "transition-all duration-[1400ms]" : ""}`}
+          className={`absolute inset-0 ${
+            !isFirstRender ? "transition-all duration-[1400ms]" : ""
+          }`}
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${image})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: isActive ? "blur(0)" : "blur(2px)",
+            filter: isActive ? "blur(0)" : "blur(0)",
             ...(!isFirstRender && {
               transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
             }),
@@ -154,11 +197,12 @@ export function CategoryCarouselCard({
           className="hidden lg:flex absolute -bottom-16 left-0 right-0 items-center justify-between transition-all duration-700 ease-out"
           style={{
             opacity: showLabel && !isActive ? 1 : 0,
-            transform: showLabel && !isActive
-              ? isHovered
-                ? "translateX(0.5rem)"
-                : "translateX(0)"
-              : "translateX(3rem)", // Slide from right - works for both entry scenarios
+            transform:
+              showLabel && !isActive
+                ? isHovered
+                  ? "translateX(0.5rem)"
+                  : "translateX(0)"
+                : "translateX(3rem)", // Slide from right - works for both entry scenarios
             pointerEvents: showLabel && !isActive ? "auto" : "none",
           }}
         >

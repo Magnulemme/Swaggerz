@@ -37,15 +37,18 @@ function AnimatedText({
   as?: "p" | "span" | "div";
 }) {
   const containerRef = React.useRef<HTMLParagraphElement>(null);
-  const [charsWithLines, setCharsWithLines] = React.useState<CharWithLine[]>([]);
+  const [charsWithLines, setCharsWithLines] = React.useState<CharWithLine[]>(
+    []
+  );
 
   React.useEffect(() => {
     if (!containerRef.current) return;
 
-    const spans = containerRef.current.querySelectorAll<HTMLSpanElement>(".char-span");
+    const spans =
+      containerRef.current.querySelectorAll<HTMLSpanElement>(".char-span");
 
     // First pass: detect lines and count chars per line
-    const tempChars: Omit<CharWithLine, 'charsInLine'>[] = [];
+    const tempChars: Omit<CharWithLine, "charsInLine">[] = [];
     const charsPerLine: number[] = [0];
     let currentLineIndex = 0;
     let lastY = -1;
@@ -74,7 +77,7 @@ function AnimatedText({
     });
 
     // Second pass: add charsInLine to each char
-    const chars: CharWithLine[] = tempChars.map(char => ({
+    const chars: CharWithLine[] = tempChars.map((char) => ({
       ...char,
       charsInLine: charsPerLine[char.lineIndex],
     }));
@@ -92,7 +95,12 @@ function AnimatedText({
   const targetWaveTime = 0.3;
 
   return (
-    <Component ref={containerRef as any} className={`${className} ${charsWithLines.length === 0 ? 'invisible' : ''}`}>
+    <Component
+      ref={containerRef as any}
+      className={`${className} ${
+        charsWithLines.length === 0 ? "invisible" : ""
+      }`}
+    >
       {charsWithLines.length === 0
         ? // Initial render: invisible spans for measurement (hidden but measurable)
           text.split("").map((char, i) => (
@@ -103,8 +111,13 @@ function AnimatedText({
         : // After measurement: animated spans with per-line dynamic delay
           charsWithLines.map((item, i) => {
             // Calculate delay specific to this line's length
-            const dynamicCharDelay = Math.min(targetWaveTime / item.charsInLine, 0.02); // Cap at title's delay
-            const charDelay = isExiting ? dynamicCharDelay * 0.4 : dynamicCharDelay; // Exit faster
+            const dynamicCharDelay = Math.min(
+              targetWaveTime / item.charsInLine,
+              0.02
+            ); // Cap at title's delay
+            const charDelay = isExiting
+              ? dynamicCharDelay * 0.4
+              : dynamicCharDelay; // Exit faster
 
             return (
               <span
@@ -112,7 +125,11 @@ function AnimatedText({
                 className={`inline-block ${isExiting ? "" : "opacity-0"}`}
                 style={{
                   animation: `${animationName} ${animationDuration} cubic-bezier(0.65, 0, 0.35, 1) forwards`,
-                  animationDelay: `${baseDelay + item.lineIndex * lineDelay + item.charIndex * charDelay}s`,
+                  animationDelay: `${
+                    baseDelay +
+                    item.lineIndex * lineDelay +
+                    item.charIndex * charDelay
+                  }s`,
                   willChange: "transform, opacity",
                 }}
               >
@@ -146,7 +163,7 @@ export function CarouselTitleAndInfo({
 
     const updatePosition = () => {
       // Determina quale ref usare in base al viewport
-      const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
       const activeRef = isDesktop ? desktopCardRef : mobileCardRef;
 
       if (!activeRef.current || !cardsContainerRef.current) return;
@@ -168,14 +185,20 @@ export function CarouselTitleAndInfo({
   return (
     <>
       {/* Layout MOBILE/TABLET - OPEN LAYOUT */}
-      <div className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 pointer-events-none" style={{ zIndex: 30 }}>
+      <div
+        className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 pointer-events-none"
+        style={{ zIndex: 30 }}
+      >
         {/* Immagine con Titolo Overlayed */}
-        <div className="relative" style={{
-          width: "70vw",
-          maxWidth: "350px",
-          height: "50vh",
-          maxHeight: "450px",
-        }}>
+        <div
+          className="relative"
+          style={{
+            width: "70vw",
+            maxWidth: "350px",
+            height: "50vh",
+            maxHeight: "450px",
+          }}
+        >
           {/* Fake card spacer per calcolo posizione - IDENTICA all'immagine */}
           <div
             ref={mobileCardRef}
@@ -186,9 +209,7 @@ export function CarouselTitleAndInfo({
           />
 
           {/* Immagine (nessun bordo/card wrapper) - riempie il parent */}
-          <div
-            className="absolute inset-0 rounded-2xl overflow-hidden"
-          >
+          <div className="absolute inset-0 rounded-2xl overflow-hidden">
             {/* Titolo overlayed sull'immagine */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase pointer-events-none flex items-center justify-center w-full z-10">
               {/* Previous title - sliding out upwards */}
@@ -272,7 +293,7 @@ export function CarouselTitleAndInfo({
             <div className="flex justify-center pointer-events-auto">
               <AnimatedButton
                 as="button"
-                size="sm"
+                size="lg"
                 onClick={() => {
                   console.log("Category selected:", collection.label);
                 }}
@@ -296,12 +317,11 @@ export function CarouselTitleAndInfo({
         {/* Fake card spacer - Grid position: col 1, rows 1-2 */}
         <div
           ref={desktopCardRef}
-          className="invisible pointer-events-none"
+          className="invisible pointer-events-none lg:max-w-[300px] xl:max-w-[350px]"
           style={{
             gridColumn: "1",
             gridRow: "1 / 3",
             width: "70vw",
-            maxWidth: "350px",
             height: "70vh",
             maxHeight: "450px",
           }}
@@ -385,117 +405,117 @@ export function CarouselTitleAndInfo({
 
         {/* Descrizione Desktop - Grid position: col 2, row 2 (accanto al bottom della card) */}
         <div
-          className="flex items-start justify-start pl-8 xl:pl-12"
+          className="flex items-start justify-start pl-4"
           style={{
             gridColumn: "2",
             gridRow: "2",
           }}
         >
-        <div
-          className={`
-            w-[300px] xl:w-[360px]
+          <div
+            className={`
+            w-[240px] xl:w-[300px]
             flex flex-col gap-6
             pointer-events-auto
           `}
-        >
-          {/* Collection Label */}
-          <div className="flex flex-col gap-2">
-            <div className="relative">
-              {/* Previous "Collection" label - sliding out */}
-              {isTransitioning && previousCollection && (
+          >
+            {/* Collection Label */}
+            <div className="flex flex-col gap-2">
+              <div className="relative">
+                {/* Previous "Collection" label - sliding out */}
+                {isTransitioning && previousCollection && (
+                  <AnimatedText
+                    key={`collection-exit-${previousCollection.label}`}
+                    text="Collection"
+                    animationKey={`collection-${previousCollection.label}`}
+                    isExiting={true}
+                    as="span"
+                    className="absolute text-white/40 text-xs font-light uppercase tracking-[0.3em]"
+                  />
+                )}
+
+                {/* Current "Collection" label - sliding in */}
                 <AnimatedText
-                  key={`collection-exit-${previousCollection.label}`}
+                  key={`collection-enter-${collection.label}`}
                   text="Collection"
-                  animationKey={`collection-${previousCollection.label}`}
-                  isExiting={true}
+                  animationKey={`collection-${collection.label}`}
+                  isExiting={false}
                   as="span"
-                  className="absolute text-white/40 text-xs font-light uppercase tracking-[0.3em]"
+                  className="text-white/40 text-xs font-light uppercase tracking-[0.3em]"
                 />
-              )}
-
-              {/* Current "Collection" label - sliding in */}
-              <AnimatedText
-                key={`collection-enter-${collection.label}`}
-                text="Collection"
-                animationKey={`collection-${collection.label}`}
-                isExiting={false}
-                as="span"
-                className="text-white/40 text-xs font-light uppercase tracking-[0.3em]"
-              />
+              </div>
+              <div className="h-px w-12 bg-gradient-to-r from-white/30 to-transparent" />
             </div>
-            <div className="h-px w-12 bg-gradient-to-r from-white/30 to-transparent" />
-          </div>
 
-          {/* Description - Letters wave, lines together */}
-          {collection.description && (
-            <div className="relative min-h-[80px]">
-              {/* Previous description - sliding out upwards */}
-              {isTransitioning && previousCollection?.description && (
+            {/* Description - Letters wave, lines together */}
+            {collection.description && (
+              <div className="relative min-h-[80px]">
+                {/* Previous description - sliding out upwards */}
+                {isTransitioning && previousCollection?.description && (
+                  <AnimatedDescription
+                    key={`desc-exit-${previousCollection.label}`}
+                    text={previousCollection.description}
+                    animationKey={previousCollection.label}
+                    isExiting={true}
+                    className="absolute text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
+                  />
+                )}
+
+                {/* Current description - sliding in from bottom */}
                 <AnimatedDescription
-                  key={`desc-exit-${previousCollection.label}`}
-                  text={previousCollection.description}
-                  animationKey={previousCollection.label}
-                  isExiting={true}
-                  className="absolute text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
+                  key={`desc-enter-${collection.label}`}
+                  text={collection.description}
+                  animationKey={collection.label}
+                  isExiting={false}
+                  className="text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
                 />
-              )}
+              </div>
+            )}
 
-              {/* Current description - sliding in from bottom */}
-              <AnimatedDescription
-                key={`desc-enter-${collection.label}`}
-                text={collection.description}
-                animationKey={collection.label}
-                isExiting={false}
-                className="text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
-              />
-            </div>
-          )}
+            {/* Item Count - Minimal Style */}
+            {collection.itemCount && (
+              <div className="flex items-baseline gap-3 pt-2 relative">
+                {/* Previous item count - sliding out */}
+                {isTransitioning && previousCollection?.itemCount && (
+                  <>
+                    <AnimatedText
+                      key={`count-exit-${previousCollection.label}`}
+                      text={String(previousCollection.itemCount)}
+                      animationKey={`count-${previousCollection.label}`}
+                      isExiting={true}
+                      as="span"
+                      className="absolute text-white text-4xl xl:text-5xl font-extralight tabular-nums"
+                    />
+                    <AnimatedText
+                      key={`items-exit-${previousCollection.label}`}
+                      text="Items"
+                      animationKey={`items-${previousCollection.label}`}
+                      isExiting={true}
+                      as="span"
+                      className="absolute left-[120px] xl:left-[150px] text-white/40 text-xs font-light uppercase tracking-[0.2em]"
+                    />
+                  </>
+                )}
 
-          {/* Item Count - Minimal Style */}
-          {collection.itemCount && (
-            <div className="flex items-baseline gap-3 pt-2 relative">
-              {/* Previous item count - sliding out */}
-              {isTransitioning && previousCollection?.itemCount && (
-                <>
-                  <AnimatedText
-                    key={`count-exit-${previousCollection.label}`}
-                    text={String(previousCollection.itemCount)}
-                    animationKey={`count-${previousCollection.label}`}
-                    isExiting={true}
-                    as="span"
-                    className="absolute text-white text-4xl xl:text-5xl font-extralight tabular-nums"
-                  />
-                  <AnimatedText
-                    key={`items-exit-${previousCollection.label}`}
-                    text="Items"
-                    animationKey={`items-${previousCollection.label}`}
-                    isExiting={true}
-                    as="span"
-                    className="absolute left-[120px] xl:left-[150px] text-white/40 text-xs font-light uppercase tracking-[0.2em]"
-                  />
-                </>
-              )}
-
-              {/* Current item count - sliding in */}
-              <AnimatedText
-                key={`count-enter-${collection.label}`}
-                text={String(collection.itemCount)}
-                animationKey={`count-${collection.label}`}
-                isExiting={false}
-                as="span"
-                className="text-white text-4xl xl:text-5xl font-extralight tabular-nums"
-              />
-              <AnimatedText
-                key={`items-enter-${collection.label}`}
-                text="Items"
-                animationKey={`items-${collection.label}`}
-                isExiting={false}
-                as="span"
-                className="text-white/40 text-xs font-light uppercase tracking-[0.2em]"
-              />
-            </div>
-          )}
-        </div>
+                {/* Current item count - sliding in */}
+                <AnimatedText
+                  key={`count-enter-${collection.label}`}
+                  text={String(collection.itemCount)}
+                  animationKey={`count-${collection.label}`}
+                  isExiting={false}
+                  as="span"
+                  className="text-white text-4xl xl:text-5xl font-extralight tabular-nums"
+                />
+                <AnimatedText
+                  key={`items-enter-${collection.label}`}
+                  text="Items"
+                  animationKey={`items-${collection.label}`}
+                  isExiting={false}
+                  as="span"
+                  className="text-white/40 text-xs font-light uppercase tracking-[0.2em]"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

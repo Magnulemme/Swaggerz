@@ -31,6 +31,8 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     top: number;
   } | null>(null);
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isMainCardHovered, setIsMainCardHovered] = useState(false);
+  const [isSideCardHovered, setIsSideCardHovered] = useState(false);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   const goToPrev = () => {
@@ -135,9 +137,9 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Autoplay
+  // Autoplay - stop durante hover
   useEffect(() => {
-    if (!autoplayEnabled) return;
+    if (!autoplayEnabled || isMainCardHovered || isSideCardHovered) return;
 
     const interval = setInterval(() => {
       if (!document.hidden && !isTransitioning) {
@@ -154,7 +156,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     }, CAROUSEL_TIMINGS.AUTOPLAY_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [autoplayEnabled, isTransitioning, autoplayKey, activeIndex]);
+  }, [autoplayEnabled, isTransitioning, autoplayKey, activeIndex, isMainCardHovered, isSideCardHovered]);
 
   return (
     <div className={`relative w-full ${className}`}>
@@ -183,7 +185,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
         {/* Cards container with 3D context */}
         <div
           ref={cardsContainerRef}
-          className="relative flex items-center justify-center gap-8 h-auto min-h-[80vh] lg:h-[80vh] lg:max-h-[500px] cursor-grab active:cursor-grabbing"
+          className="relative flex items-center justify-center gap-8 h-auto min-h-[80vh] lg:h-[80vh] lg:max-h-[500px] cursor-grab active:cursor-grabbing mx-auto max-w-[1600px]"
           style={{
             perspective: "2000px",
             transformStyle: "preserve-3d",
@@ -217,14 +219,14 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
             } else if (diff === CATEGORY_CARDS.length - 1 || diff === -1) {
               // This is prev (left visible) - rotated + horizontal dimensions + più piccola e spostata
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-60 md:opacity-70 lg:opacity-85";
+                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
               rotateY = 50; // Angolo più pronunciato
               isHorizontal = true;
             } else if (diff === 1) {
               // This is next (right visible) - rotated + horizontal dimensions + più piccola e spostata
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-60 md:opacity-70 lg:opacity-85";
+                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
               rotateY = -50; // Angolo più pronunciato (direzione opposta)
               isHorizontal = true;
@@ -275,6 +277,8 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
                 onClick={handleCardClick}
                 gridPosition={diff === 0 ? gridCardPosition : null}
                 isFirstRender={isFirstRender}
+                onMainCardHoverChange={setIsMainCardHovered}
+                onSideCardHoverChange={setIsSideCardHovered}
               />
             );
           })}
