@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCarouselStore } from "@/store/useCarouselStore";
 
 interface CategoryCarouselCardProps {
@@ -47,99 +48,23 @@ export function CategoryCarouselCard({
     typeof window !== "undefined" &&
       window.matchMedia("(min-width: 1280px)").matches
   );
-  const [showLabel, setShowLabel] = useState(false);
-  const [isLabelExiting, setIsLabelExiting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
-
-  // Refs for guards - prevent re-execution within same phase
-  const lastPhaseRef = useRef<string>('idle');
-  const hasProcessedExitRef = useRef(false);
 
   // Determine if this is left or right card based on rotateY
   const isLeftCard = rotateY < 0;
   const isRightCard = rotateY > 0;
 
-  const { currentPhase, cardPositions, previousCardPositions } = useCarouselStore();
+  const { cardPositions, currentPhase } = useCarouselStore();
 
-  // Get current and previous positions from store
+  // Get current position from store
   const currentPosition = cardPositions.get(cardIndex) || null;
-  const previousPosition = previousCardPositions.get(cardIndex) || null;
 
-  // useEffect #1: Handle exitPhase - trigger exit animation for cards that were prev/next
-  useEffect(() => {
-    if (currentPhase !== 'exitPhase') return;
+  // Only render label for prev/next cards (not active or hidden)
+  const shouldRenderLabel = currentPosition === 'prev' || currentPosition === 'next';
 
-    // Guard: prevent multiple executions in same phase
-    if (lastPhaseRef.current === 'exitPhase' && hasProcessedExitRef.current) {
-      return;
-    }
-
-    // Mark that we've entered exit phase
-    lastPhaseRef.current = 'exitPhase';
-
-    // Only cards that WERE prev/next should have exit animation
-    if (previousPosition === 'prev' || previousPosition === 'next') {
-      console.log(`🚪 EXIT - Card ${cardIndex} (${label})`);
-      setIsLabelExiting(true);
-      hasProcessedExitRef.current = true;
-
-      const timer = setTimeout(() => {
-        setShowLabel(false);
-        setIsLabelExiting(false);
-      }, 400);
-
-      return () => clearTimeout(timer);
-    } else {
-      // Other cards: hide without animation
-      setShowLabel(false);
-      setIsLabelExiting(false);
-    }
-  }, [currentPhase, previousPosition, cardIndex, label]);
-
-  // useEffect #2: Handle centerContentPhase - reset all states
-  useEffect(() => {
-    if (currentPhase !== 'centerContentPhase') return;
-
-    lastPhaseRef.current = 'centerContentPhase';
-    hasProcessedExitRef.current = false; // Reset exit guard for next transition
-
-    setShowLabel(false);
-    setIsLabelExiting(false);
-  }, [currentPhase]);
-
-  // useEffect #3: Handle sideLabelsPhase - show labels for prev/next cards
-  useEffect(() => {
-    if (currentPhase !== 'sideLabelsPhase') return;
-
-    lastPhaseRef.current = 'sideLabelsPhase';
-
-    if (currentPosition === 'prev' || currentPosition === 'next') {
-      // Show label with entry animation
-      console.log(`✅ PHASE 3 ENTRY - Card ${cardIndex} (${label}) - Setting showLabel=true, isLabelExiting=false`);
-      setShowLabel(true);
-      setIsLabelExiting(false);
-    } else {
-      // Active/hidden cards: ensure label is hidden
-      setShowLabel(false);
-      setIsLabelExiting(false);
-    }
-  }, [currentPhase, currentPosition, cardIndex, label]);
-
-  // useEffect #4: Handle idle - maintain label visibility for prev/next
-  useEffect(() => {
-    if (currentPhase !== 'idle') return;
-
-    lastPhaseRef.current = 'idle';
-
-    if (currentPosition === 'prev' || currentPosition === 'next') {
-      setShowLabel(true);
-      setIsLabelExiting(false);
-    } else {
-      setShowLabel(false);
-      setIsLabelExiting(false);
-    }
-  }, [currentPhase, currentPosition]);
+  // Show animation only when transition is complete
+  const isTransitioning = currentPhase === 'transitioning';
 
   // Track viewport changes
   useEffect(() => {
@@ -184,7 +109,7 @@ export function CategoryCarouselCard({
 
       // Check if mouse is within label bounding box (only for side cards)
       let isInsideLabel = false;
-      if (labelRef.current && showLabel && isClickable) {
+      if (labelRef.current && shouldRenderLabel && isClickable) {
         const labelRect = labelRef.current.getBoundingClientRect();
         isInsideLabel =
           mouseX >= labelRect.left &&
@@ -203,7 +128,7 @@ export function CategoryCarouselCard({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [isClickable, isActive, showLabel]);
+  }, [isClickable, isActive, shouldRenderLabel]);
 
   // Notify parent about hover state changes
   useEffect(() => {
@@ -278,73 +203,64 @@ export function CategoryCarouselCard({
       </div>
 
       {/* BOX 2: Label below card with ref for hover detection */}
-      {(showLabel || isLabelExiting) && (
-        <div
-          ref={labelRef}
-          className="hidden md:flex absolute -bottom-16 left-0 right-0 items-center"
-          style={{
-            pointerEvents: showLabel && !isActive ? "auto" : "none",
-            // Layout logic:
-            // xl+: space-between (arrow far from text)
-            // lg: flex-start for both cards (arrow next to text, aligned left)
-            // md (tablet): flex-start for left card, flex-end for right card
-            justifyContent: isXL
-              ? "space-between"
-              : isLG
-              ? "flex-start"
-              : isLeftCard
-              ? "flex-start"
-              : "flex-end",
-            gap: isXL ? "0" : "0.75rem",
-          }}
-        >
-          <h3
-            className={`font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg transition-colors duration-300 ${
-              isHovered ? "text-brand" : "text-white/90"
-            }`}
-          >
-            {label.split("").map((char, i) => {
-              // Log when rendering with exit animation during phase 3
-              if (i === 0 && isLabelExiting && currentPhase === 'sideLabelsPhase') {
-                console.log(`🔴 RENDERING EXIT ANIMATION IN PHASE 3! Card ${cardIndex} (${label})`);
-              }
-              return (
-                <span
-                  key={i}
-                  className="inline-block"
-                  style={{
-                    animationName: isLabelExiting ? 'slideUpOut' : 'slideUpIn',
-                    animationDuration: isLabelExiting ? '0.3s' : '0.8s',
-                    animationTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)',
-                    animationFillMode: 'forwards',
-                    animationDelay: `${i * 0.02}s`,
-                    willChange: "transform, opacity",
-                  }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              );
-            })}
-          </h3>
-          <div
-            className={`text-3xl xl:text-4xl transition-all duration-300 ${
-              isHovered
-                ? "text-brand translate-x-2"
-                : "text-white/70 translate-x-0"
-            }`}
+      <AnimatePresence>
+        {shouldRenderLabel && (
+          <motion.div
+            key={`${cardIndex}-${currentPosition}`}
+            ref={labelRef}
+            className="hidden md:flex absolute -bottom-16 left-0 right-0 items-center"
             style={{
-              animationName: isLabelExiting ? 'slideUpOut' : 'slideUpIn',
-              animationDuration: isLabelExiting ? '0.3s' : '0.8s',
-              animationTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)',
-              animationFillMode: 'forwards',
-              animationDelay: isLabelExiting ? '0s' : `${label.length * 0.02 + 0.05}s`,
-              willChange: "transform, opacity",
+              pointerEvents: !isActive ? "auto" : "none",
+              justifyContent: isXL
+                ? "space-between"
+                : isLG
+                ? "flex-start"
+                : isLeftCard
+                ? "flex-start"
+                : "flex-end",
+              gap: isXL ? "0" : "0.75rem",
             }}
           >
-            →
-          </div>
-        </div>
-      )}
+            <h3
+              className="font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg"
+            >
+              {[...label.split(""), "→"].map((char, i) => {
+                const isArrow = char === "→";
+                return (
+                  <motion.span
+                    key={`${cardIndex}-${currentPosition}-${i}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={
+                      isTransitioning
+                        ? { opacity: 0, y: 20 }
+                        : { opacity: 1, y: 0 }
+                    }
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{
+                      duration: isTransitioning ? 0 : 0.8,
+                      delay: isTransitioning ? 0 : i * 0.02,
+                      ease: [0.65, 0, 0.35, 1],
+                    }}
+                    className={
+                      isArrow
+                        ? `inline-block text-3xl xl:text-4xl ml-3 transition-colors duration-300 ${
+                            isHovered
+                              ? "text-brand"
+                              : "text-white/70"
+                          }`
+                        : `inline-block transition-colors duration-300 ${
+                            isHovered ? "text-brand" : "text-white/90"
+                          }`
+                    }
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </motion.span>
+                );
+              })}
+            </h3>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

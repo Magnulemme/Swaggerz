@@ -21,14 +21,12 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
   const {
     currentPhase,
     startTransition,
-    enterCenterContentPhase,
-    enterSideLabelsPhase,
     endTransition,
     initializePositions,
   } = useCarouselStore();
   const [activeIndex, setActiveIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(0);
-  const isTransitioning = currentPhase !== "idle";
+  const isTransitioning = currentPhase === "transitioning";
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
   const [autoplayKey, setAutoplayKey] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -69,25 +67,15 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
       activeIndex === 0 ? CATEGORY_CARDS.length - 1 : activeIndex - 1;
     setActiveIndex(newIndex);
 
-    // Phase 1: Start exit animations + card movement
-    startTransition(CATEGORY_CARDS.length, newIndex);
+    // Start transition - Framer Motion handles animations automatically
+    startTransition(newIndex);
 
-    // Phase 2: Center content starts appearing (during phase 1)
+    // End transition and re-enable autoplay
     setTimeout(() => {
-      enterCenterContentPhase();
-    }, 600); // Title exit animation completes, new title starts
-
-    // Phase 3: Cards have finished moving, show side labels
-    setTimeout(() => {
-      enterSideLabelsPhase();
+      endTransition();
       setAutoplayEnabled(true);
       setAutoplayKey((prev) => prev + 1);
     }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
-
-    // End: Back to idle
-    setTimeout(() => {
-      endTransition();
-    }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
   };
 
   const goToNext = () => {
@@ -99,25 +87,15 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
       activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
     setActiveIndex(newIndex);
 
-    // Phase 1: Start exit animations + card movement
-    startTransition(CATEGORY_CARDS.length, newIndex);
+    // Start transition - Framer Motion handles animations automatically
+    startTransition(newIndex);
 
-    // Phase 2: Center content starts appearing (during phase 1)
+    // End transition and re-enable autoplay
     setTimeout(() => {
-      enterCenterContentPhase();
-    }, 600); // Title exit animation completes, new title starts
-
-    // Phase 3: Cards have finished moving, show side labels
-    setTimeout(() => {
-      enterSideLabelsPhase();
+      endTransition();
       setAutoplayEnabled(true);
       setAutoplayKey((prev) => prev + 1);
     }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
-
-    // End: Back to idle
-    setTimeout(() => {
-      endTransition();
-    }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
   };
 
   // Swipe handlers
@@ -216,24 +194,14 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
           activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
         setActiveIndex(newIndex);
 
-        // Phase 1: Start exit animations + card movement
-        startTransition(CATEGORY_CARDS.length, newIndex);
+        // Start transition - Framer Motion handles animations automatically
+        startTransition(newIndex);
 
-        // Phase 2: Center content starts appearing (during phase 1)
-        setTimeout(() => {
-          enterCenterContentPhase();
-        }, 600);
-
-        // Phase 3: Cards have finished moving, show side labels
-        setTimeout(() => {
-          enterSideLabelsPhase();
-          setAutoplayKey((prev) => prev + 1);
-        }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
-
-        // End: Back to idle
+        // End transition
         setTimeout(() => {
           endTransition();
-        }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
+          setAutoplayKey((prev) => prev + 1);
+        }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
       }
     }, CAROUSEL_TIMINGS.AUTOPLAY_INTERVAL);
 
