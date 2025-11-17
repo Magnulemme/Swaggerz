@@ -26,7 +26,7 @@ export interface CategoryCard {
 // Carousel animation constants
 export const CAROUSEL_TIMINGS = {
   TRANSITION_DURATION: 1400, // ms - Card transition duration
-  AUTOPLAY_INTERVAL: 2000, // ms - Time between auto transitions (velocizzato per testing)
+  AUTOPLAY_INTERVAL: 5000, // ms - Time between auto transitions (5s = 1.5s transition + 3.5s pause)
   TEXT_ENTER_DURATION: 0.8, // seconds - Title slide in duration
   TEXT_EXIT_DURATION: 0.6, // seconds - Title slide out duration
   TEXT_INITIAL_DELAY: 0.6, // seconds - Delay before text starts entering

@@ -10,7 +10,7 @@ export function CarouselControls({
   disabled,
 }: CarouselControlsProps) {
   return (
-    <div className="hidden md:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6">
+    <div className="hidden lg:flex px-md md:px-lg lg:px-xl xl:px-2xl justify-end gap-3 mb-8 mt-6">
       <button
         onClick={onNext}
         disabled={disabled}

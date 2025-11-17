@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CategoryCarouselCard } from "./CategoryCarouselCard";
-import { CarouselControls } from "./CarouselControls";
 import { CarouselBackground } from "./CarouselBackground";
 import { CarouselTitleAndInfo } from "./CarouselTitleAndInfo";
 import { SectionTitle } from "../SectionTitle";
+import { useCarouselStore } from "@/store/useCarouselStore";
 import {
   CATEGORY_CARDS,
   CAROUSEL_TIMINGS,
@@ -18,9 +18,17 @@ interface HeroCategoriesProps {
 }
 
 export function HeroCategories({ className = "" }: HeroCategoriesProps) {
+  const {
+    currentPhase,
+    startTransition,
+    enterCenterContentPhase,
+    enterSideLabelsPhase,
+    endTransition,
+    initializePositions,
+  } = useCarouselStore();
   const [activeIndex, setActiveIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isTransitioning = currentPhase !== "idle";
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
   const [autoplayKey, setAutoplayKey] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -33,36 +41,83 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [isMainCardHovered, setIsMainCardHovered] = useState(false);
   const [isSideCardHovered, setIsSideCardHovered] = useState(false);
+
+  // Wrap setGridCardPosition in useCallback to prevent unnecessary re-renders
+  const handleCardPositionCalculated = useCallback((position: { left: number; top: number }) => {
+    setGridCardPosition(position);
+  }, []);
+  const [isTouchDevice, setIsTouchDevice] = useState(
+    typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches
+  );
+  const [mobileContentHeight, setMobileContentHeight] = useState<number | null>(
+    null
+  );
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Initialize card positions on mount
+  useEffect(() => {
+    initializePositions(CATEGORY_CARDS.length, 0);
+  }, [initializePositions]);
 
   const goToPrev = () => {
     if (isTransitioning) return;
-    setIsTransitioning(true);
+
     setAutoplayEnabled(false);
     setPreviousIndex(activeIndex);
-    setActiveIndex((prev) =>
-      prev === 0 ? CATEGORY_CARDS.length - 1 : prev - 1
-    );
+    const newIndex =
+      activeIndex === 0 ? CATEGORY_CARDS.length - 1 : activeIndex - 1;
+    setActiveIndex(newIndex);
+
+    // Phase 1: Start exit animations + card movement
+    startTransition(CATEGORY_CARDS.length, newIndex);
+
+    // Phase 2: Center content starts appearing (during phase 1)
     setTimeout(() => {
-      setIsTransitioning(false);
+      enterCenterContentPhase();
+    }, 600); // Title exit animation completes, new title starts
+
+    // Phase 3: Cards have finished moving, show side labels
+    setTimeout(() => {
+      enterSideLabelsPhase();
       setAutoplayEnabled(true);
       setAutoplayKey((prev) => prev + 1);
     }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
+
+    // End: Back to idle
+    setTimeout(() => {
+      endTransition();
+    }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
   };
 
   const goToNext = () => {
     if (isTransitioning) return;
-    setIsTransitioning(true);
+
     setAutoplayEnabled(false);
     setPreviousIndex(activeIndex);
-    setActiveIndex((prev) =>
-      prev === CATEGORY_CARDS.length - 1 ? 0 : prev + 1
-    );
+    const newIndex =
+      activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
+    setActiveIndex(newIndex);
+
+    // Phase 1: Start exit animations + card movement
+    startTransition(CATEGORY_CARDS.length, newIndex);
+
+    // Phase 2: Center content starts appearing (during phase 1)
     setTimeout(() => {
-      setIsTransitioning(false);
+      enterCenterContentPhase();
+    }, 600); // Title exit animation completes, new title starts
+
+    // Phase 3: Cards have finished moving, show side labels
+    setTimeout(() => {
+      enterSideLabelsPhase();
       setAutoplayEnabled(true);
       setAutoplayKey((prev) => prev + 1);
     }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
+
+    // End: Back to idle
+    setTimeout(() => {
+      endTransition();
+    }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
   };
 
   // Swipe handlers
@@ -128,6 +183,17 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
     }
   };
 
+  // Detect touch device capability
+  useEffect(() => {
+    const pointerMediaQuery = window.matchMedia("(pointer: coarse)");
+    const handlePointerChange = (e: MediaQueryListEvent) =>
+      setIsTouchDevice(e.matches);
+
+    pointerMediaQuery.addEventListener("change", handlePointerChange);
+    return () =>
+      pointerMediaQuery.removeEventListener("change", handlePointerChange);
+  }, []);
+
   // Disable first render flag after mount
   useEffect(() => {
     // Enable transitions after first render
@@ -139,24 +205,49 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
 
   // Autoplay - stop durante hover
   useEffect(() => {
-    if (!autoplayEnabled || isMainCardHovered || isSideCardHovered) return;
+    if (!autoplayEnabled || isMainCardHovered || isSideCardHovered || isTransitioning) {
+      return;
+    }
 
     const interval = setInterval(() => {
-      if (!document.hidden && !isTransitioning) {
-        setIsTransitioning(true);
+      if (!document.hidden) {
         setPreviousIndex(activeIndex);
-        setActiveIndex((prev) =>
-          prev === CATEGORY_CARDS.length - 1 ? 0 : prev + 1
-        );
+        const newIndex =
+          activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
+        setActiveIndex(newIndex);
+
+        // Phase 1: Start exit animations + card movement
+        startTransition(CATEGORY_CARDS.length, newIndex);
+
+        // Phase 2: Center content starts appearing (during phase 1)
         setTimeout(() => {
-          setIsTransitioning(false);
+          enterCenterContentPhase();
+        }, 600);
+
+        // Phase 3: Cards have finished moving, show side labels
+        setTimeout(() => {
+          enterSideLabelsPhase();
           setAutoplayKey((prev) => prev + 1);
         }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
+
+        // End: Back to idle
+        setTimeout(() => {
+          endTransition();
+        }, CAROUSEL_TIMINGS.TRANSITION_DURATION + 100);
       }
     }, CAROUSEL_TIMINGS.AUTOPLAY_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [autoplayEnabled, isTransitioning, autoplayKey, activeIndex, isMainCardHovered, isSideCardHovered]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    autoplayEnabled,
+    isTransitioning,
+    activeIndex,
+    isMainCardHovered,
+    isSideCardHovered,
+    // Note: autoplayKey is intentionally NOT in deps - it's used to force re-mount when needed
+    // Note: Zustand store functions (startTransition, etc.) are stable and don't need to be in deps
+  ]);
 
   return (
     <div className={`relative w-full ${className}`}>
@@ -170,32 +261,35 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
         />
       </div>
 
-      {/* Controlli navigazione */}
-      <CarouselControls
-        onNext={goToNext}
-        onPrev={goToPrev}
-        disabled={isTransitioning}
-      />
-
       {/* Custom Carousel - Universale per tutti i dispositivi */}
-      <div className="relative w-full py-8 overflow-hidden" data-lenis-prevent>
+      <div
+        className={`relative w-full py-4 overflow-hidden ${
+          !isTouchDevice ? "cursor-grab active:cursor-grabbing" : ""
+        }`}
+        data-lenis-prevent
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        {...(!isTouchDevice && {
+          onMouseDown: handleMouseDown,
+          onMouseMove: handleMouseMove,
+          onMouseUp: handleMouseUp,
+        })}
+      >
         {/* Background parallax blur - solo desktop */}
         <CarouselBackground imageUrl={CATEGORY_CARDS[activeIndex].image} />
 
         {/* Cards container with 3D context */}
         <div
           ref={cardsContainerRef}
-          className="relative flex items-center justify-center gap-8 h-auto min-h-[80vh] lg:h-[80vh] lg:max-h-[500px] cursor-grab active:cursor-grabbing mx-auto max-w-[1600px]"
+          className="relative flex items-center justify-center gap-8 lg:py-8 mx-auto max-w-[1600px] lg:h-[80vh] lg:max-h-[600px]"
           style={{
             perspective: "2000px",
             transformStyle: "preserve-3d",
+            minHeight: mobileContentHeight
+              ? `${mobileContentHeight}px`
+              : "50vh",
           }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
         >
           {/* Render only side cards (prev/next), active card is in grid */}
           {CATEGORY_CARDS.map((card, index) => {
@@ -253,7 +347,8 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
             }
 
             // Determine if this card is clickable (prev or next)
-            const isClickable = diff === CATEGORY_CARDS.length - 1 || diff === 1;
+            const isClickable =
+              diff === CATEGORY_CARDS.length - 1 || diff === 1;
             const handleCardClick = () => {
               if (!isClickable || isTransitioning) return;
               if (diff === CATEGORY_CARDS.length - 1) {
@@ -266,6 +361,7 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
             return (
               <CategoryCarouselCard
                 key={index}
+                cardIndex={index}
                 image={card.image}
                 label={card.label}
                 slotClasses={slotClasses}
@@ -299,7 +395,8 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
               ? CATEGORY_CARDS[previousIndex]
               : undefined
           }
-          onCardPositionCalculated={setGridCardPosition}
+          onCardPositionCalculated={handleCardPositionCalculated}
+          onMobileContentHeightCalculated={setMobileContentHeight}
           cardsContainerRef={cardsContainerRef}
           isFirstRender={isFirstRender}
         />

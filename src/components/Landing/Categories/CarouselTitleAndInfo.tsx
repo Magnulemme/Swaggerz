@@ -9,6 +9,7 @@ interface CarouselTitleAndInfoProps {
   collection: CategoryCard;
   previousCollection?: CategoryCard;
   onCardPositionCalculated?: (position: { left: number; top: number }) => void;
+  onMobileContentHeightCalculated?: (height: number) => void;
   cardsContainerRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -151,11 +152,13 @@ export function CarouselTitleAndInfo({
   collection,
   previousCollection,
   onCardPositionCalculated,
+  onMobileContentHeightCalculated,
   cardsContainerRef,
 }: CarouselTitleAndInfoProps) {
   // Ref condiviso per mobile e desktop
   const mobileCardRef = useRef<HTMLDivElement>(null);
   const desktopCardRef = useRef<HTMLDivElement>(null);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
 
   // Use useLayoutEffect to calculate position BEFORE paint (sync)
   React.useLayoutEffect(() => {
@@ -171,22 +174,56 @@ export function CarouselTitleAndInfo({
       const fakeCardRect = activeRef.current.getBoundingClientRect();
       const containerRect = cardsContainerRef.current.getBoundingClientRect();
 
-      onCardPositionCalculated({
+      // Su mobile: la fake card è dentro mobileContainerRef che è centrato rispetto al cardsContainer
+      // Dobbiamo calcolare la posizione della card rispetto al cards container, non rispetto al mobile container
+      const position = {
         left: fakeCardRect.left - containerRect.left + fakeCardRect.width / 2,
         top: fakeCardRect.top - containerRect.top + fakeCardRect.height / 2,
+      };
+
+      console.log('📍 Position calculated:', {
+        isDesktop,
+        fakeCardTop: fakeCardRect.top,
+        containerTop: containerRect.top,
+        fakeCardHeight: fakeCardRect.height,
+        calculatedTop: position.top,
+        fakeCardRect,
+        containerRect,
       });
+
+      onCardPositionCalculated(position);
     };
 
     updatePosition();
     window.addEventListener("resize", updatePosition);
     return () => window.removeEventListener("resize", updatePosition);
-  }, [onCardPositionCalculated, cardsContainerRef]);
+  }, [onCardPositionCalculated, cardsContainerRef, collection.label]);
+
+  // Calculate mobile content height
+  React.useLayoutEffect(() => {
+    if (!onMobileContentHeightCalculated) return;
+
+    const updateMobileHeight = () => {
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+
+      // Only calculate for mobile/tablet
+      if (isDesktop || !mobileContainerRef.current) return;
+
+      const height = mobileContainerRef.current.offsetHeight;
+      onMobileContentHeightCalculated(height);
+    };
+
+    updateMobileHeight();
+    window.addEventListener("resize", updateMobileHeight);
+    return () => window.removeEventListener("resize", updateMobileHeight);
+  }, [onMobileContentHeightCalculated, collection]);
 
   return (
     <>
       {/* Layout MOBILE/TABLET - OPEN LAYOUT */}
       <div
-        className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6 pointer-events-none"
+        ref={mobileContainerRef}
+        className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
         style={{ zIndex: 30 }}
       >
         {/* Immagine con Titolo Overlayed */}
@@ -202,7 +239,7 @@ export function CarouselTitleAndInfo({
           {/* Fake card spacer per calcolo posizione - IDENTICA all'immagine */}
           <div
             ref={mobileCardRef}
-            className="absolute inset-0 invisible pointer-events-none"
+            className="absolute inset-0 pointer-events-none"
             style={{
               zIndex: -1,
             }}
@@ -262,10 +299,10 @@ export function CarouselTitleAndInfo({
         {/* Descrizione + Button (PIÙ LARGHI dell'immagine) */}
         {collection.description && (
           <div
-            className="flex flex-col gap-4 items-center px-4"
+            className="flex flex-col gap-4 items-center px-4 pt-8 pointer-events-none"
             style={{
-              width: "90vw",
-              maxWidth: "500px",
+              width: "80vw",
+              maxWidth: "400px",
             }}
           >
             {/* Descrizione */}
