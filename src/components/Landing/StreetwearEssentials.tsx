@@ -9,9 +9,9 @@ const CollectionsSection = dynamic(() =>
     default: mod.CollectionsSection,
   }))
 );
-const HeroCategories = dynamic(() =>
-  import("./Categories/HeroCategories").then((mod) => ({
-    default: mod.HeroCategories,
+const HeroCategoriesCarousel = dynamic(() =>
+  import("./Categories/HeroCategoriesCarousel").then((mod) => ({
+    default: mod.HeroCategoriesCarousel,
   }))
 );
 const BannerAndFeaturedProductWithTitle = dynamic(
@@ -32,7 +32,7 @@ export function StreetwearEssentials() {
 
       {/* Categories Section - Gallery */}
       <div className="relative w-full z-[60]">
-        <HeroCategories />
+        <HeroCategoriesCarousel />
       </div>
       <BannerAndFeaturedProductWithTitle />
     </div>

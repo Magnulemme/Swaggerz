@@ -9,7 +9,7 @@ interface CarouselTitleAndInfoProps {
   collection: CategoryCard;
   previousCollection?: CategoryCard;
   onCardPositionCalculated?: (position: { left: number; top: number }) => void;
-  cardsContainerRef: React.RefObject<HTMLDivElement>;
+  cardsContainerRef: React.RefObject<HTMLDivElement | null>;
   isFirstRender?: boolean;
   isXL: boolean;
 }

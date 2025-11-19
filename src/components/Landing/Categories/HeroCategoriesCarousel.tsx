@@ -12,12 +12,12 @@ import {
   type ImageConfig,
 } from "./categories.constants";
 
-interface HeroCategoriesProps {
+interface HeroCategoriesCarouselProps {
   images?: ImageConfig[];
   className?: string;
 }
 
-export function HeroCategories({ className = "" }: HeroCategoriesProps) {
+export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouselProps) {
   const {
     currentPhase,
     startTransition,
@@ -298,14 +298,14 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
             } else if (diff === CATEGORY_CARDS.length - 1 || diff === -1) {
               // This is prev (left visible) - rotated + horizontal dimensions + più piccola e spostata
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6]";
+                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
               rotateY = 50; // Angolo più pronunciato
               isHorizontal = true;
             } else if (diff === 1) {
               // This is next (right visible) - rotated + horizontal dimensions + più piccola e spostata
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6]";
+                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
               rotateY = -50; // Angolo più pronunciato (direzione opposta)
               isHorizontal = true;
