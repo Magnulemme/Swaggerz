@@ -20,7 +20,7 @@ const BannerAndFeaturedProductWithTitle = dynamic(
 
 export function StreetwearEssentials() {
   return (
-    <div className="relative h-full w-full bg-zinc-950 pt-xl">
+    <div className="relative h-full w-full bg-zinc-950 pt-xl overflow-x-clip">
       {/* Animated Gradient Blobs Background - Lazy loaded */}
       <LazyScrollingGradientBlobs />
 
