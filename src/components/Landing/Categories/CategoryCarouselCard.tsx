@@ -190,7 +190,7 @@ export function CategoryCarouselCard({
             !isFirstRender ? "transition-all duration-[1400ms]" : ""
           }`}
           style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${image})`,
+            backgroundImage: `url(${image})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter: isActive ? "blur(0)" : "blur(0)",
