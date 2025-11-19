@@ -27,7 +27,7 @@ export function CollectionCardWrapper({
   imageUrl,
   index,
   isLast,
-  isFirstCard,
+  isFirstCard: _isFirstCard,
   layout,
   globalScrollProgress,
   range,

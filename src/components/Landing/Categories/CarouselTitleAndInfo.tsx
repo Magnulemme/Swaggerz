@@ -27,7 +27,7 @@ interface CharWithLine {
  */
 function AnimatedText({
   text,
-  animationKey: _animationKey, // Used as React key for forced re-renders
+  // animationKey is used as React key for forced re-renders (passed externally)
   isExiting = false,
   className,
   as: Component = "p",

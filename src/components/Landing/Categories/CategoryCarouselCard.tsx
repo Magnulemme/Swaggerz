@@ -46,9 +46,8 @@ export function CategoryCarouselCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
-  // Determine if this is left or right card based on rotateY
+  // Determine if this is left card based on rotateY
   const isLeftCard = rotateY < 0;
-  const isRightCard = rotateY > 0;
 
   const { cardPositions, currentPhase } = useCarouselStore();
 
