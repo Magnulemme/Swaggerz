@@ -254,7 +254,6 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
         className={`relative w-full py-4 overflow-hidden ${
           !isTouchDevice ? "cursor-grab active:cursor-grabbing" : ""
         }`}
-        data-lenis-prevent
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
