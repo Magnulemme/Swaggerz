@@ -132,7 +132,8 @@ export function CollectionsShowcase({
             className="w-full flex items-center justify-center pointer-events-none px-8 md:px-12 lg:px-16"
           >
             <SectionTitle
-              title="Esplora le Collezioni"
+              title="Esplora le"
+              shaderText="Collezioni"
               description="Raccolte di stile, scelte esclusivamente per te"
             />
           </div>
@@ -180,7 +181,8 @@ export function CollectionsShowcase({
                 className="w-full flex items-center justify-center pointer-events-none"
               >
                 <SectionTitle
-                  title="Esplora le Collezioni"
+                  title="Esplora le"
+                  shaderText="Collezioni"
                   description="Raccolte di stile, scelte esclusivamente per te"
                 />
               </div>
