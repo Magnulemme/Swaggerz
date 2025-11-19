@@ -206,7 +206,7 @@ export function CarouselTitleAndInfo({
       <div
         ref={mobileContainerRef}
         className="lg:hidden flex flex-col items-center pointer-events-none"
-        style={{ zIndex: 30 }}
+        style={{ zIndex: 70 }}
       >
         {/* Immagine con Titolo Overlayed */}
         <div
@@ -330,7 +330,7 @@ export function CarouselTitleAndInfo({
         style={{
           gridTemplateColumns: "auto auto",
           gridTemplateRows: "auto auto",
-          zIndex: 30,
+          zIndex: 70,
         }}
       >
         {/* Fake card spacer - Grid position: col 1, rows 1-2 */}
