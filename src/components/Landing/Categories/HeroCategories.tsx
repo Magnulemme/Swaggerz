@@ -44,13 +44,9 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
   const handleCardPositionCalculated = useCallback((position: { left: number; top: number }) => {
     setGridCardPosition(position);
   }, []);
-  const [isTouchDevice, setIsTouchDevice] = useState(
-    typeof window !== "undefined" &&
-      window.matchMedia("(pointer: coarse)").matches
-  );
-  const [mobileContentHeight, setMobileContentHeight] = useState<number | null>(
-    null
-  );
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [isXL, setIsXL] = useState(false);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize card positions on mount
@@ -164,12 +160,36 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
   // Detect touch device capability
   useEffect(() => {
     const pointerMediaQuery = window.matchMedia("(pointer: coarse)");
+    setIsTouchDevice(pointerMediaQuery.matches); // Set initial value on mount
+
     const handlePointerChange = (e: MediaQueryListEvent) =>
       setIsTouchDevice(e.matches);
 
     pointerMediaQuery.addEventListener("change", handlePointerChange);
     return () =>
       pointerMediaQuery.removeEventListener("change", handlePointerChange);
+  }, []);
+
+  // Track Desktop (LG) breakpoint
+  useEffect(() => {
+    const lgMediaQuery = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(lgMediaQuery.matches); // Set initial value on mount
+
+    const handleLgChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+
+    lgMediaQuery.addEventListener("change", handleLgChange);
+    return () => lgMediaQuery.removeEventListener("change", handleLgChange);
+  }, []);
+
+  // Track XL breakpoint
+  useEffect(() => {
+    const xlMediaQuery = window.matchMedia("(min-width: 1280px)");
+    setIsXL(xlMediaQuery.matches); // Set initial value on mount
+
+    const handleXlChange = (e: MediaQueryListEvent) => setIsXL(e.matches);
+
+    xlMediaQuery.addEventListener("change", handleXlChange);
+    return () => xlMediaQuery.removeEventListener("change", handleXlChange);
   }, []);
 
   // Disable first render flag after mount
@@ -254,9 +274,6 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
           style={{
             perspective: "2000px",
             transformStyle: "preserve-3d",
-            minHeight: mobileContentHeight
-              ? `${mobileContentHeight}px`
-              : "50vh",
           }}
         >
           {/* Render only side cards (prev/next), active card is in grid */}
@@ -340,7 +357,10 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
                 isActive={diff === 0}
                 onClick={handleCardClick}
                 gridPosition={diff === 0 ? gridCardPosition : null}
+                centerY={diff !== 0 && gridCardPosition ? gridCardPosition.top : null}
                 isFirstRender={isFirstRender}
+                isDesktop={isDesktop}
+                isXL={isXL}
                 onMainCardHoverChange={setIsMainCardHovered}
                 onSideCardHoverChange={setIsSideCardHovered}
               />
@@ -364,9 +384,9 @@ export function HeroCategories({ className = "" }: HeroCategoriesProps) {
               : undefined
           }
           onCardPositionCalculated={handleCardPositionCalculated}
-          onMobileContentHeightCalculated={setMobileContentHeight}
           cardsContainerRef={cardsContainerRef}
           isFirstRender={isFirstRender}
+          isXL={isXL}
         />
       </div>
     </div>

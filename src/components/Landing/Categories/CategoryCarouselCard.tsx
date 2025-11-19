@@ -14,7 +14,10 @@ interface CategoryCarouselCardProps {
   isActive: boolean;
   onClick: () => void;
   gridPosition?: { left: number; top: number } | null;
+  centerY?: number | null; // Y coordinate for side cards to align with center card
   isFirstRender?: boolean;
+  isDesktop: boolean;
+  isXL: boolean;
   onMainCardHoverChange?: (isHovered: boolean) => void;
   onSideCardHoverChange?: (isHovered: boolean) => void;
 }
@@ -31,23 +34,15 @@ export function CategoryCarouselCard({
   isActive,
   onClick,
   gridPosition,
+  centerY,
   isFirstRender = false,
+  isDesktop,
+  isXL,
   onMainCardHoverChange,
   onSideCardHoverChange,
 }: CategoryCarouselCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(
-    typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1024px)").matches
-  );
-  const [isLG, setIsLG] = useState(
-    typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1024px)").matches
-  );
-  const [isXL, setIsXL] = useState(
-    typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1280px)").matches
-  );
+  const [isLG, setIsLG] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
@@ -69,20 +64,16 @@ export function CategoryCarouselCard({
   // Track viewport changes
   useEffect(() => {
     const lgMediaQuery = window.matchMedia("(min-width: 1024px)");
-    const xlMediaQuery = window.matchMedia("(min-width: 1280px)");
+    setIsLG(lgMediaQuery.matches); // Set initial value on mount
 
     const handleLgChange = (e: MediaQueryListEvent) => {
-      setIsDesktop(e.matches);
       setIsLG(e.matches);
     };
-    const handleXlChange = (e: MediaQueryListEvent) => setIsXL(e.matches);
 
     lgMediaQuery.addEventListener("change", handleLgChange);
-    xlMediaQuery.addEventListener("change", handleXlChange);
 
     return () => {
       lgMediaQuery.removeEventListener("change", handleLgChange);
-      xlMediaQuery.removeEventListener("change", handleXlChange);
     };
   }, []);
 
@@ -143,7 +134,12 @@ export function CategoryCarouselCard({
   }, [isHovered, isClickable, isActive, onSideCardHoverChange, onMainCardHoverChange]);
 
   // Hide active card until gridPosition is calculated (prevents flash)
-  const shouldHide = isActive && !gridPosition && isFirstRender;
+  const shouldHideActive = isActive && !gridPosition && isFirstRender;
+
+  // Hide side cards until centerY is calculated (prevents jump on mobile)
+  const shouldHideSide = !isActive && !centerY && isFirstRender && !isDesktop;
+
+  const shouldHide = shouldHideActive || shouldHideSide;
 
   return (
     <div
@@ -176,6 +172,10 @@ export function CategoryCarouselCard({
           left: `${gridPosition.left}px`,
           top: `${gridPosition.top}px`,
           transform: `translate(-50%, -50%) rotateY(${rotateY}deg)`,
+        }),
+        // For side cards: use centerY to align with center card
+        ...(centerY && !gridPosition && {
+          top: `${centerY}px`,
         }),
       }}
       onClick={onClick}

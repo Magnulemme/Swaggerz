@@ -9,8 +9,9 @@ interface CarouselTitleAndInfoProps {
   collection: CategoryCard;
   previousCollection?: CategoryCard;
   onCardPositionCalculated?: (position: { left: number; top: number }) => void;
-  onMobileContentHeightCalculated?: (height: number) => void;
   cardsContainerRef: React.RefObject<HTMLDivElement>;
+  isFirstRender?: boolean;
+  isXL: boolean;
 }
 
 interface CharWithLine {
@@ -152,8 +153,8 @@ export function CarouselTitleAndInfo({
   collection,
   previousCollection,
   onCardPositionCalculated,
-  onMobileContentHeightCalculated,
   cardsContainerRef,
+  isXL,
 }: CarouselTitleAndInfoProps) {
   // Ref condiviso per mobile e desktop
   const mobileCardRef = useRef<HTMLDivElement>(null);
@@ -197,33 +198,14 @@ export function CarouselTitleAndInfo({
     updatePosition();
     window.addEventListener("resize", updatePosition);
     return () => window.removeEventListener("resize", updatePosition);
-  }, [onCardPositionCalculated, cardsContainerRef, collection.label]);
-
-  // Calculate mobile content height
-  React.useLayoutEffect(() => {
-    if (!onMobileContentHeightCalculated) return;
-
-    const updateMobileHeight = () => {
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-
-      // Only calculate for mobile/tablet
-      if (isDesktop || !mobileContainerRef.current) return;
-
-      const height = mobileContainerRef.current.offsetHeight;
-      onMobileContentHeightCalculated(height);
-    };
-
-    updateMobileHeight();
-    window.addEventListener("resize", updateMobileHeight);
-    return () => window.removeEventListener("resize", updateMobileHeight);
-  }, [onMobileContentHeightCalculated, collection]);
+  }, [onCardPositionCalculated, cardsContainerRef, collection.label, isXL]);
 
   return (
     <>
       {/* Layout MOBILE/TABLET - OPEN LAYOUT */}
       <div
         ref={mobileContainerRef}
-        className="lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none"
+        className="lg:hidden flex flex-col items-center pointer-events-none"
         style={{ zIndex: 30 }}
       >
         {/* Immagine con Titolo Overlayed */}
@@ -236,19 +218,19 @@ export function CarouselTitleAndInfo({
             maxHeight: "450px",
           }}
         >
-          {/* Fake card spacer per calcolo posizione - IDENTICA all'immagine */}
+          {/* Fake card spacer per calcolo posizione - IDENTICA all'immagine, occupa spazio naturale */}
           <div
             ref={mobileCardRef}
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none"
             style={{
-              zIndex: -1,
+              width: '100%',
+              height: '100%',
             }}
           />
 
-          {/* Immagine (nessun bordo/card wrapper) - riempie il parent */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden">
-            {/* Titolo overlayed sull'immagine */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 uppercase pointer-events-none flex items-center justify-center w-full z-10">
+          {/* Titolo overlayed sull'immagine */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="uppercase pointer-events-none flex items-center justify-center w-full z-10">
               {/* Previous title - sliding out upwards */}
               {isTransitioning && previousLabel && (
                 <div
@@ -354,11 +336,12 @@ export function CarouselTitleAndInfo({
         {/* Fake card spacer - Grid position: col 1, rows 1-2 */}
         <div
           ref={desktopCardRef}
-          className="invisible pointer-events-none lg:max-w-[300px] xl:max-w-[350px]"
+          className="pointer-events-none"
           style={{
             gridColumn: "1",
             gridRow: "1 / 3",
             width: "70vw",
+            maxWidth: isXL ? "350px" : "300px",
             height: "70vh",
             maxHeight: "450px",
           }}
