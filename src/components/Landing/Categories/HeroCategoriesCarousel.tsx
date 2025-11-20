@@ -251,7 +251,7 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
 
       {/* Custom Carousel - Universale per tutti i dispositivi */}
       <div
-        className={`relative w-full py-4 overflow-hidden ${
+        className={`relative w-full py-4 pb-16 lg:pb-4 overflow-hidden ${
           !isTouchDevice ? "cursor-grab active:cursor-grabbing" : ""
         }`}
         onTouchStart={handleTouchStart}

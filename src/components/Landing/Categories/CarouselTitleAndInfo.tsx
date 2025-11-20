@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { type CategoryCard } from "./categories.constants";
-import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
 interface CarouselTitleAndInfoProps {
   currentLabel: string;
@@ -208,9 +207,14 @@ export function CarouselTitleAndInfo({
         className="lg:hidden flex flex-col items-center pointer-events-none"
         style={{ zIndex: 70 }}
       >
-        {/* Immagine con Titolo Overlayed */}
-        <div
-          className="relative"
+        {/* Immagine cliccabile (senza titolo overlayed) */}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("Category selected:", collection.label);
+          }}
+          className="pointer-events-auto cursor-pointer group"
           style={{
             width: "70vw",
             maxWidth: "350px",
@@ -221,52 +225,34 @@ export function CarouselTitleAndInfo({
           {/* Fake card spacer per calcolo posizione - IDENTICA all'immagine, occupa spazio naturale */}
           <div
             ref={mobileCardRef}
-            className="pointer-events-none"
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
+            className="pointer-events-none w-full h-full"
           />
+        </a>
 
-          {/* Titolo overlayed sull'immagine */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="uppercase pointer-events-none flex items-center justify-center w-full z-10">
-              {/* Previous title - sliding out upwards */}
-              {isTransitioning && previousLabel && (
-                <div
-                  key={`title-mobile-exit-${previousLabel}`}
-                  className="absolute text-4xl md:text-5xl font-black drop-shadow-2xl tracking-tight leading-none text-center px-4 text-white whitespace-nowrap"
-                >
-                  {previousLabel.split("").map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block"
-                      style={{
-                        animation:
-                          "slideUpOut 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards",
-                        animationDelay: `${i * 0.02}s`,
-                        willChange: "transform, opacity",
-                      }}
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Current title - sliding in from bottom */}
+        {/* Contenuto sotto l'immagine: Titolo + Descrizione + CTA */}
+        <div
+          className="flex flex-col gap-3 items-center px-4 pt-6 pointer-events-none"
+          style={{
+            width: "80vw",
+            maxWidth: "400px",
+          }}
+        >
+          {/* Titolo */}
+          <div className="uppercase flex items-center justify-center w-full">
+            {/* Previous title - sliding out upwards */}
+            {isTransitioning && previousLabel && (
               <div
-                key={`title-mobile-enter-${currentLabel}`}
-                className="absolute text-4xl md:text-5xl font-black drop-shadow-2xl tracking-tight leading-none text-center px-4 text-white whitespace-nowrap"
+                key={`title-mobile-exit-${previousLabel}`}
+                className="absolute text-3xl md:text-4xl font-black tracking-tight leading-none text-center text-white whitespace-nowrap"
               >
-                {currentLabel.split("").map((char, i) => (
+                {previousLabel.split("").map((char, i) => (
                   <span
                     key={i}
-                    className="inline-block opacity-0"
+                    className="inline-block"
                     style={{
                       animation:
-                        "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
-                      animationDelay: `${0.6 + i * 0.02}s`,
+                        "slideUpOut 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                      animationDelay: `${i * 0.02}s`,
                       willChange: "transform, opacity",
                     }}
                   >
@@ -274,28 +260,40 @@ export function CarouselTitleAndInfo({
                   </span>
                 ))}
               </div>
+            )}
+
+            {/* Current title - sliding in from bottom */}
+            <div
+              key={`title-mobile-enter-${currentLabel}`}
+              className="text-3xl md:text-4xl font-black tracking-tight leading-none text-center text-white whitespace-nowrap"
+            >
+              {currentLabel.split("").map((char, i) => (
+                <span
+                  key={i}
+                  className="inline-block opacity-0"
+                  style={{
+                    animation:
+                      "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                    animationDelay: `${0.6 + i * 0.02}s`,
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Descrizione + Button (PIÙ LARGHI dell'immagine) */}
-        {collection.description && (
-          <div
-            className="flex flex-col gap-4 items-center px-4 pt-8 pointer-events-none"
-            style={{
-              width: "80vw",
-              maxWidth: "400px",
-            }}
-          >
-            {/* Descrizione */}
-            <div className="relative text-center min-h-[60px] w-full">
+          {/* Descrizione */}
+          {collection.description && (
+            <div className="relative text-center min-h-[50px] w-full">
               {isTransitioning && previousCollection?.description && (
                 <AnimatedDescription
                   key={`desc-mobile-exit-${previousCollection.label}`}
                   text={previousCollection.description}
                   animationKey={`mobile-${previousCollection.label}`}
                   isExiting={true}
-                  className="absolute inset-0 text-white/90 text-sm font-light leading-relaxed tracking-wide"
+                  className="absolute inset-0 text-white/70 text-sm font-light leading-relaxed tracking-wide"
                 />
               )}
 
@@ -304,24 +302,50 @@ export function CarouselTitleAndInfo({
                 text={collection.description}
                 animationKey={`mobile-${collection.label}`}
                 isExiting={false}
-                className="text-white/90 text-sm font-light leading-relaxed tracking-wide"
+                className="text-white/70 text-sm font-light leading-relaxed tracking-wide"
               />
             </div>
+          )}
 
-            {/* Bottone */}
-            <div className="flex justify-center pointer-events-auto">
-              <AnimatedButton
-                as="button"
-                size="lg"
-                onClick={() => {
-                  console.log("Category selected:", collection.label);
-                }}
+          {/* CTA Secondaria (stile ProductShowcase) */}
+          <div className="relative pointer-events-auto">
+            {/* Previous CTA - sliding out */}
+            {isTransitioning && previousCollection && (
+              <a
+                key={`cta-mobile-exit-${previousCollection.label}`}
+                href="#"
+                className="absolute group inline-flex items-center text-sm font-semibold text-brand cursor-pointer"
               >
-                Scopri
-              </AnimatedButton>
-            </div>
+                <AnimatedText
+                  text="Scopri la Collezione →"
+                  animationKey={`cta-mobile-exit-${previousCollection.label}`}
+                  isExiting={true}
+                  as="span"
+                  className="text-sm font-semibold text-brand"
+                />
+              </a>
+            )}
+
+            {/* Current CTA - sliding in */}
+            <a
+              key={`cta-mobile-enter-${collection.label}`}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Category selected:", collection.label);
+              }}
+              className="group inline-flex items-center text-sm font-semibold text-brand hover:gap-1 cursor-pointer transition-all duration-300"
+            >
+              <AnimatedText
+                text="Scopri la Collezione →"
+                animationKey={`cta-mobile-enter-${collection.label}`}
+                isExiting={false}
+                as="span"
+                className="text-sm font-semibold text-brand"
+              />
+            </a>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Layout DESKTOP - GRID (come prima) */}
@@ -401,26 +425,6 @@ export function CarouselTitleAndInfo({
               </span>
             ))}
           </div>
-        </div>
-
-        {/* Button Desktop - Grid position: col 1, row 2 (bottom della card) */}
-        <div
-          className="flex items-end justify-center pb-8 xl:pb-12 pointer-events-auto"
-          style={{
-            gridColumn: "1",
-            gridRow: "2",
-            zIndex: 40,
-          }}
-        >
-          <AnimatedButton
-            as="button"
-            size="sm"
-            onClick={() => {
-              console.log("Category selected:", collection.label);
-            }}
-          >
-            Scopri
-          </AnimatedButton>
         </div>
 
         {/* Descrizione Desktop - Grid position: col 2, row 2 (accanto al bottom della card) */}
@@ -535,6 +539,45 @@ export function CarouselTitleAndInfo({
                 />
               </div>
             )}
+
+            {/* CTA Secondaria Desktop */}
+            <div className="relative pointer-events-auto pt-4">
+              {/* Previous CTA - sliding out */}
+              {isTransitioning && previousCollection && (
+                <a
+                  key={`cta-desktop-exit-${previousCollection.label}`}
+                  href="#"
+                  className="absolute group inline-flex items-center text-sm font-semibold text-brand cursor-pointer"
+                >
+                  <AnimatedText
+                    text="Scopri la Collezione →"
+                    animationKey={`cta-desktop-exit-${previousCollection.label}`}
+                    isExiting={true}
+                    as="span"
+                    className="text-sm font-semibold text-brand"
+                  />
+                </a>
+              )}
+
+              {/* Current CTA - sliding in */}
+              <a
+                key={`cta-desktop-enter-${collection.label}`}
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log("Category selected:", collection.label);
+                }}
+                className="group inline-flex items-center text-sm font-semibold text-brand hover:gap-1 cursor-pointer transition-all duration-300"
+              >
+                <AnimatedText
+                  text="Scopri la Collezione →"
+                  animationKey={`cta-desktop-enter-${collection.label}`}
+                  isExiting={false}
+                  as="span"
+                  className="text-sm font-semibold text-brand"
+                />
+              </a>
+            </div>
           </div>
         </div>
       </div>
