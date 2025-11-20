@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, MotionValue } from "framer-motion";
+import { motion, MotionValue, useTransform } from "framer-motion";
 import Image from "next/image";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
 
@@ -12,6 +12,9 @@ interface CollectionCardProps {
   scale: MotionValue<number>;
   layout: "desktop" | "mobile";
   imageScale?: MotionValue<number>; // Solo per mobile parallax
+  cardWidth?: MotionValue<string>; // Solo per mobile width expansion
+  cardBorderRadius?: MotionValue<number>; // Solo per mobile border-radius animation
+  cardBorderOpacity?: MotionValue<number>; // Solo per mobile border opacity (via box-shadow)
 }
 
 export function CollectionCard({
@@ -22,18 +25,33 @@ export function CollectionCard({
   scale,
   layout,
   imageScale,
+  cardWidth,
+  cardBorderRadius,
+  cardBorderOpacity,
 }: CollectionCardProps) {
   // Alterna layout: indici pari = immagine a destra (solo desktop)
   const isImageRight = index % 2 === 0;
 
   // Mobile layout - Hero Card
   if (layout === "mobile") {
+    // Crea un box-shadow dinamico che simula il bordo con opacity controllabile
+    const boxShadow = cardBorderOpacity
+      ? useTransform(
+          cardBorderOpacity,
+          (opacity) => `inset 0 0 0 1px rgba(255, 255, 255, ${opacity})`
+        )
+      : undefined;
+
     return (
-      <div className="w-screen flex justify-center">
-        <motion.div
-          style={{ scale }}
-          className="relative w-[90%] max-w-[400px] h-[calc(100dvh-200px)] max-h-[600px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
-        >
+      <motion.div
+        style={{
+          scale,
+          width: cardWidth,
+          borderRadius: cardBorderRadius,
+          boxShadow: boxShadow,
+        }}
+        className="relative h-[calc(100dvh-200px)] max-h-[600px] overflow-hidden origin-top bg-black will-change-transform"
+      >
           {/* Image Section - Full background */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
@@ -89,8 +107,7 @@ export function CollectionCard({
               </svg>
             </AnimatedButton>
           </div>
-        </motion.div>
-      </div>
+      </motion.div>
     );
   }
 
