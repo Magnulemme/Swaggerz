@@ -7,7 +7,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
+import { motion } from "framer-motion";
 import { SectionTitle } from "../SectionTitle";
+import { staggerContainer, staggerItem, viewport } from "@/lib/animations";
 
 interface Product {
   id: number;
@@ -327,12 +329,20 @@ const ProductShowcase = () => {
       />
       {/* Product Slider - Desktop only, Grid on mobile */}
       <div className="mb-lg md:mb-xl">
-        {/* Mobile: Grid */}
-        <div className="grid grid-cols-2 gap-sm md:hidden">
+        {/* Mobile: Grid with Stagger Animation */}
+        <motion.div
+          className="grid grid-cols-2 gap-sm md:hidden"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewport.once}
+        >
           {products.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <motion.div key={product.id} variants={staggerItem}>
+              <ProductCard product={product} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Desktop: Slider */}
         <div className="hidden md:block relative">
@@ -381,32 +391,41 @@ const ProductShowcase = () => {
             </button>
           </div>
 
-          <Swiper
-            modules={[Navigation]}
-            spaceBetween={16}
-            slidesPerView={2}
-            breakpoints={{
-              768: { slidesPerView: 3, spaceBetween: 20 },
-              1024: { slidesPerView: 4, spaceBetween: 24 },
-              1280: { slidesPerView: 5, spaceBetween: 24 },
-              1536: { slidesPerView: 6, spaceBetween: 24 },
-            }}
-            onSwiper={setSwiperInstance}
-            onSlideChange={(swiper) => {
-              setCanScrollPrev(!swiper.isBeginning);
-              setCanScrollNext(!swiper.isEnd);
-            }}
-            onInit={(swiper) => {
-              setCanScrollPrev(!swiper.isBeginning);
-              setCanScrollNext(!swiper.isEnd);
-            }}
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport.once}
           >
-            {products.map((product) => (
-              <SwiperSlide key={product.id}>
-                <ProductCard product={product} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+            <Swiper
+              modules={[Navigation]}
+              spaceBetween={16}
+              slidesPerView={2}
+              breakpoints={{
+                768: { slidesPerView: 3, spaceBetween: 20 },
+                1024: { slidesPerView: 4, spaceBetween: 24 },
+                1280: { slidesPerView: 5, spaceBetween: 24 },
+                1536: { slidesPerView: 6, spaceBetween: 24 },
+              }}
+              onSwiper={setSwiperInstance}
+              onSlideChange={(swiper) => {
+                setCanScrollPrev(!swiper.isBeginning);
+                setCanScrollNext(!swiper.isEnd);
+              }}
+              onInit={(swiper) => {
+                setCanScrollPrev(!swiper.isBeginning);
+                setCanScrollNext(!swiper.isEnd);
+              }}
+            >
+              {products.map((product) => (
+                <SwiperSlide key={product.id}>
+                  <motion.div variants={staggerItem}>
+                    <ProductCard product={product} />
+                  </motion.div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </motion.div>
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import ShaderText from "@/components/ShaderText";
 import { useJostAlignment } from "@/hooks/useAlignedFontSize";
+import { AnimatedText } from "@/components/ui/AnimatedText";
 
 interface SectionTitleProps {
   eyebrow?: string;
@@ -90,7 +91,12 @@ export function SectionTitle({
           ref={jostTitleRef}
           className={`${sizeClasses[size].title} font-black text-light leading-none tracking-tight font-jost`}
         >
-          {title}
+          <AnimatedText
+            text={title}
+            variant="normal"
+            delay={0.2}
+            charDelay={0.03}
+          />
         </h3>
         {/* Container con shadow text (per baseline) e ShaderText sovrapposto */}
         <div ref={shadowTextRef} className="relative">
@@ -108,13 +114,21 @@ export function SectionTitle({
             {shaderText}
           </div>
 
-          {/* ShaderText posizionato esattamente sopra lo shadow text */}
-          <div
+          {/* ShaderText posizionato esattamente sopra lo shadow text - fade in staggerato */}
+          <motion.div
             className="absolute inset-0"
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+            }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{
+              duration: 0.6,
+              delay: 0.2 + title.length * 0.03 + 0.1,
+              ease: [0.65, 0, 0.35, 1],
             }}
           >
             <ShaderText
@@ -122,7 +136,7 @@ export function SectionTitle({
             >
               {shaderText}
             </ShaderText>
-          </div>
+          </motion.div>
         </div>
       </div>
 
