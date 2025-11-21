@@ -78,7 +78,7 @@ export function CollectionsShowcase({
   // Constants per desktop
   const DESKTOP_OFFSET = 50;
   const DESKTOP_MIN_HEIGHT = 500;
-  const DESKTOP_DESIRED_MARGIN = 150;
+  const DESKTOP_DESIRED_MARGIN = 200;
 
   // Constants per mobile
   const MOBILE_OFFSET = 25;
@@ -160,8 +160,10 @@ export function CollectionsShowcase({
           // Sticky height
           const stickyHeight = isMobile
             ? CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET
-            : !isMobile && isTitleSticky && isFirstCard
-            ? titleHeight + CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET
+            : !isMobile && isTitleSticky
+            ? isFirstCard
+              ? titleHeight + CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET // First card includes title
+              : CARD_MIN_HEIGHT + (totalCards - 2 - i) * CARD_OFFSET // Subsequent cards have one less stacking layer
             : CARD_MIN_HEIGHT + (totalCards - 1 - i) * CARD_OFFSET;
 
           // Top position
@@ -170,7 +172,7 @@ export function CollectionsShowcase({
             : !isMobile && isTitleSticky
             ? isFirstCard
               ? TOP_BASE
-              : TOP_BASE + i * CARD_OFFSET
+              : TOP_BASE + titleHeight + (i + 1) * CARD_OFFSET // Add titleHeight to account for sticky title, then stack cards with offset
             : TOP_BASE + i * CARD_OFFSET;
 
           // Title element for desktop first card with sticky title
@@ -190,7 +192,7 @@ export function CollectionsShowcase({
 
           return (
             <CollectionCardWrapper
-              key={`card_${i}`}
+              key={`card_${i}_${isMobile ? 'mobile' : 'desktop'}`}
               {...collection}
               index={i}
               isLast={isLast}
