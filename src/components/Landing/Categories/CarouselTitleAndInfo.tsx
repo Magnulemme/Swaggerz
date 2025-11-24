@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { type CategoryCard } from "./categories.constants";
 
 interface CarouselTitleAndInfoProps {
@@ -21,8 +21,21 @@ interface CharWithLine {
 }
 
 /**
- * Helper component that calculates line breaks based on actual rendered positions
- * Works for any text: descriptions, labels, numbers, etc.
+ * Helper function to determine style for a specific word
+ */
+function getWordStyle(word: string): 'bold' | 'normal' {
+  const lowerWord = word.toLowerCase();
+
+  // Bold keywords - solo le parole chiave più importanti
+  const boldKeywords = ['oversize', 'essenziali', 'bold', 'premium', 'statement', 'attitudine', 'comfort', 'tech'];
+  if (boldKeywords.includes(lowerWord)) return 'bold';
+
+  return 'normal';
+}
+
+/**
+ * Simplified AnimatedText component with natural word-wrapping
+ * Words are kept as units, characters are animated within each word
  */
 function AnimatedText({
   text,
@@ -30,114 +43,99 @@ function AnimatedText({
   isExiting = false,
   className,
   as: Component = "p",
+  enableStyling = false,
 }: {
   text: string;
   animationKey: string;
   isExiting?: boolean;
   className?: string;
   as?: "p" | "span" | "div";
+  enableStyling?: boolean;
 }) {
-  const containerRef = React.useRef<HTMLParagraphElement>(null);
-  const [charsWithLines, setCharsWithLines] = React.useState<CharWithLine[]>(
-    []
-  );
-
-  React.useEffect(() => {
-    if (!containerRef.current) return;
-
-    const spans =
-      containerRef.current.querySelectorAll<HTMLSpanElement>(".char-span");
-
-    // First pass: detect lines and count chars per line
-    const tempChars: Omit<CharWithLine, "charsInLine">[] = [];
-    const charsPerLine: number[] = [0];
-    let currentLineIndex = 0;
-    let lastY = -1;
-    let charIndexInLine = 0;
-
-    spans.forEach((span) => {
-      const rect = span.getBoundingClientRect();
-      const y = Math.round(rect.top);
-
-      // New line detected
-      if (lastY !== -1 && y > lastY + 5) {
-        currentLineIndex++;
-        charIndexInLine = 0;
-        charsPerLine[currentLineIndex] = 0;
-      }
-
-      tempChars.push({
-        char: span.textContent || "",
-        lineIndex: currentLineIndex,
-        charIndex: charIndexInLine,
-      });
-
-      charsPerLine[currentLineIndex]++;
-      lastY = y;
-      charIndexInLine++;
-    });
-
-    // Second pass: add charsInLine to each char
-    const chars: CharWithLine[] = tempChars.map((char) => ({
-      ...char,
-      charsInLine: charsPerLine[char.lineIndex],
-    }));
-
-    setCharsWithLines(chars);
-  }, [text]);
-
   // Sync with title animation timing
   const animationName = isExiting ? "slideUpOut" : "slideUpIn";
-  const animationDuration = isExiting ? "0.3s" : "0.8s"; // Exit faster, enter same as title
-  const baseDelay = isExiting ? 0 : 0.6; // Same as title (0.6s for enter)
-  const lineDelay = isExiting ? 0.03 : 0.08; // Exit lines faster (30ms), enter with slight offset (80ms)
+  const animationDuration = isExiting ? "0.3s" : "0.8s";
+  const baseDelay = isExiting ? 0 : 0.6;
+  const charDelay = isExiting ? 0.002 : 0.004; // Exit: 2ms, Enter: 4ms
 
-  // Title target: ~0.3s wave time for ~15 chars (0.02s per char)
-  const targetWaveTime = 0.3;
+  // Build character array with styles
+  const styledChars: Array<{ char: string; style: 'bold' | 'normal' }> = [];
+
+  if (enableStyling) {
+    // Split by words and spaces, preserving both
+    const words = text.split(/(\s+)/);
+    words.forEach(word => {
+      const style = getWordStyle(word.trim());
+      word.split('').forEach(char => {
+        styledChars.push({ char, style: char.trim() ? style : 'normal' });
+      });
+    });
+  } else {
+    text.split('').forEach(char => {
+      styledChars.push({ char, style: 'normal' });
+    });
+  }
+
+  // Group styled characters into words
+  const groupedStyledWords: Array<Array<{ char: string; style: 'bold' | 'normal' }>> = [];
+  let currentWordChars: Array<{ char: string; style: 'bold' | 'normal' }> = [];
+
+  styledChars.forEach((item) => {
+    if (item.char === ' ') {
+      if (currentWordChars.length > 0) {
+        groupedStyledWords.push(currentWordChars);
+        currentWordChars = [];
+      }
+      // Add space as a separate "word"
+      groupedStyledWords.push([{ char: ' ', style: 'normal' }]);
+    } else {
+      currentWordChars.push(item);
+    }
+  });
+
+  // Add last word if exists
+  if (currentWordChars.length > 0) {
+    groupedStyledWords.push(currentWordChars);
+  }
+
+  // Calculate global character index for delay
+  let globalCharIndex = 0;
 
   return (
-    <Component
-      ref={containerRef as any}
-      className={`${className} ${
-        charsWithLines.length === 0 ? "invisible" : ""
-      }`}
-    >
-      {charsWithLines.length === 0
-        ? // Initial render: invisible spans for measurement (hidden but measurable)
-          text.split("").map((char, i) => (
-            <span key={i} className="char-span inline-block">
-              {char === " " ? "\u00A0" : char}
-            </span>
-          ))
-        : // After measurement: animated spans with per-line dynamic delay
-          charsWithLines.map((item, i) => {
-            // Calculate delay specific to this line's length
-            const dynamicCharDelay = Math.min(
-              targetWaveTime / item.charsInLine,
-              0.02
-            ); // Cap at title's delay
-            const charDelay = isExiting
-              ? dynamicCharDelay * 0.4
-              : dynamicCharDelay; // Exit faster
+    <Component className={className}>
+      {groupedStyledWords.map((wordChars, wordIdx) => {
+        const isSpace = wordChars.length === 1 && wordChars[0].char === ' ';
 
-            return (
-              <span
-                key={i}
-                className={`inline-block ${isExiting ? "" : "opacity-0"}`}
-                style={{
-                  animation: `${animationName} ${animationDuration} cubic-bezier(0.65, 0, 0.35, 1) forwards`,
-                  animationDelay: `${
-                    baseDelay +
-                    item.lineIndex * lineDelay +
-                    item.charIndex * charDelay
-                  }s`,
-                  willChange: "transform, opacity",
-                }}
-              >
-                {item.char === " " ? "\u00A0" : item.char}
-              </span>
-            );
-          })}
+        if (isSpace) {
+          globalCharIndex++;
+          return <span key={`space-${wordIdx}`}> </span>;
+        }
+
+        return (
+          <span key={`word-${wordIdx}`} className="inline-block">
+            {wordChars.map((item, charIdx) => {
+              const currentGlobalIndex = globalCharIndex++;
+
+              const styleClasses =
+                item.style === 'bold' ? 'font-semibold text-white' : '';
+
+              return (
+                <span
+                  key={charIdx}
+                  className={`inline-block ${isExiting ? "" : "opacity-0"} ${styleClasses}`}
+                  style={{
+                    animation: `${animationName} ${animationDuration} cubic-bezier(0.65, 0, 0.35, 1) forwards`,
+                    animationDelay: `${baseDelay + currentGlobalIndex * charDelay}s`,
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  {item.char}
+                </span>
+              );
+            })}
+          </span>
+        );
+      })}
     </Component>
   );
 }
@@ -160,7 +158,29 @@ export function CarouselTitleAndInfo({
   const desktopCardRef = useRef<HTMLDivElement>(null);
   const mobileContainerRef = useRef<HTMLDivElement>(null);
 
+  // State per controllare quale descrizione mostrare nello spacer
+  const [spacerDescription, setSpacerDescription] = useState(collection.description);
+
+  // Aggiorna spacer description con timing corretto
+  useEffect(() => {
+    if (isTransitioning && previousCollection?.description) {
+      // Durante la transizione, mantieni la descrizione precedente
+      setSpacerDescription(previousCollection.description);
+
+      // Aggiorna dopo 0.4s (tra exit 0.3s e enter 0.6s)
+      const timer = setTimeout(() => {
+        setSpacerDescription(collection.description);
+      }, 400);
+
+      return () => clearTimeout(timer);
+    } else {
+      // Quando non c'è transizione, usa sempre la corrente
+      setSpacerDescription(collection.description);
+    }
+  }, [isTransitioning, collection.description, previousCollection?.description]);
+
   // Use useLayoutEffect to calculate position BEFORE paint (sync)
+  // La fake card è sempre nello stesso posto, quindi calcoliamo solo on mount e resize
   React.useLayoutEffect(() => {
     if (!cardsContainerRef.current || !onCardPositionCalculated) return;
 
@@ -197,14 +217,14 @@ export function CarouselTitleAndInfo({
     updatePosition();
     window.addEventListener("resize", updatePosition);
     return () => window.removeEventListener("resize", updatePosition);
-  }, [onCardPositionCalculated, cardsContainerRef, collection.label, isXL]);
+  }, [onCardPositionCalculated, cardsContainerRef, isXL]);
 
   return (
     <>
       {/* Layout MOBILE/TABLET - OPEN LAYOUT */}
       <div
         ref={mobileContainerRef}
-        className="lg:hidden flex flex-col items-center pointer-events-none"
+        className="lg:hidden flex flex-col items-center pointer-events-none gap-3"
         style={{ zIndex: 70 }}
       >
         {/* Immagine cliccabile (senza titolo overlayed) */}
@@ -248,7 +268,7 @@ export function CarouselTitleAndInfo({
                 {previousLabel.split("").map((char, i) => (
                   <span
                     key={i}
-                    className="inline-block"
+                    className="inline-block font-jost"
                     style={{
                       animation:
                         "slideUpOut 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards",
@@ -265,12 +285,12 @@ export function CarouselTitleAndInfo({
             {/* Current title - sliding in from bottom */}
             <div
               key={`title-mobile-enter-${currentLabel}`}
-              className="text-3xl md:text-4xl font-black tracking-tight leading-none text-center text-white whitespace-nowrap"
+              className="text-3xl md:text-4xl font-black tracking-tight leading-none text-center text-white whitespace-nowrap font-jost"
             >
               {currentLabel.split("").map((char, i) => (
                 <span
                   key={i}
-                  className="inline-block opacity-0"
+                  className="inline-block opacity-0 font-jost"
                   style={{
                     animation:
                       "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
@@ -284,26 +304,64 @@ export function CarouselTitleAndInfo({
             </div>
           </div>
 
-          {/* Descrizione */}
+          {/* Descrizione con numero */}
           {collection.description && (
-            <div className="relative text-center min-h-[50px] w-full">
-              {isTransitioning && previousCollection?.description && (
-                <AnimatedDescription
-                  key={`desc-mobile-exit-${previousCollection.label}`}
-                  text={previousCollection.description}
-                  animationKey={`mobile-${previousCollection.label}`}
-                  isExiting={true}
-                  className="absolute inset-0 text-white/70 text-sm font-light leading-relaxed tracking-wide"
-                />
-              )}
+            <div className="relative min-h-[50px] w-full flex items-baseline justify-start gap-2">
+              {/* Category Number - decorative, secondary */}
+              <div className="relative flex-shrink-0">
+                {/* Previous number */}
+                {isTransitioning && previousCollection && (
+                  <span
+                    key={`number-mobile-exit-${previousCollection.label}`}
+                    className="absolute text-brand/40 text-xs font-jost font-medium"
+                    style={{
+                      animation: "slideUpOut 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                      animationDelay: "0s",
+                    }}
+                  >
+                    [{String(previousCollection.id + 1).padStart(2, '0')}]
+                  </span>
+                )}
 
-              <AnimatedDescription
-                key={`desc-mobile-enter-${collection.label}`}
-                text={collection.description}
-                animationKey={`mobile-${collection.label}`}
-                isExiting={false}
-                className="text-white/70 text-sm font-light leading-relaxed tracking-wide"
-              />
+                {/* Current number */}
+                <span
+                  key={`number-mobile-enter-${collection.label}`}
+                  className="text-brand/40 text-xs font-jost font-medium opacity-0"
+                  style={{
+                    animation: "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                    animationDelay: "0.6s",
+                  }}
+                >
+                  [{String(collection.id + 1).padStart(2, '0')}]
+                </span>
+              </div>
+
+              {/* Description text */}
+              <div className="relative flex-1">
+                {/* Invisible spacer to maintain height - aggiornato con timing preciso */}
+                <div className="invisible text-light-secondary text-sm leading-relaxed font-jost break-words text-left">
+                  {spacerDescription}
+                </div>
+
+                {isTransitioning && previousCollection?.description && (
+                  <AnimatedDescription
+                    key={`desc-mobile-exit-${previousCollection.label}`}
+                    text={previousCollection.description}
+                    animationKey={`mobile-${previousCollection.label}`}
+                    isExiting={true}
+                    className="absolute inset-0 text-light-secondary text-sm leading-relaxed font-jost break-words text-left"
+                  />
+                )}
+
+                <AnimatedDescription
+                  key={`desc-mobile-enter-${collection.label}`}
+                  text={collection.description}
+                  animationKey={`mobile-${collection.label}`}
+                  isExiting={false}
+                  enableStyling={false}
+                  className="absolute inset-0 text-light-secondary text-sm leading-relaxed font-jost break-words text-left"
+                />
+              </div>
             </div>
           )}
 
@@ -314,15 +372,30 @@ export function CarouselTitleAndInfo({
               <a
                 key={`cta-mobile-exit-${previousCollection.label}`}
                 href="#"
-                className="absolute group inline-flex items-center text-sm font-semibold text-brand cursor-pointer"
+                className="absolute group inline-flex items-center gap-2 text-sm font-semibold text-brand cursor-pointer"
               >
                 <AnimatedText
-                  text="Scopri la Collezione →"
+                  text="Scopri la Collezione"
                   animationKey={`cta-mobile-exit-${previousCollection.label}`}
                   isExiting={true}
                   as="span"
-                  className="text-sm font-semibold text-brand"
+                  className="text-sm font-semibold text-brand font-jost"
                 />
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-brand"
+                  style={{
+                    animation: "slideUpOut 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                    animationDelay: "0s",
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </a>
             )}
 
@@ -334,15 +407,37 @@ export function CarouselTitleAndInfo({
                 e.preventDefault();
                 console.log("Category selected:", collection.label);
               }}
-              className="group inline-flex items-center text-sm font-semibold text-brand hover:gap-1 cursor-pointer transition-all duration-300"
+              className="group relative inline-flex items-center gap-2 cursor-pointer"
+              style={{ pointerEvents: isTransitioning ? 'none' : 'auto' }}
             >
-              <AnimatedText
-                text="Scopri la Collezione →"
-                animationKey={`cta-mobile-enter-${collection.label}`}
-                isExiting={false}
-                as="span"
-                className="text-sm font-semibold text-brand"
-              />
+              <span className="relative">
+                <AnimatedText
+                  text="Scopri la Collezione"
+                  animationKey={`cta-mobile-enter-${collection.label}`}
+                  isExiting={false}
+                  as="span"
+                  className="text-sm font-semibold text-brand font-jost"
+                />
+                {/* Animated underline - solo dopo che l'animazione è completa */}
+                {!isTransitioning && (
+                  <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-brand transition-all duration-300 group-hover:w-full" />
+                )}
+              </span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-brand opacity-0 transform transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                style={{
+                  animation: "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                  animationDelay: "0.85s", // Dopo l'ultimo carattere del testo
+                  willChange: "transform, opacity",
+                }}
+              >
+                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </a>
           </div>
         </div>
@@ -391,7 +486,7 @@ export function CarouselTitleAndInfo({
               {previousLabel.split("").map((char, i) => (
                 <span
                   key={i}
-                  className="inline-block"
+                  className="inline-block font-jost"
                   style={{
                     animation:
                       "slideUpOut 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards",
@@ -408,12 +503,12 @@ export function CarouselTitleAndInfo({
           {/* Current title - sliding in from bottom */}
           <div
             key={`title-desktop-enter-${currentLabel}`}
-            className="absolute text-6xl xl:text-7xl font-black drop-shadow-2xl tracking-tight leading-none text-center px-4 text-white whitespace-nowrap"
+            className="absolute text-6xl xl:text-7xl font-black drop-shadow-2xl tracking-tight leading-none text-center px-4 text-white whitespace-nowrap font-jost"
           >
             {currentLabel.split("").map((char, i) => (
               <span
                 key={i}
-                className="inline-block opacity-0"
+                className="inline-block opacity-0 font-jost"
                 style={{
                   animation:
                     "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
@@ -442,101 +537,117 @@ export function CarouselTitleAndInfo({
             pointer-events-auto
           `}
           >
-            {/* Collection Label */}
-            <div className="flex flex-col gap-2">
-              <div className="relative">
-                {/* Previous "Collection" label - sliding out */}
-                {isTransitioning && previousCollection && (
-                  <AnimatedText
-                    key={`collection-exit-${previousCollection.label}`}
-                    text="Collection"
-                    animationKey={`collection-${previousCollection.label}`}
-                    isExiting={true}
-                    as="span"
-                    className="absolute text-white/40 text-xs font-light uppercase tracking-[0.3em]"
-                  />
-                )}
-
-                {/* Current "Collection" label - sliding in */}
-                <AnimatedText
-                  key={`collection-enter-${collection.label}`}
-                  text="Collection"
-                  animationKey={`collection-${collection.label}`}
-                  isExiting={false}
-                  as="span"
-                  className="text-white/40 text-xs font-light uppercase tracking-[0.3em]"
-                />
-              </div>
-              <div className="h-px w-12 bg-gradient-to-r from-white/30 to-transparent" />
-            </div>
-
-            {/* Description - Letters wave, lines together */}
+            {/* Description with Category Number */}
             {collection.description && (
-              <div className="relative min-h-[80px]">
-                {/* Previous description - sliding out upwards */}
-                {isTransitioning && previousCollection?.description && (
-                  <AnimatedDescription
-                    key={`desc-exit-${previousCollection.label}`}
-                    text={previousCollection.description}
-                    animationKey={previousCollection.label}
-                    isExiting={true}
-                    className="absolute text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
-                  />
-                )}
+              <div className="relative min-h-[75px] flex items-baseline gap-3">
+                {/* Category Number - decorative, secondary */}
+                <div className="relative flex-shrink-0">
+                  {/* Previous number */}
+                  {isTransitioning && previousCollection && (
+                    <span
+                      key={`number-desc-exit-${previousCollection.label}`}
+                      className="absolute text-brand/40 text-sm font-jost font-medium"
+                      style={{
+                        animation: "slideUpOut 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                        animationDelay: "0s",
+                      }}
+                    >
+                      [{String(previousCollection.id + 1).padStart(2, '0')}]
+                    </span>
+                  )}
 
-                {/* Current description - sliding in from bottom */}
-                <AnimatedDescription
-                  key={`desc-enter-${collection.label}`}
-                  text={collection.description}
-                  animationKey={collection.label}
-                  isExiting={false}
-                  className="text-white/70 text-sm xl:text-base font-light leading-relaxed tracking-wide"
-                />
+                  {/* Current number */}
+                  <span
+                    key={`number-desc-enter-${collection.label}`}
+                    className="text-brand/40 text-sm font-jost font-medium opacity-0"
+                    style={{
+                      animation: "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                      animationDelay: "0.6s",
+                    }}
+                  >
+                    [{String(collection.id + 1).padStart(2, '0')}]
+                  </span>
+                </div>
+
+                {/* Description text */}
+                <div className="relative flex-1">
+                  {/* Invisible spacer to maintain height - aggiornato con timing preciso */}
+                  <div className="invisible text-light-secondary text-base xl:text-lg leading-relaxed font-jost break-words text-left">
+                    {spacerDescription}
+                  </div>
+
+                  {/* Previous description - sliding out upwards */}
+                  {isTransitioning && previousCollection?.description && (
+                    <AnimatedDescription
+                      key={`desc-exit-${previousCollection.label}`}
+                      text={previousCollection.description}
+                      animationKey={previousCollection.label}
+                      isExiting={true}
+                      enableStyling={false}
+                      className="absolute inset-0 text-light-secondary text-base xl:text-lg leading-relaxed font-jost break-words text-left"
+                    />
+                  )}
+
+                  {/* Current description - sliding in from bottom */}
+                  <AnimatedDescription
+                    key={`desc-enter-${collection.label}`}
+                    text={collection.description}
+                    animationKey={collection.label}
+                    isExiting={false}
+                    enableStyling={false}
+                    className="absolute inset-0 text-light-secondary text-base xl:text-lg leading-relaxed font-jost break-words text-left"
+                  />
+                </div>
               </div>
             )}
 
-            {/* Item Count - Minimal Style */}
+            {/* Stats Row */}
             {collection.itemCount && (
-              <div className="flex items-baseline gap-3 pt-2 relative">
-                {/* Previous item count - sliding out */}
+              <div className="flex items-baseline gap-2 relative">
+                {/* Previous count */}
                 {isTransitioning && previousCollection?.itemCount && (
-                  <>
-                    <AnimatedText
-                      key={`count-exit-${previousCollection.label}`}
-                      text={String(previousCollection.itemCount)}
-                      animationKey={`count-${previousCollection.label}`}
-                      isExiting={true}
-                      as="span"
-                      className="absolute text-white text-4xl xl:text-5xl font-extralight tabular-nums"
-                    />
-                    <AnimatedText
-                      key={`items-exit-${previousCollection.label}`}
-                      text="Items"
-                      animationKey={`items-${previousCollection.label}`}
-                      isExiting={true}
-                      as="span"
-                      className="absolute left-[120px] xl:left-[150px] text-white/40 text-xs font-light uppercase tracking-[0.2em]"
-                    />
-                  </>
+                  <AnimatedText
+                    key={`count-exit-${previousCollection.label}`}
+                    text={String(previousCollection.itemCount)}
+                    animationKey={`count-${previousCollection.label}`}
+                    isExiting={true}
+                    as="span"
+                    className="absolute text-white text-4xl xl:text-5xl font-light tabular-nums font-jost"
+                  />
                 )}
-
-                {/* Current item count - sliding in */}
+                {/* Current count */}
                 <AnimatedText
                   key={`count-enter-${collection.label}`}
                   text={String(collection.itemCount)}
                   animationKey={`count-${collection.label}`}
                   isExiting={false}
                   as="span"
-                  className="text-white text-4xl xl:text-5xl font-extralight tabular-nums"
+                  className="text-white text-4xl xl:text-5xl font-light tabular-nums font-jost"
                 />
-                <AnimatedText
-                  key={`items-enter-${collection.label}`}
-                  text="Items"
-                  animationKey={`items-${collection.label}`}
-                  isExiting={false}
-                  as="span"
-                  className="text-white/40 text-xs font-light uppercase tracking-[0.2em]"
-                />
+
+                {/* Animated "Items" label */}
+                <div className="relative">
+                  {/* Previous label */}
+                  {isTransitioning && previousCollection && (
+                    <AnimatedText
+                      key={`items-label-exit-${previousCollection.label}`}
+                      text="Items"
+                      animationKey={`items-label-${previousCollection.label}`}
+                      isExiting={true}
+                      as="span"
+                      className="absolute text-white/40 text-sm font-light uppercase tracking-wider font-jost"
+                    />
+                  )}
+                  {/* Current label */}
+                  <AnimatedText
+                    key={`items-label-enter-${collection.label}`}
+                    text="Items"
+                    animationKey={`items-label-${collection.label}`}
+                    isExiting={false}
+                    as="span"
+                    className="text-white/40 text-sm font-light uppercase tracking-wider font-jost"
+                  />
+                </div>
               </div>
             )}
 
@@ -547,15 +658,30 @@ export function CarouselTitleAndInfo({
                 <a
                   key={`cta-desktop-exit-${previousCollection.label}`}
                   href="#"
-                  className="absolute group inline-flex items-center text-sm font-semibold text-brand cursor-pointer"
+                  className="absolute group inline-flex items-center gap-2 text-sm font-semibold text-brand cursor-pointer"
                 >
                   <AnimatedText
-                    text="Scopri la Collezione →"
+                    text="Scopri la Collezione"
                     animationKey={`cta-desktop-exit-${previousCollection.label}`}
                     isExiting={true}
                     as="span"
-                    className="text-sm font-semibold text-brand"
+                    className="text-sm font-semibold text-brand font-jost"
                   />
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-brand"
+                    style={{
+                      animation: "slideUpOut 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                      animationDelay: "0s",
+                      willChange: "transform, opacity",
+                    }}
+                  >
+                    <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
                 </a>
               )}
 
@@ -567,15 +693,37 @@ export function CarouselTitleAndInfo({
                   e.preventDefault();
                   console.log("Category selected:", collection.label);
                 }}
-                className="group inline-flex items-center text-sm font-semibold text-brand hover:gap-1 cursor-pointer transition-all duration-300"
+                className="group relative inline-flex items-center gap-2 cursor-pointer"
+                style={{ pointerEvents: isTransitioning ? 'none' : 'auto' }}
               >
-                <AnimatedText
-                  text="Scopri la Collezione →"
-                  animationKey={`cta-desktop-enter-${collection.label}`}
-                  isExiting={false}
-                  as="span"
-                  className="text-sm font-semibold text-brand"
-                />
+                <span className="relative">
+                  <AnimatedText
+                    text="Scopri la Collezione"
+                    animationKey={`cta-desktop-enter-${collection.label}`}
+                    isExiting={false}
+                    as="span"
+                    className="text-sm font-semibold text-brand font-jost"
+                  />
+                  {/* Animated underline - solo dopo che l'animazione è completa */}
+                  {!isTransitioning && (
+                    <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-brand transition-all duration-300 group-hover:w-full" />
+                  )}
+                </span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-brand opacity-0 transform transition-transform duration-300 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  style={{
+                    animation: "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
+                    animationDelay: "0.85s", // Dopo l'ultimo carattere del testo
+                    willChange: "transform, opacity",
+                  }}
+                >
+                  <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </a>
             </div>
           </div>

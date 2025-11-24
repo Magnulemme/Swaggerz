@@ -410,6 +410,10 @@
     font-family: var(--font-pastor-of-muppets), sans-serif;
   }
 
+  .font-jost {
+    font-family: var(--font-jost);
+  }
+
   .bg-size-200 {
     background-size: 200% 200%;
   }

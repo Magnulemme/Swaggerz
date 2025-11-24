@@ -6,6 +6,7 @@ interface CategoryCarouselCardProps {
   cardIndex: number;
   image: string;
   label: string;
+  badge?: "hot" | "sale" | "new" | "exclusive";
   slotClasses: string;
   zIndex: number;
   rotateY: number;
@@ -26,6 +27,7 @@ export function CategoryCarouselCard({
   cardIndex,
   image,
   label,
+  badge,
   slotClasses,
   zIndex,
   rotateY,
@@ -179,6 +181,63 @@ export function CategoryCarouselCard({
       }}
       onClick={onClick}
     >
+      {/* Badge overlay - positioned in top-left corner with shimmer */}
+      {/* Only render if badge exists */}
+      {badge && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
+          className="absolute top-4 left-4 pointer-events-none z-20"
+        >
+          <div
+            className={`
+              relative inline-flex h-8 md:h-9 overflow-hidden rounded-full p-[1px] flex-shrink-0
+              ${badge === 'hot' ? 'bg-gradient-to-r from-red-900 via-red-600 to-red-900' : ''}
+              ${badge === 'new' ? 'bg-gradient-to-r from-emerald-900 via-emerald-600 to-emerald-900' : ''}
+              ${badge === 'exclusive' ? 'bg-gradient-to-r from-purple-900 via-purple-600 to-purple-900' : ''}
+              ${badge === 'sale' ? 'bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900' : ''}
+            `}
+          >
+            {/* Shimmer Effect */}
+            <motion.div
+              className="absolute inset-0 z-0 rounded-full"
+              animate={{
+                backgroundPosition: ["200% 0", "-200% 0"],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              style={{
+                background:
+                  badge === 'hot' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(248, 113, 113, 0.6) 50%, transparent 70%, transparent 100%)" :
+                  badge === 'new' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(52, 211, 153, 0.6) 50%, transparent 70%, transparent 100%)" :
+                  badge === 'exclusive' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(192, 132, 252, 0.6) 50%, transparent 70%, transparent 100%)" :
+                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(251, 191, 36, 0.6) 50%, transparent 70%, transparent 100%)",
+                backgroundSize: "200% 100%",
+              }}
+            />
+
+            <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-3 md:px-4 py-1 bg-zinc-950 backdrop-blur-sm">
+              <span
+                className={`
+                  text-[10px] md:text-xs font-bold uppercase tracking-wider md:tracking-widest font-jost
+                  ${badge === 'hot' ? 'text-red-400' : ''}
+                  ${badge === 'new' ? 'text-emerald-400' : ''}
+                  ${badge === 'exclusive' ? 'text-purple-400' : ''}
+                  ${badge === 'sale' ? 'text-amber-400' : ''}
+                `}
+              >
+                {badge}
+              </span>
+            </span>
+          </div>
+        </motion.div>
+      )}
+
       {/* BOX 1: Card image wrapper with ref for hover detection */}
       <div
         ref={cardRef}
@@ -220,12 +279,31 @@ export function CategoryCarouselCard({
               gap: isXL ? "0" : "0.75rem",
             }}
           >
-            <h3
-              className="font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg"
-            >
-              {[...label.split(""), "→"].map((char, i) => {
-                const isArrow = char === "→";
-                return (
+            <div className="flex items-center gap-3">
+              {/* Category Number */}
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                animate={
+                  isTransitioning
+                    ? { opacity: 0, y: 20 }
+                    : { opacity: 1, y: 0 }
+                }
+                exit={{ opacity: 0, y: -20 }}
+                transition={{
+                  duration: isTransitioning ? 0 : 0.8,
+                  delay: isTransitioning ? 0 : 0,
+                  ease: [0.65, 0, 0.35, 1],
+                }}
+                className={`text-lg xl:text-xl font-jost font-semibold transition-colors duration-300 ${
+                  isHovered ? "text-brand" : "text-brand/80"
+                }`}
+              >
+                [{String(cardIndex + 1).padStart(2, '0')}]
+              </motion.span>
+
+              {/* Label */}
+              <h3 className="font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg">
+                {label.split("").map((char, i) => (
                   <motion.span
                     key={`${cardIndex}-${currentPosition}-${i}`}
                     initial={{ opacity: 0, y: 20 }}
@@ -240,23 +318,43 @@ export function CategoryCarouselCard({
                       delay: isTransitioning ? 0 : i * 0.02,
                       ease: [0.65, 0, 0.35, 1],
                     }}
-                    className={
-                      isArrow
-                        ? `inline-block text-3xl xl:text-4xl ml-3 transition-colors duration-300 ${
-                            isHovered
-                              ? "text-brand"
-                              : "text-white/70"
-                          }`
-                        : `inline-block transition-colors duration-300 ${
-                            isHovered ? "text-brand" : "text-white/90"
-                          }`
-                    }
+                    className={`inline-block transition-colors duration-300 ${
+                      isHovered ? "text-brand" : "text-white/90"
+                    }`}
                   >
                     {char === " " ? "\u00A0" : char}
                   </motion.span>
-                );
-              })}
-            </h3>
+                ))}
+              </h3>
+
+              {/* Diagonal Arrow SVG */}
+              <motion.svg
+                width="24"
+                height="24"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={
+                  isTransitioning
+                    ? { opacity: 0, y: 20 }
+                    : { opacity: 1, y: 0 }
+                }
+                exit={{ opacity: 0, y: -20 }}
+                transition={{
+                  duration: isTransitioning ? 0 : 0.6,
+                  delay: isTransitioning ? 0 : 0.08,
+                  ease: [0.65, 0, 0.35, 1],
+                }}
+                className={`transition-all duration-300 ${
+                  isHovered
+                    ? "text-brand translate-x-0.5 -translate-y-0.5"
+                    : "text-white/70"
+                }`}
+              >
+                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </motion.svg>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

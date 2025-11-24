@@ -21,6 +21,7 @@ interface Product {
   reviewCount: number;
   colors?: string[]; // Colori disponibili (hex)
   sizes?: string[]; // Taglie disponibili
+  badge?: "hot" | "sale" | "new" | "exclusive"; // Badge tag
 }
 
 interface Collection {
@@ -47,6 +48,7 @@ const collections: Collection[] = [
         reviewCount: 156,
         colors: ["#FFFFFF", "#000000", "#DC2626"],
         sizes: ["39", "40", "41", "42", "43", "44"],
+        badge: "hot",
       },
       {
         id: 2,
@@ -71,6 +73,7 @@ const collections: Collection[] = [
         reviewCount: 134,
         colors: ["#000000", "#8B4513", "#2C3E50"],
         sizes: ["XS", "S", "M", "L", "XL"],
+        badge: "exclusive",
       },
       {
         id: 4,
@@ -95,6 +98,7 @@ const collections: Collection[] = [
         reviewCount: 201,
         colors: ["#000000", "#A0826D", "#FFFFFF"],
         sizes: ["Unica"],
+        badge: "new",
       },
       {
         id: 6,
@@ -144,6 +148,7 @@ const collections: Collection[] = [
         price: "€350",
         rating: 5.0,
         reviewCount: 198,
+        badge: "exclusive",
       },
       {
         id: 10,
@@ -154,6 +159,7 @@ const collections: Collection[] = [
         price: "€45",
         rating: 4.7,
         reviewCount: 421,
+        badge: "sale",
       },
       {
         id: 11,
@@ -211,6 +217,7 @@ const collections: Collection[] = [
         price: "€220",
         rating: 4.9,
         reviewCount: 176,
+        badge: "new",
       },
       {
         id: 16,
@@ -261,6 +268,61 @@ const ProductCard = ({ product }: { product: Product }) => {
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+        {/* Badge overlay - positioned in top-left corner with shimmer */}
+        {product.badge && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.65, 0, 0.35, 1] }}
+            className="absolute top-3 left-3 z-20"
+          >
+            <div
+              className={`
+                relative inline-flex h-7 md:h-8 overflow-hidden rounded-full p-[1px] flex-shrink-0
+                ${product.badge === 'hot' ? 'bg-gradient-to-r from-red-900 via-red-600 to-red-900' : ''}
+                ${product.badge === 'new' ? 'bg-gradient-to-r from-emerald-900 via-emerald-600 to-emerald-900' : ''}
+                ${product.badge === 'exclusive' ? 'bg-gradient-to-r from-purple-900 via-purple-600 to-purple-900' : ''}
+                ${product.badge === 'sale' ? 'bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900' : ''}
+              `}
+            >
+              {/* Shimmer Effect */}
+              <motion.div
+                className="absolute inset-0 z-0 rounded-full"
+                animate={{
+                  backgroundPosition: ["200% 0", "-200% 0"],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                style={{
+                  background:
+                    product.badge === 'hot' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(248, 113, 113, 0.6) 50%, transparent 70%, transparent 100%)" :
+                    product.badge === 'new' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(52, 211, 153, 0.6) 50%, transparent 70%, transparent 100%)" :
+                    product.badge === 'exclusive' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(192, 132, 252, 0.6) 50%, transparent 70%, transparent 100%)" :
+                    "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(251, 191, 36, 0.6) 50%, transparent 70%, transparent 100%)",
+                  backgroundSize: "200% 100%",
+                }}
+              />
+
+              <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-2.5 md:px-3 py-1 bg-zinc-950 backdrop-blur-sm">
+                <span
+                  className={`
+                    text-[9px] md:text-[10px] font-bold uppercase tracking-wider md:tracking-widest font-jost
+                    ${product.badge === 'hot' ? 'text-red-400' : ''}
+                    ${product.badge === 'new' ? 'text-emerald-400' : ''}
+                    ${product.badge === 'exclusive' ? 'text-purple-400' : ''}
+                    ${product.badge === 'sale' ? 'text-amber-400' : ''}
+                  `}
+                >
+                  {product.badge}
+                </span>
+              </span>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Product Info */}

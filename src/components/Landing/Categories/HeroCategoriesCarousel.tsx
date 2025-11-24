@@ -348,6 +348,7 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
                 cardIndex={index}
                 image={card.image}
                 label={card.label}
+                badge={card.badge}
                 slotClasses={slotClasses}
                 zIndex={zIndex}
                 rotateY={rotateY}
