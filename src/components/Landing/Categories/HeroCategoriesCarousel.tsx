@@ -295,36 +295,36 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
               rotateY = 0;
               isHorizontal = false;
             } else if (diff === CATEGORY_CARDS.length - 1 || diff === -1) {
-              // This is prev (left visible) - rotated + horizontal dimensions + più piccola e spostata
+              // This is prev (left visible) - usando solo transform
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
+                "top-1/2 -translate-y-1/2 -translate-x-[calc(50%+60vw)] md:-translate-x-[calc(50%+42vw)] lg:-translate-x-[calc(50%+38vw)] scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
-              rotateY = 50; // Angolo più pronunciato
+              rotateY = 50;
               isHorizontal = true;
             } else if (diff === 1) {
-              // This is next (right visible) - rotated + horizontal dimensions + più piccola e spostata
+              // This is next (right visible) - usando solo transform
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
+                "top-1/2 -translate-y-1/2 translate-x-[calc(-50%+60vw)] md:translate-x-[calc(-50%+42vw)] lg:translate-x-[calc(-50%+38vw)] scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
               zIndex = 10;
-              rotateY = -50; // Angolo più pronunciato (direzione opposta)
+              rotateY = -50;
               isHorizontal = true;
             } else if (diff === CATEGORY_CARDS.length - 2 || diff === -2) {
-              // This is prevPrev (hidden left) - allineata con prev
+              // This is prevPrev (hidden left) - usando solo transform
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[-10%] md:left-[8%] lg:left-[12%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
+                "top-1/2 -translate-y-1/2 -translate-x-[calc(50%+60vw)] md:-translate-x-[calc(50%+42vw)] lg:-translate-x-[calc(50%+38vw)] scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
               zIndex = 5;
               rotateY = 50;
               isHorizontal = true;
             } else if (diff === 2) {
-              // This is nextNext (hidden right) - allineata con next
+              // This is nextNext (hidden right) - usando solo transform
               slotClasses =
-                "top-1/2 -translate-y-1/2 left-[110%] md:left-[92%] lg:left-[88%] -translate-x-1/2 scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
+                "top-1/2 -translate-y-1/2 translate-x-[calc(-50%+60vw)] md:translate-x-[calc(-50%+42vw)] lg:translate-x-[calc(-50%+38vw)] scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
               zIndex = 5;
               rotateY = -50;
               isHorizontal = true;
             } else {
               // Hidden cards (should not show)
-              slotClasses = "left-1/2 -translate-x-1/2 opacity-0 invisible";
+              slotClasses = "-translate-x-1/2 opacity-0 invisible";
               zIndex = 0;
               rotateY = 0;
               isHorizontal = false;

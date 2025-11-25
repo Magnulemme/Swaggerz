@@ -145,7 +145,7 @@ export function CategoryCarouselCard({
   return (
     <div
       className={`absolute ${
-        !isFirstRender ? "transition-all duration-[1400ms]" : ""
+        !isFirstRender ? "transition-all duration-[1200ms]" : ""
       } ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
         shouldHide ? "opacity-0 invisible" : ""
       }`}
@@ -153,26 +153,22 @@ export function CategoryCarouselCard({
         zIndex,
         transform: `rotateY(${rotateY}deg)`,
         transformStyle: "preserve-3d",
+        willChange: "transform, opacity",
+        isolation: "isolate",
         ...(!isFirstRender && {
-          transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+          transitionTimingFunction: "cubic-bezier(0.3, 0, 0.8, 1)",
         }),
-        // Swap width/height based on orientation + 3D rotation
-        // On mobile, limit horizontal cards to vertical card max width
-        width: isHorizontal ? "min(70vh, 70vw)" : "70vw",
-        // Active card: lg=300px, xl=350px; Side cards: always 350px
-        maxWidth: isHorizontal
-          ? "350px"
-          : isActive && isDesktop && !isXL
-          ? "300px"
-          : "350px",
-        // Height: 50vh on mobile (< lg), 70vh on desktop (>= lg)
-        height: isHorizontal ? "70vw" : isDesktop ? "70vh" : "50vh",
-        maxHeight: isHorizontal ? "350px" : "450px",
+        // Fixed dimensions for all cards - no width/height transitions
+        width: "70vw",
+        maxWidth: isDesktop && !isXL ? "300px" : "350px",
+        height: isDesktop ? "70vh" : "50vh",
+        maxHeight: "450px",
+        // Always use left: 50% and control position via transform
+        left: "50%",
         // Use grid position if available (for active card)
         ...(gridPosition && {
-          left: `${gridPosition.left}px`,
           top: `${gridPosition.top}px`,
-          transform: `translate(-50%, -50%) rotateY(${rotateY}deg)`,
+          transform: `translate(calc(-50% + ${gridPosition.left - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)}px), -50%) rotateY(${rotateY}deg)`,
         }),
         // For side cards: use centerY to align with center card
         ...(centerY && !gridPosition && {
