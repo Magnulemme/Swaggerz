@@ -48,38 +48,11 @@ export function CollectionCardWrapper({
     console.log(`Card ${index} (${title}) - range:`, range, `targetScale: ${targetScale}`);
   }, [index, title, range, targetScale]); // Dipendenze per evitare warning
 
-  // Scale della card basata sul global scroll (disabilitato su mobile per width expansion)
+  // Scale della card basata sul global scroll (disabilitato su mobile)
   const scale = useTransform(
     globalScrollProgress,
     range,
     layout === "mobile" ? [1, 1] : [1, targetScale]
-  );
-
-  // Width expansion effect (solo mobile) - ogni card usa il proprio range
-  // Card 0: [0, 0.33], Card 1: [0.33, 0.66], Card 2: [0.66, 1]
-  // clamp: true blocca il valore a 100vw evitando l'interpolazione inversa
-  const cardWidth = useTransform(
-    globalScrollProgress,
-    range, // Usa il range specifico della card (1/3 dello scroll totale)
-    layout === "mobile" ? ["90%", "100vw"] : ["100%", "100%"],
-    { clamp: true }
-  );
-
-  // Border radius animation (solo mobile) - sincronizzato con width
-  const cardBorderRadius = useTransform(
-    globalScrollProgress,
-    range,
-    layout === "mobile" ? [24, 0] : [24, 24],
-    { clamp: true }
-  );
-
-  // Border opacity animation via box-shadow (solo mobile) - fade out graduale
-  // Usiamo box-shadow invece di border per avere controllo sull'opacity
-  const cardBorderOpacity = useTransform(
-    globalScrollProgress,
-    range,
-    layout === "mobile" ? [0.2, 0] : [0.2, 0.2],
-    { clamp: true }
   );
 
   // Parallax image scale (solo mobile)
@@ -115,9 +88,6 @@ export function CollectionCardWrapper({
           scale={scale}
           layout={layout}
           imageScale={layout === "mobile" ? imageScale : undefined}
-          cardWidth={layout === "mobile" ? cardWidth : undefined}
-          cardBorderRadius={layout === "mobile" ? cardBorderRadius : undefined}
-          cardBorderOpacity={layout === "mobile" ? cardBorderOpacity : undefined}
         />
       </div>
       {/* Spacer compensato per margine uniforme */}

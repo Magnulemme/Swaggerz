@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, MotionValue, useTransform, useInView, useMotionValue } from "framer-motion";
+import { motion, MotionValue, useInView } from "framer-motion";
 import Image from "next/image";
 import { useRef } from "react";
 import { AnimatedButton } from "@/components/ui/AnimatedButton";
@@ -19,9 +19,6 @@ interface CollectionCardProps {
   scale: MotionValue<number>;
   layout: "desktop" | "mobile";
   imageScale?: MotionValue<number>; // Solo per mobile parallax
-  cardWidth?: MotionValue<string>; // Solo per mobile width expansion
-  cardBorderRadius?: MotionValue<number>; // Solo per mobile border-radius animation
-  cardBorderOpacity?: MotionValue<number>; // Solo per mobile border opacity (via box-shadow)
 }
 
 export function CollectionCard({
@@ -33,9 +30,6 @@ export function CollectionCard({
   scale,
   layout,
   imageScale,
-  cardWidth,
-  cardBorderRadius,
-  cardBorderOpacity,
 }: CollectionCardProps) {
   // Alterna layout: indici pari = immagine a destra (solo desktop)
   const isImageRight = index % 2 === 0;
@@ -44,26 +38,12 @@ export function CollectionCard({
   const statsRef = useRef(null);
   const isInView = useInView(statsRef, { once: true, amount: 0.3 });
 
-  // Crea un box-shadow dinamico che simula il bordo con opacity controllabile (solo mobile)
-  // Hook deve essere chiamato sempre, non condizionalmente - usa un fallback se undefined
-  const dummyOpacity = useMotionValue(0);
-  const boxShadow = useTransform(
-    cardBorderOpacity || dummyOpacity,
-    (opacity) => `inset 0 0 0 1px rgba(255, 255, 255, ${opacity})`
-  );
-
   // Mobile layout - Hero Card
   if (layout === "mobile") {
-
     return (
       <motion.div
-        style={{
-          scale,
-          width: cardWidth,
-          borderRadius: cardBorderRadius,
-          boxShadow: boxShadow,
-        }}
-        className="relative h-[calc(100dvh-200px)] max-h-[600px] overflow-hidden origin-top bg-black will-change-transform"
+        style={{ scale }}
+        className="relative h-[calc(100dvh-200px)] max-h-[600px] w-[90%] overflow-hidden origin-top bg-black rounded-3xl border border-light-subtle/20 will-change-transform"
       >
           {/* Image Section - Full background */}
           <div className="absolute inset-0 overflow-hidden">
