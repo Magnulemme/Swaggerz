@@ -13,13 +13,6 @@ interface CarouselTitleAndInfoProps {
   isXL: boolean;
 }
 
-interface CharWithLine {
-  char: string;
-  lineIndex: number;
-  charIndex: number;
-  charsInLine: number; // Total chars in this line for dynamic delay calculation
-}
-
 /**
  * Helper function to determine style for a specific word
  */
@@ -194,19 +187,36 @@ export function CarouselTitleAndInfo({
       const fakeCardRect = activeRef.current.getBoundingClientRect();
       const containerRect = cardsContainerRef.current.getBoundingClientRect();
 
-      // Su mobile: la fake card è dentro mobileContainerRef che è centrato rispetto al cardsContainer
-      // Dobbiamo calcolare la posizione della card rispetto al cards container, non rispetto al mobile container
+      // La fake card è dentro un grid che ha transform: translate(-50%, -50%)
+      // La vera card è position: absolute dentro cardsContainerRef
+      // Dobbiamo calcolare la posizione della fake card rispetto al cardsContainer
+      // e poi usare quella posizione per la vera card
+
+      // Centro della fake card rispetto al viewport
+      const fakeCardCenterX = fakeCardRect.left + fakeCardRect.width / 2;
+      const fakeCardCenterY = fakeCardRect.top + fakeCardRect.height / 2;
+
+      // Centro del container rispetto al viewport
+      const containerLeft = containerRect.left;
+      const containerTop = containerRect.top;
+
+      // Posizione del centro della fake card rispetto al container
+      const fakeCardRelativeX = fakeCardCenterX - containerLeft;
+      const fakeCardRelativeY = fakeCardCenterY - containerTop;
+
       const position = {
-        left: fakeCardRect.left - containerRect.left + fakeCardRect.width / 2,
-        top: fakeCardRect.top - containerRect.top + fakeCardRect.height / 2,
+        left: fakeCardRelativeX,
+        top: fakeCardRelativeY,
       };
 
       console.log('📍 Position calculated:', {
         isDesktop,
-        fakeCardTop: fakeCardRect.top,
-        containerTop: containerRect.top,
-        fakeCardHeight: fakeCardRect.height,
-        calculatedTop: position.top,
+        fakeCardCenterX,
+        fakeCardCenterY,
+        containerLeft,
+        containerTop,
+        fakeCardRelativeX,
+        fakeCardRelativeY,
         fakeCardRect,
         containerRect,
       });
