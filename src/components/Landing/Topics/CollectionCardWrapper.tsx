@@ -8,6 +8,10 @@ interface CollectionCardWrapperProps {
   title: string;
   subtitle?: string;
   imageUrl: string;
+  stats: {
+    pieces: number;
+    swagLevel: number;
+  };
   index: number;
   isLast: boolean;
   isFirstCard: boolean;
@@ -25,9 +29,9 @@ export function CollectionCardWrapper({
   title,
   subtitle,
   imageUrl,
+  stats,
   index,
   isLast,
-  isFirstCard: _isFirstCard,
   layout,
   globalScrollProgress,
   range,
@@ -42,7 +46,7 @@ export function CollectionCardWrapper({
   // Debug: log del range per ogni card (solo al mount)
   useEffect(() => {
     console.log(`Card ${index} (${title}) - range:`, range, `targetScale: ${targetScale}`);
-  }, []); // Array vuoto = esegui solo al mount
+  }, [index, title, range, targetScale]); // Dipendenze per evitare warning
 
   // Scale della card basata sul global scroll (disabilitato su mobile per width expansion)
   const scale = useTransform(
@@ -107,6 +111,7 @@ export function CollectionCardWrapper({
           title={title}
           subtitle={subtitle}
           imageUrl={imageUrl}
+          stats={stats}
           scale={scale}
           layout={layout}
           imageScale={layout === "mobile" ? imageScale : undefined}

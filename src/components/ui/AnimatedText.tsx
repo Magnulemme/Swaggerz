@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, Variants } from "framer-motion";
-import { waveText, waveTextSubtle } from "@/lib/animations";
+import { motion } from "framer-motion";
 
 interface AnimatedTextProps {
   /**

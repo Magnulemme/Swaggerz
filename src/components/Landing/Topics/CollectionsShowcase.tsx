@@ -10,6 +10,10 @@ interface Collection {
   title: string;
   subtitle?: string;
   imageUrl: string;
+  stats: {
+    pieces: number;
+    swagLevel: number;
+  };
 }
 
 const defaultCollections: Collection[] = [
@@ -17,16 +21,28 @@ const defaultCollections: Collection[] = [
     title: "Essentials",
     subtitle: "Timeless Basics",
     imageUrl: "/mockups/essentials.png",
+    stats: {
+      pieces: 24,
+      swagLevel: 95,
+    },
   },
   {
     title: "Digital Art",
     subtitle: "Digital Collection",
     imageUrl: "/mockups/generative.png",
+    stats: {
+      pieces: 18,
+      swagLevel: 88,
+    },
   },
   {
     title: "Retrò",
     subtitle: "Vintage Collection",
     imageUrl: "/mockups/retro.png",
+    stats: {
+      pieces: 32,
+      swagLevel: 92,
+    },
   },
 ];
 
@@ -193,7 +209,10 @@ export function CollectionsShowcase({
           return (
             <CollectionCardWrapper
               key={`card_${i}_${isMobile ? 'mobile' : 'desktop'}`}
-              {...collection}
+              title={collection.title}
+              subtitle={collection.subtitle}
+              imageUrl={collection.imageUrl}
+              stats={collection.stats}
               index={i}
               isLast={isLast}
               isFirstCard={isFirstCard}

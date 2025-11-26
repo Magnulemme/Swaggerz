@@ -31,7 +31,7 @@ export function CategoryCarouselCard({
   slotClasses,
   zIndex,
   rotateY,
-  isHorizontal,
+  isHorizontal: _isHorizontal,
   isClickable,
   isActive,
   onClick,

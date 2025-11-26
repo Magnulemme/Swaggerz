@@ -23,7 +23,7 @@ export const timing = {
 } as const;
 
 // Custom easing curve (smooth, natural)
-export const easing = [0.6, 0.05, 0.01, 0.9];
+export const easing = [0.6, 0.05, 0.01, 0.9] as const;
 
 // Spring configs
 export const spring = {
