@@ -41,10 +41,11 @@ export function CollectionCard({
   // Mobile layout - Hero Card
   if (layout === "mobile") {
     return (
-      <motion.div
-        style={{ scale }}
-        className="relative h-[calc(100dvh-200px)] max-h-[600px] w-[90%] overflow-hidden origin-top bg-black rounded-3xl border border-light-subtle/20 will-change-transform"
-      >
+      <div className="w-screen flex justify-center">
+        <motion.div
+          style={{ scale }}
+          className="relative w-[90%] max-w-[400px] h-[calc(100dvh-200px)] max-h-[600px] rounded-3xl overflow-hidden origin-top bg-black border border-light-subtle will-change-transform"
+        >
           {/* Image Section - Full background */}
           <div className="absolute inset-0 overflow-hidden">
             <motion.div
@@ -137,7 +138,8 @@ export function CollectionCard({
               </AnimatedButton>
             </motion.div>
           </div>
-      </motion.div>
+        </motion.div>
+      </div>
     );
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { useScroll, useTransform, MotionValue } from "framer-motion";
 import { CollectionCard } from "./CollectionCard";
 
@@ -32,6 +32,7 @@ export function CollectionCardWrapper({
   stats,
   index,
   isLast,
+  isFirstCard: _isFirstCard,
   layout,
   globalScrollProgress,
   range,
@@ -43,17 +44,8 @@ export function CollectionCardWrapper({
 }: CollectionCardWrapperProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Debug: log del range per ogni card (solo al mount)
-  useEffect(() => {
-    console.log(`Card ${index} (${title}) - range:`, range, `targetScale: ${targetScale}`);
-  }, [index, title, range, targetScale]); // Dipendenze per evitare warning
-
-  // Scale della card basata sul global scroll (disabilitato su mobile)
-  const scale = useTransform(
-    globalScrollProgress,
-    range,
-    layout === "mobile" ? [1, 1] : [1, targetScale]
-  );
+  // Scale della card basata sul global scroll
+  const scale = useTransform(globalScrollProgress, range, [1, targetScale]);
 
   // Parallax image scale (solo mobile)
   const { scrollYProgress: cardScrollProgress } = useScroll({
