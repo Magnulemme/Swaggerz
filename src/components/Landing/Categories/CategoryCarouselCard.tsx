@@ -31,7 +31,7 @@ export function CategoryCarouselCard({
   slotClasses,
   zIndex,
   rotateY,
-  isHorizontal: _isHorizontal,
+  isHorizontal,
   isClickable,
   isActive,
   onClick,
@@ -163,18 +163,16 @@ export function CategoryCarouselCard({
         maxWidth: isDesktop && !isXL ? "300px" : "350px",
         height: isDesktop ? "70vh" : "50vh",
         maxHeight: "450px",
+        // Always use left: 50% and control position via transform
+        left: "50%",
         // Use grid position if available (for active card)
-        ...(gridPosition ? {
-          // Position using absolute coordinates from fake card calculation
-          left: `${gridPosition.left}px`,
+        ...(gridPosition && {
           top: `${gridPosition.top}px`,
-          transform: `translate(-50%, -50%) rotateY(${rotateY}deg)`,
-        } : {
-          // For side cards: use centerY to align with center card
-          left: "50%",
-          ...(centerY && {
-            top: `${centerY}px`,
-          }),
+          transform: `translate(calc(-50% + ${gridPosition.left - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)}px), -50%) rotateY(${rotateY}deg)`,
+        }),
+        // For side cards: use centerY to align with center card
+        ...(centerY && !gridPosition && {
+          top: `${centerY}px`,
         }),
       }}
       onClick={onClick}

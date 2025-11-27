@@ -28,7 +28,7 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
   const [previousIndex, setPreviousIndex] = useState(0);
   const isTransitioning = currentPhase === "transitioning";
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
-  const [, setAutoplayKey] = useState(0);
+  const [_autoplayKey, setAutoplayKey] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);

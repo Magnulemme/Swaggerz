@@ -1,4 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { waveText, staggerContainer } from "@/lib/animations";
 import { type CategoryCard } from "./categories.constants";
 
 interface CarouselTitleAndInfoProps {
@@ -260,12 +262,16 @@ export function CarouselTitleAndInfo({
         </a>
 
         {/* Contenuto sotto l'immagine: Titolo + Descrizione + CTA */}
-        <div
+        <motion.div
           className="flex flex-col gap-3 items-center px-4 pt-6 pointer-events-none"
           style={{
             width: "80vw",
             maxWidth: "400px",
           }}
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
         >
           {/* Titolo */}
           <div className="uppercase flex items-center justify-center w-full">
@@ -292,31 +298,22 @@ export function CarouselTitleAndInfo({
               </div>
             )}
 
-            {/* Current title - sliding in from bottom */}
-            <div
+            {/* Current title - wave effect */}
+            <motion.div
               key={`title-mobile-enter-${currentLabel}`}
               className="text-3xl md:text-4xl font-black tracking-tight leading-none text-center text-white whitespace-nowrap font-jost"
+              variants={waveText}
             >
-              {currentLabel.split("").map((char, i) => (
-                <span
-                  key={i}
-                  className="inline-block opacity-0 font-jost"
-                  style={{
-                    animation:
-                      "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
-                    animationDelay: `${0.6 + i * 0.02}s`,
-                    willChange: "transform, opacity",
-                  }}
-                >
-                  {char === " " ? "\u00A0" : char}
-                </span>
-              ))}
-            </div>
+              {currentLabel}
+            </motion.div>
           </div>
 
           {/* Descrizione con numero */}
           {collection.description && (
-            <div className="relative min-h-[50px] w-full flex items-baseline justify-start gap-2">
+            <motion.div
+              className="relative min-h-[50px] w-full flex items-baseline justify-start gap-2"
+              variants={waveText}
+            >
               {/* Category Number - decorative, secondary */}
               <div className="relative flex-shrink-0">
                 {/* Previous number */}
@@ -372,11 +369,11 @@ export function CarouselTitleAndInfo({
                   className="absolute inset-0 text-light-secondary text-sm leading-relaxed font-jost break-words text-left"
                 />
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* CTA Secondaria (stile ProductShowcase) */}
-          <div className="relative pointer-events-auto">
+          <motion.div className="relative pointer-events-auto" variants={waveText}>
             {/* Previous CTA - sliding out */}
             {isTransitioning && previousCollection && (
               <a
@@ -449,8 +446,8 @@ export function CarouselTitleAndInfo({
                 <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </a>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Layout DESKTOP - GRID (come prima) */}
@@ -510,26 +507,17 @@ export function CarouselTitleAndInfo({
             </div>
           )}
 
-          {/* Current title - sliding in from bottom */}
-          <div
+          {/* Current title - wave effect */}
+          <motion.div
             key={`title-desktop-enter-${currentLabel}`}
             className="absolute text-6xl xl:text-7xl font-black drop-shadow-2xl tracking-tight leading-none text-center px-4 text-white whitespace-nowrap font-jost"
+            variants={waveText}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
           >
-            {currentLabel.split("").map((char, i) => (
-              <span
-                key={i}
-                className="inline-block opacity-0 font-jost"
-                style={{
-                  animation:
-                    "slideUpIn 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards",
-                  animationDelay: `${0.6 + i * 0.02}s`,
-                  willChange: "transform, opacity",
-                }}
-              >
-                {char === " " ? "\u00A0" : char}
-              </span>
-            ))}
-          </div>
+            {currentLabel}
+          </motion.div>
         </div>
 
         {/* Descrizione Desktop - Grid position: col 2, row 2 (accanto al bottom della card) */}
@@ -540,16 +528,23 @@ export function CarouselTitleAndInfo({
             gridRow: "2",
           }}
         >
-          <div
+          <motion.div
             className={`
             w-[240px] xl:w-[300px]
             flex flex-col gap-6
             pointer-events-auto
           `}
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.5 }}
           >
             {/* Description with Category Number */}
             {collection.description && (
-              <div className="relative min-h-[75px] flex items-baseline gap-3">
+              <motion.div
+                className="relative min-h-[75px] flex items-baseline gap-3"
+                variants={waveText}
+              >
                 {/* Category Number - decorative, secondary */}
                 <div className="relative flex-shrink-0">
                   {/* Previous number */}
@@ -608,12 +603,12 @@ export function CarouselTitleAndInfo({
                     className="absolute inset-0 text-light-secondary text-base xl:text-lg leading-relaxed font-jost break-words text-left"
                   />
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Stats Row */}
             {collection.itemCount && (
-              <div className="flex items-baseline gap-2 relative">
+              <motion.div className="flex items-baseline gap-2 relative" variants={waveText}>
                 {/* Previous count */}
                 {isTransitioning && previousCollection?.itemCount && (
                   <AnimatedText
@@ -658,11 +653,11 @@ export function CarouselTitleAndInfo({
                     className="text-white/40 text-sm font-light uppercase tracking-wider font-jost"
                   />
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* CTA Secondaria Desktop */}
-            <div className="relative pointer-events-auto pt-4">
+            <motion.div className="relative pointer-events-auto pt-4" variants={waveText}>
               {/* Previous CTA - sliding out */}
               {isTransitioning && previousCollection && (
                 <a
@@ -735,8 +730,8 @@ export function CarouselTitleAndInfo({
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </a>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </>
