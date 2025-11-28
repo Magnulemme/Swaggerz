@@ -11,6 +11,7 @@ import {
   CAROUSEL_TIMINGS,
   type ImageConfig,
 } from "./categories.constants";
+import { getCardSlotConfig } from "./carouselPositions";
 
 interface HeroCategoriesCarouselProps {
   images?: ImageConfig[];
@@ -277,67 +278,25 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
         >
           {/* Render only side cards (prev/next), active card is in grid */}
           {CATEGORY_CARDS.map((card, index) => {
-            // Calculate relative position to activeIndex
-            const diff =
-              (index - activeIndex + CATEGORY_CARDS.length) %
-              CATEGORY_CARDS.length;
+            // Get slot configuration - this is just a simple lookup + assignment
+            // No heavy calculations, SLOT_CONFIGS is static
+            const slotConfig = getCardSlotConfig(
+              index,
+              activeIndex,
+              CATEGORY_CARDS.length
+            );
 
-            // Determine which slot this card belongs to
-            let slotClasses = "";
-            let zIndex = 0;
-            let rotateY = 0; // 3D rotation on Y axis
-            let isHorizontal = false; // Controls width/height swap
+            const { slotClasses, zIndex, rotateY, translateX, translateY, scale, isHorizontal, isClickable, isActive } = slotConfig;
 
-            if (diff === 0) {
-              // This is the active card (center) - positioned at grid location
-              slotClasses = "scale-100 opacity-100";
-              zIndex = 20;
-              rotateY = 0;
-              isHorizontal = false;
-            } else if (diff === CATEGORY_CARDS.length - 1 || diff === -1) {
-              // This is prev (left visible) - usando solo transform
-              slotClasses =
-                "top-1/2 -translate-y-1/2 -translate-x-[calc(50%+60vw)] md:-translate-x-[calc(50%+42vw)] lg:-translate-x-[calc(50%+38vw)] scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
-              zIndex = 10;
-              rotateY = 50;
-              isHorizontal = true;
-            } else if (diff === 1) {
-              // This is next (right visible) - usando solo transform
-              slotClasses =
-                "top-1/2 -translate-y-1/2 translate-x-[calc(-50%+60vw)] md:translate-x-[calc(-50%+42vw)] lg:translate-x-[calc(-50%+38vw)] scale-[0.75] md:scale-[0.6] lg:scale-[0.6]";
-              zIndex = 10;
-              rotateY = -50;
-              isHorizontal = true;
-            } else if (diff === CATEGORY_CARDS.length - 2 || diff === -2) {
-              // This is prevPrev (hidden left) - usando solo transform
-              slotClasses =
-                "top-1/2 -translate-y-1/2 -translate-x-[calc(50%+60vw)] md:-translate-x-[calc(50%+42vw)] lg:-translate-x-[calc(50%+38vw)] scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
-              zIndex = 5;
-              rotateY = 50;
-              isHorizontal = true;
-            } else if (diff === 2) {
-              // This is nextNext (hidden right) - usando solo transform
-              slotClasses =
-                "top-1/2 -translate-y-1/2 translate-x-[calc(-50%+60vw)] md:translate-x-[calc(-50%+42vw)] lg:translate-x-[calc(-50%+38vw)] scale-[0.55] md:scale-[0.6] lg:scale-[0.6] opacity-0";
-              zIndex = 5;
-              rotateY = -50;
-              isHorizontal = true;
-            } else {
-              // Hidden cards (should not show)
-              slotClasses = "-translate-x-1/2 opacity-0 invisible";
-              zIndex = 0;
-              rotateY = 0;
-              isHorizontal = false;
-            }
-
-            // Determine if this card is clickable (prev or next)
-            const isClickable =
-              diff === CATEGORY_CARDS.length - 1 || diff === 1;
+            // Determine click handler for side cards
             const handleCardClick = () => {
               if (!isClickable || isTransitioning) return;
-              if (diff === CATEGORY_CARDS.length - 1) {
+
+              // Determine direction based on slot type
+              const slotType = slotConfig.slotType;
+              if (slotType === 'prev') {
                 goToPrev();
-              } else if (diff === 1) {
+              } else if (slotType === 'next') {
                 goToNext();
               }
             };
@@ -352,12 +311,15 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
                 slotClasses={slotClasses}
                 zIndex={zIndex}
                 rotateY={rotateY}
+                translateX={translateX}
+                translateY={translateY}
+                scale={scale}
                 isHorizontal={isHorizontal}
                 isClickable={isClickable}
-                isActive={diff === 0}
+                isActive={isActive}
                 onClick={handleCardClick}
-                gridPosition={diff === 0 ? gridCardPosition : null}
-                centerY={diff !== 0 && gridCardPosition ? gridCardPosition.top : null}
+                gridPosition={isActive ? gridCardPosition : null}
+                centerY={!isActive && gridCardPosition ? gridCardPosition.top : null}
                 isFirstRender={isFirstRender}
                 isDesktop={isDesktop}
                 isXL={isXL}

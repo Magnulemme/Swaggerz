@@ -1,21 +1,36 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRef, useEffect, memo } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useCarouselStore } from "@/store/useCarouselStore";
+import { CategoryBadge } from "./CategoryBadge";
+import { CategoryLabel } from "./CategoryLabel";
+import { CardImage } from "./CardImage";
+import { useMediaQuery } from "./useMediaQuery";
+import { useCustomHover } from "./useCustomHover";
+import {
+  getCardDimensions,
+  shouldRenderLabel,
+  TRANSITION_CLASSES,
+  BREAKPOINTS,
+  type BadgeType,
+} from "./categories.ui-constants";
 
 interface CategoryCarouselCardProps {
   cardIndex: number;
   image: string;
   label: string;
-  badge?: "hot" | "sale" | "new" | "exclusive";
+  badge?: BadgeType;
   slotClasses: string;
   zIndex: number;
   rotateY: number;
+  translateX: string;
+  translateY: string;
+  scale: number;
   isHorizontal: boolean;
   isClickable: boolean;
   isActive: boolean;
   onClick: () => void;
   gridPosition?: { left: number; top: number } | null;
-  centerY?: number | null; // Y coordinate for side cards to align with center card
+  centerY?: number | null;
   isFirstRender?: boolean;
   isDesktop: boolean;
   isXL: boolean;
@@ -23,7 +38,7 @@ interface CategoryCarouselCardProps {
   onSideCardHoverChange?: (isHovered: boolean) => void;
 }
 
-export function CategoryCarouselCard({
+const CategoryCarouselCardComponent = ({
   cardIndex,
   image,
   label,
@@ -31,6 +46,9 @@ export function CategoryCarouselCard({
   slotClasses,
   zIndex,
   rotateY,
+  translateX,
+  translateY,
+  scale,
   isHorizontal,
   isClickable,
   isActive,
@@ -42,14 +60,26 @@ export function CategoryCarouselCard({
   isXL,
   onMainCardHoverChange,
   onSideCardHoverChange,
-}: CategoryCarouselCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLG, setIsLG] = useState(false);
+}: CategoryCarouselCardProps): JSX.Element => {
   const cardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
 
   // Determine if this is left card based on rotateY
   const isLeftCard = rotateY < 0;
+
+  // Apply responsive values for side cards
+  const responsiveTranslateX = isHorizontal
+    ? translateX.replace(
+        "60vw",
+        isDesktop ? (isXL ? "38vw" : "42vw") : "60vw"
+      )
+    : translateX;
+
+  const responsiveScale = isHorizontal
+    ? isDesktop
+      ? 0.6
+      : 0.75
+    : scale;
 
   const { cardPositions, currentPhase } = useCarouselStore();
 
@@ -57,70 +87,22 @@ export function CategoryCarouselCard({
   const currentPosition = cardPositions.get(cardIndex) || null;
 
   // Only render label for prev/next cards (not active or hidden)
-  const shouldRenderLabel = currentPosition === 'prev' || currentPosition === 'next';
+  const shouldShowLabel = shouldRenderLabel(currentPosition);
 
   // Show animation only when transition is complete
-  const isTransitioning = currentPhase === 'transitioning';
+  const isTransitioning = currentPhase === "transitioning";
 
   // Track viewport changes
-  useEffect(() => {
-    const lgMediaQuery = window.matchMedia("(min-width: 1024px)");
-    setIsLG(lgMediaQuery.matches); // Set initial value on mount
+  const isLG = useMediaQuery(BREAKPOINTS.lg);
 
-    const handleLgChange = (e: MediaQueryListEvent) => {
-      setIsLG(e.matches);
-    };
-
-    lgMediaQuery.addEventListener("change", handleLgChange);
-
-    return () => {
-      lgMediaQuery.removeEventListener("change", handleLgChange);
-    };
-  }, []);
-
-  // Custom hover detection using mouse coordinates
-  // For side cards: check card AND label
-  // For main card: check only card (to avoid conflicts with overlaid elements)
-  useEffect(() => {
-    if (!isClickable && !isActive) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      // Check if mouse is within card bounding box
-      let isInsideCard = false;
-      if (cardRef.current) {
-        const cardRect = cardRef.current.getBoundingClientRect();
-        isInsideCard =
-          mouseX >= cardRect.left &&
-          mouseX <= cardRect.right &&
-          mouseY >= cardRect.top &&
-          mouseY <= cardRect.bottom;
-      }
-
-      // Check if mouse is within label bounding box (only for side cards)
-      let isInsideLabel = false;
-      if (labelRef.current && shouldRenderLabel && isClickable) {
-        const labelRect = labelRef.current.getBoundingClientRect();
-        isInsideLabel =
-          mouseX >= labelRect.left &&
-          mouseX <= labelRect.right &&
-          mouseY >= labelRect.top &&
-          mouseY <= labelRect.bottom;
-      }
-
-      // Set hovered if inside either card OR label
-      setIsHovered(isInsideCard || isInsideLabel);
-    };
-
-    // Add listener to document to track mouse globally
-    document.addEventListener("mousemove", handleMouseMove);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [isClickable, isActive, shouldRenderLabel]);
+  // Custom hover detection
+  const isHovered = useCustomHover({
+    cardRef,
+    labelRef,
+    isClickable,
+    isActive,
+    shouldRenderLabel: shouldShowLabel,
+  });
 
   // Notify parent about hover state changes
   useEffect(() => {
@@ -142,218 +124,74 @@ export function CategoryCarouselCard({
 
   const shouldHide = shouldHideActive || shouldHideSide;
 
+  // Get card dimensions based on viewport
+  const dimensions = getCardDimensions(isDesktop, isXL);
+
   return (
     <div
       className={`absolute ${
-        !isFirstRender ? "transition-all duration-[1200ms]" : ""
+        !isFirstRender ? TRANSITION_CLASSES.card : ""
       } ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
         shouldHide ? "opacity-0 invisible" : ""
       }`}
       style={{
         zIndex,
-        transform: `rotateY(${rotateY}deg)`,
         transformStyle: "preserve-3d",
-        willChange: "transform, opacity",
         isolation: "isolate",
         ...(!isFirstRender && {
-          transitionTimingFunction: "cubic-bezier(0.3, 0, 0.8, 1)",
+          transitionTimingFunction: TRANSITION_CLASSES.cardEasing,
         }),
-        // Fixed dimensions for all cards - no width/height transitions
-        width: "70vw",
-        maxWidth: isDesktop && !isXL ? "300px" : "350px",
-        height: isDesktop ? "70vh" : "50vh",
-        maxHeight: "450px",
-        // Always use left: 50% and control position via transform
-        left: "50%",
-        // Use grid position if available (for active card)
+        // Fixed dimensions for all cards
+        width: dimensions.width,
+        maxWidth: dimensions.maxWidth,
+        height: dimensions.height,
+        maxHeight: dimensions.maxHeight,
+        // Active card: positioned by grid
         ...(gridPosition && {
+          left: `${gridPosition.left}px`,
           top: `${gridPosition.top}px`,
-          transform: `translate(calc(-50% + ${gridPosition.left - (typeof window !== 'undefined' ? window.innerWidth / 2 : 0)}px), -50%) rotateY(${rotateY}deg)`,
+          transform: `translate(${translateX}, ${translateY}) rotateY(${rotateY}deg) scale(${scale})`,
         }),
-        // For side cards: use centerY to align with center card
-        ...(centerY && !gridPosition && {
-          top: `${centerY}px`,
+        // Side cards: compose all transforms inline to prevent overwrite
+        ...(!gridPosition && {
+          transform: `translate(${responsiveTranslateX}, ${translateY}) rotateY(${rotateY}deg) scale(${responsiveScale})`,
         }),
+        willChange: "transform, opacity",
       }}
       onClick={onClick}
     >
-      {/* Badge overlay - positioned in top-left corner with shimmer */}
-      {/* Only render if badge exists */}
-      {badge && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.8 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: [0.65, 0, 0.35, 1] }}
-          className="absolute top-4 left-4 pointer-events-none z-20"
-        >
-          <div
-            className={`
-              relative inline-flex h-8 md:h-9 overflow-hidden rounded-full p-[1px] flex-shrink-0
-              ${badge === 'hot' ? 'bg-gradient-to-r from-red-900 via-red-600 to-red-900' : ''}
-              ${badge === 'new' ? 'bg-gradient-to-r from-emerald-900 via-emerald-600 to-emerald-900' : ''}
-              ${badge === 'exclusive' ? 'bg-gradient-to-r from-purple-900 via-purple-600 to-purple-900' : ''}
-              ${badge === 'sale' ? 'bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900' : ''}
-            `}
-          >
-            {/* Shimmer Effect */}
-            <motion.div
-              className="absolute inset-0 z-0 rounded-full"
-              animate={{
-                backgroundPosition: ["200% 0", "-200% 0"],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              style={{
-                background:
-                  badge === 'hot' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(248, 113, 113, 0.6) 50%, transparent 70%, transparent 100%)" :
-                  badge === 'new' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(52, 211, 153, 0.6) 50%, transparent 70%, transparent 100%)" :
-                  badge === 'exclusive' ? "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(192, 132, 252, 0.6) 50%, transparent 70%, transparent 100%)" :
-                  "linear-gradient(90deg, transparent 0%, transparent 30%, rgba(251, 191, 36, 0.6) 50%, transparent 70%, transparent 100%)",
-                backgroundSize: "200% 100%",
-              }}
-            />
+      {/* Badge overlay */}
+      {badge && <CategoryBadge badge={badge} />}
 
-            <span className="relative z-10 inline-flex h-full w-full items-center justify-center rounded-full px-3 md:px-4 py-1 bg-zinc-950 backdrop-blur-sm">
-              <span
-                className={`
-                  text-[10px] md:text-xs font-bold uppercase tracking-wider md:tracking-widest font-jost
-                  ${badge === 'hot' ? 'text-red-400' : ''}
-                  ${badge === 'new' ? 'text-emerald-400' : ''}
-                  ${badge === 'exclusive' ? 'text-purple-400' : ''}
-                  ${badge === 'sale' ? 'text-amber-400' : ''}
-                `}
-              >
-                {badge}
-              </span>
-            </span>
-          </div>
-        </motion.div>
-      )}
+      {/* Card image wrapper */}
+      <CardImage
+        image={image}
+        isActive={isActive}
+        isFirstRender={isFirstRender}
+        cardRef={cardRef}
+      />
 
-      {/* BOX 1: Card image wrapper with ref for hover detection */}
-      <div
-        ref={cardRef}
-        className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl"
-      >
-        {/* Image layer with 3D effect */}
-        <div
-          className={`absolute inset-0 ${
-            !isFirstRender ? "transition-all duration-[1400ms]" : ""
-          }`}
-          style={{
-            backgroundImage: `url(${image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: isActive ? "blur(0)" : "blur(0)",
-            ...(!isFirstRender && {
-              transitionTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
-            }),
-          }}
-        />
-      </div>
-
-      {/* BOX 2: Label below card with ref for hover detection */}
+      {/* Label below card */}
       <AnimatePresence>
-        {shouldRenderLabel && (
-          <motion.div
-            key={`${cardIndex}-${currentPosition}`}
-            ref={labelRef}
-            className="hidden md:flex absolute -bottom-16 left-0 right-0 items-center"
-            style={{
-              pointerEvents: !isActive ? "auto" : "none",
-              justifyContent: isXL
-                ? "space-between"
-                : isLG
-                ? "flex-start"
-                : isLeftCard
-                ? "flex-start"
-                : "flex-end",
-              gap: isXL ? "0" : "0.75rem",
-            }}
-          >
-            <div className="flex items-center gap-3">
-              {/* Category Number */}
-              <motion.span
-                initial={{ opacity: 0, y: 20 }}
-                animate={
-                  isTransitioning
-                    ? { opacity: 0, y: 20 }
-                    : { opacity: 1, y: 0 }
-                }
-                exit={{ opacity: 0, y: -20 }}
-                transition={{
-                  duration: isTransitioning ? 0 : 0.8,
-                  delay: isTransitioning ? 0 : 0,
-                  ease: [0.65, 0, 0.35, 1],
-                }}
-                className={`text-lg xl:text-xl font-jost font-semibold transition-colors duration-300 ${
-                  isHovered ? "text-brand" : "text-brand/80"
-                }`}
-              >
-                [{String(cardIndex + 1).padStart(2, '0')}]
-              </motion.span>
-
-              {/* Label */}
-              <h3 className="font-light text-2xl xl:text-3xl tracking-[0.2em] uppercase drop-shadow-lg">
-                {label.split("").map((char, i) => (
-                  <motion.span
-                    key={`${cardIndex}-${currentPosition}-${i}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={
-                      isTransitioning
-                        ? { opacity: 0, y: 20 }
-                        : { opacity: 1, y: 0 }
-                    }
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{
-                      duration: isTransitioning ? 0 : 0.8,
-                      delay: isTransitioning ? 0 : i * 0.02,
-                      ease: [0.65, 0, 0.35, 1],
-                    }}
-                    className={`inline-block transition-colors duration-300 ${
-                      isHovered ? "text-brand" : "text-white/90"
-                    }`}
-                  >
-                    {char === " " ? "\u00A0" : char}
-                  </motion.span>
-                ))}
-              </h3>
-
-              {/* Diagonal Arrow SVG */}
-              <motion.svg
-                width="24"
-                height="24"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={
-                  isTransitioning
-                    ? { opacity: 0, y: 20 }
-                    : { opacity: 1, y: 0 }
-                }
-                exit={{ opacity: 0, y: -20 }}
-                transition={{
-                  duration: isTransitioning ? 0 : 0.6,
-                  delay: isTransitioning ? 0 : 0.08,
-                  ease: [0.65, 0, 0.35, 1],
-                }}
-                className={`transition-all duration-300 ${
-                  isHovered
-                    ? "text-brand translate-x-0.5 -translate-y-0.5"
-                    : "text-white/70"
-                }`}
-              >
-                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </motion.svg>
-            </div>
-          </motion.div>
+        {shouldShowLabel && (
+          <div ref={labelRef}>
+            <CategoryLabel
+              label={label}
+              cardIndex={cardIndex}
+              currentPosition={currentPosition}
+              isTransitioning={isTransitioning}
+              isHovered={isHovered}
+              isXL={isXL}
+              isLG={isLG}
+              isLeftCard={isLeftCard}
+            />
+          </div>
         )}
       </AnimatePresence>
     </div>
   );
-}
+};
+
+// Memoize component to prevent unnecessary re-renders
+// Only re-render when props actually change
+export const CategoryCarouselCard = memo(CategoryCarouselCardComponent);
