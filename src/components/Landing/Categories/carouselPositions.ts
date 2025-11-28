@@ -16,7 +16,7 @@ export interface SlotConfig {
 }
 
 // Slot types (positions in the carousel)
-export type SlotType = 'active' | 'prev' | 'next' | 'prevPrev' | 'nextNext' | 'hidden';
+export type SlotType = 'active' | 'prev' | 'next' | 'prevPrev' | 'nextNext' | 'hidden' | 'hiddenLeft' | 'hiddenRight';
 
 /**
  * STATIC SLOT POSITIONS
@@ -84,7 +84,7 @@ export const SLOT_CONFIGS: Record<SlotType, SlotConfig> = {
     isClickable: false,
   },
 
-  // Hidden cards
+  // Hidden cards (generic, should not be used directly)
   hidden: {
     slotClasses: "opacity-0 invisible",
     zIndex: 0,
@@ -93,6 +93,30 @@ export const SLOT_CONFIGS: Record<SlotType, SlotConfig> = {
     translateY: "-50%",
     scale: 1,
     isHorizontal: false,
+    isClickable: false,
+  },
+
+  // Hidden cards on the left (ready to enter from left)
+  hiddenLeft: {
+    slotClasses: "left-1/2 top-1/2 opacity-0 invisible",
+    zIndex: 0,
+    rotateY: 50,
+    translateX: "calc(-50% - 60vw)",
+    translateY: "-50%",
+    scale: 0.55,
+    isHorizontal: true,
+    isClickable: false,
+  },
+
+  // Hidden cards on the right (ready to enter from right)
+  hiddenRight: {
+    slotClasses: "left-1/2 top-1/2 opacity-0 invisible",
+    zIndex: 0,
+    rotateY: -50,
+    translateX: "calc(-50% + 60vw)",
+    translateY: "-50%",
+    scale: 0.55,
+    isHorizontal: true,
     isClickable: false,
   },
 };
@@ -115,7 +139,11 @@ export function getSlotTypeForCard(
   if (diff === 1) return 'next';
   if (diff === totalCards - 2 || diff === -2) return 'prevPrev';
   if (diff === 2) return 'nextNext';
-  return 'hidden';
+
+  // Hidden cards: determine if they're on the left or right side
+  // Cards before active (negative relative position) are on the left
+  const isLeftSide = diff > totalCards / 2;
+  return isLeftSide ? 'hiddenLeft' : 'hiddenRight';
 }
 
 /**

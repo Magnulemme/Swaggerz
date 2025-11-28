@@ -1,5 +1,5 @@
-import { useRef, useEffect, memo } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCarouselStore } from "@/store/useCarouselStore";
 import { CategoryBadge } from "./CategoryBadge";
 import { CategoryLabel } from "./CategoryLabel";
@@ -9,7 +9,6 @@ import { useCustomHover } from "./useCustomHover";
 import {
   getCardDimensions,
   shouldRenderLabel,
-  TRANSITION_CLASSES,
   BREAKPOINTS,
   type BadgeType,
 } from "./categories.ui-constants";
@@ -62,7 +61,9 @@ const CategoryCarouselCardComponent = ({
   onSideCardHoverChange,
 }: CategoryCarouselCardProps): JSX.Element => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const motionCardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
+  const previousTransformRef = useRef<{ x: string; y: string; rotateY: number; scale: number } | null>(null);
 
   // Determine if this is left card based on rotateY
   const isLeftCard = rotateY < 0;
@@ -127,34 +128,84 @@ const CategoryCarouselCardComponent = ({
   // Get card dimensions based on viewport
   const dimensions = getCardDimensions(isDesktop, isXL);
 
+  // Parse transform values for Framer Motion
+  const getTransformValues = () => {
+    const x = gridPosition ? translateX : responsiveTranslateX;
+    const y = translateY;
+    const rotation = rotateY;
+    const scaleValue = gridPosition ? scale : responsiveScale;
+
+    return { x, y, rotateY: rotation, scale: scaleValue };
+  };
+
+  const transformValues = getTransformValues();
+
+  // Determine initial values: use previous transform if available, otherwise current
+  const initialValues = previousTransformRef.current || transformValues;
+
+  // DEBUG: Log transform changes ONLY for card that's transitioning to active
+  if (isActive && previousTransformRef.current &&
+      previousTransformRef.current.x !== transformValues.x) {
+    console.log(`🎯 Card ${cardIndex} transitioning to CENTER:`);
+    console.log('  FROM (previous):', previousTransformRef.current.x, 'rotateY:', previousTransformRef.current.rotateY);
+    console.log('  TO (current):', transformValues.x, 'rotateY:', transformValues.rotateY);
+    console.log('  Initial prop will be:', initialValues.x, 'rotateY:', initialValues.rotateY);
+  }
+
+  // Update the ref AFTER the animation completes, not immediately
+  // This prevents the ref from updating before Framer Motion reads the initial value
+  useEffect(() => {
+    // Wait for animation duration before updating
+    const timeout = setTimeout(() => {
+      previousTransformRef.current = transformValues;
+    }, 1400); // Match transition duration
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transformValues.x, transformValues.y, transformValues.rotateY, transformValues.scale]);
+
   return (
-    <div
-      className={`absolute ${
-        !isFirstRender ? TRANSITION_CLASSES.card : ""
-      } ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
+    <motion.div
+      ref={cardRef}
+      key={`card-${cardIndex}`}
+      className={`absolute ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
         shouldHide ? "opacity-0 invisible" : ""
       }`}
+      animate={{
+        x: transformValues.x,
+        y: transformValues.y,
+        rotateY: transformValues.rotateY,
+        scale: transformValues.scale,
+      }}
+      transition={{
+        duration: 1.4,
+        ease: [0.65, 0, 0.35, 1],
+      }}
+      onAnimationStart={() => {
+        if (cardRef.current && isActive) {
+          const transform = window.getComputedStyle(cardRef.current).transform;
+          console.log(`🎬 Card ${cardIndex} ANIMATION START - DOM transform:`, transform);
+          console.log(`   Target values:`, transformValues);
+        }
+      }}
+      onUpdate={(latest) => {
+        if (isActive && latest.x !== transformValues.x) {
+          console.log(`📍 Card ${cardIndex} animating... x=${latest.x}, rotateY=${latest.rotateY}`);
+        }
+      }}
       style={{
         zIndex,
         transformStyle: "preserve-3d",
         isolation: "isolate",
-        ...(!isFirstRender && {
-          transitionTimingFunction: TRANSITION_CLASSES.cardEasing,
-        }),
         // Fixed dimensions for all cards
         width: dimensions.width,
         maxWidth: dimensions.maxWidth,
         height: dimensions.height,
         maxHeight: dimensions.maxHeight,
-        // Active card: positioned by grid
+        // Position for active card
         ...(gridPosition && {
           left: `${gridPosition.left}px`,
           top: `${gridPosition.top}px`,
-          transform: `translate(${translateX}, ${translateY}) rotateY(${rotateY}deg) scale(${scale})`,
-        }),
-        // Side cards: compose all transforms inline to prevent overwrite
-        ...(!gridPosition && {
-          transform: `translate(${responsiveTranslateX}, ${translateY}) rotateY(${rotateY}deg) scale(${responsiveScale})`,
         }),
         willChange: "transform, opacity",
       }}
@@ -188,10 +239,11 @@ const CategoryCarouselCardComponent = ({
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
 // Memoize component to prevent unnecessary re-renders
 // Only re-render when props actually change
-export const CategoryCarouselCard = memo(CategoryCarouselCardComponent);
+// TEMP: Disabled memo for debugging
+export const CategoryCarouselCard = CategoryCarouselCardComponent; // memo(CategoryCarouselCardComponent);
