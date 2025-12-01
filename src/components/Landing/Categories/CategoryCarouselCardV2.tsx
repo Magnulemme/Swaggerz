@@ -44,7 +44,8 @@ export const CategoryCarouselCardV2 = ({
         height: coords.height,
         opacity: 1,
         scale: 1,
-        rotateY: position === "prev" ? 50 : position === "next" ? -50 : 0,
+        rotate: position === "active" ? 0 : 90, // Active dritta, prev/next ruotate
+        rotateY: position === "prev" ? 50 : position === "next" ? -50 : 0, // Rotazione 3D
       };
     }
 
@@ -52,10 +53,11 @@ export const CategoryCarouselCardV2 = ({
     return {
       x: 0,
       y: 0,
-      width: 300,
+      width: 320,
       height: 400,
       opacity: position === "hidden" ? 0 : 1,
       scale: position === "hidden" ? 0.8 : 1,
+      rotate: 0,
       rotateY: 0,
     };
   };
@@ -81,6 +83,7 @@ export const CategoryCarouselCardV2 = ({
         height: prevCoords.height,
         opacity: 1,
         scale: 1,
+        rotate: previousPosition === "active" ? 0 : 90,
         rotateY: previousPosition === "prev" ? 50 : previousPosition === "next" ? -50 : 0,
       };
     }
@@ -95,6 +98,7 @@ export const CategoryCarouselCardV2 = ({
         height: prevCoords.height,
         opacity: 1,
         scale: 1,
+        rotate: previousPosition === "active" ? 0 : 90,
         rotateY: previousPosition === "prev" ? 50 : previousPosition === "next" ? -50 : 0,
       };
     }
@@ -108,19 +112,21 @@ export const CategoryCarouselCardV2 = ({
     const baseProps = getAnimationProps();
 
     if (isExiting && previousPosition && slotCoordinates?.[previousPosition]) {
-      // Card che esce: zoom out dalla posizione precedente (senza muoversi lateralmente)
+      // Card che esce: zoom out dalla posizione precedente
       const prevCoords = slotCoordinates[previousPosition];
       return {
-        x: prevCoords.x, // Rimane nella stessa posizione x
-        y: prevCoords.y, // Rimane nella stessa posizione y
+        x: prevCoords.x,
+        y: prevCoords.y,
         width: prevCoords.width,
         height: prevCoords.height,
         opacity: 0,
-        scale: 0.7, // Zoom out
+        scale: 0.7,
+        rotate: previousPosition === "active" ? 0 : 90,
         rotateY: previousPosition === "prev" ? 50 : previousPosition === "next" ? -50 : 0,
       };
     }
 
+    // Usa sempre baseProps che ha già la rotazione corretta
     return baseProps;
   };
 
@@ -145,7 +151,7 @@ export const CategoryCarouselCardV2 = ({
       transition={{
         duration: 1.2,
         ease: [0.25, 0.1, 0.25, 1.0],
-        layout: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1.0] }, // Morphing fluido
+        layout: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1.0] },
       }}
       style={{
         zIndex,
