@@ -64,6 +64,7 @@ const CategoryCarouselCardComponent = ({
   const motionCardRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
   const previousTransformRef = useRef<{ x: string; y: string; rotateY: number; scale: number } | null>(null);
+  const currentTransformRef = useRef<{ x: string; y: string; rotateY: number; scale: number } | null>(null);
 
   // Determine if this is left card based on rotateY
   const isLeftCard = rotateY < 0;
@@ -140,37 +141,59 @@ const CategoryCarouselCardComponent = ({
 
   const transformValues = getTransformValues();
 
+  // Always update currentTransformRef with latest values
+  currentTransformRef.current = transformValues;
+
+  // Track phase changes to update previousTransformRef only when animation completes
+  const prevPhaseRef = useRef(currentPhase);
+
+  useEffect(() => {
+    // Idle -> Transitioning: save current transform BEFORE new values are used
+    if (prevPhaseRef.current === "idle" && currentPhase === "transitioning") {
+      console.log(`🎬 Card ${cardIndex} animation starting, saving previous position:`, currentTransformRef.current);
+      previousTransformRef.current = currentTransformRef.current;
+    }
+    prevPhaseRef.current = currentPhase;
+  }, [currentPhase, cardIndex]);
+
   // Determine initial values: use previous transform if available, otherwise current
   const initialValues = previousTransformRef.current || transformValues;
 
-  // DEBUG: Log transform changes ONLY for card that's transitioning to active
-  if (isActive && previousTransformRef.current &&
-      previousTransformRef.current.x !== transformValues.x) {
-    console.log(`🎯 Card ${cardIndex} transitioning to CENTER:`);
-    console.log('  FROM (previous):', previousTransformRef.current.x, 'rotateY:', previousTransformRef.current.rotateY);
-    console.log('  TO (current):', transformValues.x, 'rotateY:', transformValues.rotateY);
-    console.log('  Initial prop will be:', initialValues.x, 'rotateY:', initialValues.rotateY);
-  }
-
-  // Update the ref AFTER the animation completes, not immediately
-  // This prevents the ref from updating before Framer Motion reads the initial value
+  // DEBUG: Log when transform changes
   useEffect(() => {
-    // Wait for animation duration before updating
-    const timeout = setTimeout(() => {
-      previousTransformRef.current = transformValues;
-    }, 1400); // Match transition duration
+    if (previousTransformRef.current &&
+        (previousTransformRef.current.x !== transformValues.x ||
+         previousTransformRef.current.rotateY !== transformValues.rotateY)) {
+      console.log(`🔄 Card ${cardIndex} transform will change:`);
+      console.log('  FROM (initial):', previousTransformRef.current);
+      console.log('  TO (target):', transformValues);
+    }
+  }, [transformValues.x, transformValues.rotateY, cardIndex]);
 
-    return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transformValues.x, transformValues.y, transformValues.rotateY, transformValues.scale]);
+  // Expose initial and animate values to DOM for debugging
+  useEffect(() => {
+    if (cardRef.current) {
+      cardRef.current.setAttribute('data-initial-x', initialValues.x);
+      cardRef.current.setAttribute('data-initial-y', initialValues.y);
+      cardRef.current.setAttribute('data-initial-rotatey', String(initialValues.rotateY));
+      cardRef.current.setAttribute('data-initial-scale', String(initialValues.scale));
+
+      cardRef.current.setAttribute('data-target-x', transformValues.x);
+      cardRef.current.setAttribute('data-target-y', transformValues.y);
+      cardRef.current.setAttribute('data-target-rotatey', String(transformValues.rotateY));
+      cardRef.current.setAttribute('data-target-scale', String(transformValues.scale));
+    }
+  }, [initialValues, transformValues]);
 
   return (
     <motion.div
       ref={cardRef}
       key={`card-${cardIndex}`}
+      data-card-index={cardIndex}
       className={`absolute ${slotClasses} ${isClickable ? "cursor-pointer" : ""} ${
         shouldHide ? "opacity-0 invisible" : ""
       }`}
+      initial={initialValues}
       animate={{
         x: transformValues.x,
         y: transformValues.y,

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { CategoryCarouselCard } from "./CategoryCarouselCard";
 import { CarouselBackground } from "./CarouselBackground";
 import { CarouselTitleAndInfo } from "./CarouselTitleAndInfo";
-import { SectionTitle } from "../SectionTitle";
 import { useCarouselStore } from "@/store/useCarouselStore";
 import {
   CATEGORY_CARDS,
@@ -21,11 +20,11 @@ interface HeroCategoriesCarouselProps {
 export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouselProps) {
   const {
     currentPhase,
+    activeIndex,
     startTransition,
     endTransition,
     initializePositions,
   } = useCarouselStore();
-  const [activeIndex, setActiveIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(0);
   const isTransitioning = currentPhase === "transitioning";
   const [autoplayEnabled, setAutoplayEnabled] = useState(true);
@@ -62,7 +61,6 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
     setPreviousIndex(activeIndex);
     const newIndex =
       activeIndex === 0 ? CATEGORY_CARDS.length - 1 : activeIndex - 1;
-    setActiveIndex(newIndex);
 
     // Start transition - Framer Motion handles animations automatically
     startTransition(newIndex);
@@ -82,7 +80,6 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
     setPreviousIndex(activeIndex);
     const newIndex =
       activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
-    setActiveIndex(newIndex);
 
     // Start transition - Framer Motion handles animations automatically
     startTransition(newIndex);
@@ -202,54 +199,44 @@ export function HeroCategoriesCarousel({ className = "" }: HeroCategoriesCarouse
     return () => clearTimeout(timer);
   }, []);
 
-  // Autoplay - stop durante hover
-  useEffect(() => {
-    if (!autoplayEnabled || isMainCardHovered || isSideCardHovered || isTransitioning) {
-      return;
-    }
+  // Autoplay - DISABLED FOR DEBUG
+  // useEffect(() => {
+  //   if (!autoplayEnabled || isMainCardHovered || isSideCardHovered || isTransitioning) {
+  //     return;
+  //   }
 
-    const interval = setInterval(() => {
-      if (!document.hidden) {
-        setPreviousIndex(activeIndex);
-        const newIndex =
-          activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
-        setActiveIndex(newIndex);
+  //   const interval = setInterval(() => {
+  //     if (!document.hidden) {
+  //       setPreviousIndex(activeIndex);
+  //       const newIndex =
+  //         activeIndex === CATEGORY_CARDS.length - 1 ? 0 : activeIndex + 1;
+  //       setActiveIndex(newIndex);
 
-        // Start transition - Framer Motion handles animations automatically
-        startTransition(newIndex);
+  //       // Start transition - Framer Motion handles animations automatically
+  //       startTransition(newIndex);
 
-        // End transition
-        setTimeout(() => {
-          endTransition();
-          setAutoplayKey((prev) => prev + 1);
-        }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
-      }
-    }, CAROUSEL_TIMINGS.AUTOPLAY_INTERVAL);
+  //       // End transition
+  //       setTimeout(() => {
+  //         endTransition();
+  //         setAutoplayKey((prev) => prev + 1);
+  //       }, CAROUSEL_TIMINGS.TRANSITION_DURATION);
+  //     }
+  //   }, CAROUSEL_TIMINGS.AUTOPLAY_INTERVAL);
 
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    autoplayEnabled,
-    isTransitioning,
-    activeIndex,
-    isMainCardHovered,
-    isSideCardHovered,
-    // Note: autoplayKey is intentionally NOT in deps - it's used to force re-mount when needed
-    // Note: Zustand store functions (startTransition, etc.) are stable and don't need to be in deps
-  ]);
+  //   return () => clearInterval(interval);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   autoplayEnabled,
+  //   isTransitioning,
+  //   activeIndex,
+  //   isMainCardHovered,
+  //   isSideCardHovered,
+  //   // Note: autoplayKey is intentionally NOT in deps - it's used to force re-mount when needed
+  //   // Note: Zustand store functions (startTransition, etc.) are stable and don't need to be in deps
+  // ]);
 
   return (
     <div className={`relative w-full ${className}`}>
-      {/* Title */}
-      <div className="px-md md:px-lg lg:px-xl xl:px-2xl">
-        <SectionTitle
-          title="Esplora le"
-          shaderText="Categorie"
-          description="Trova il tuo stile perfetto tra le nostre categorie curate"
-          size="md"
-        />
-      </div>
-
       {/* Custom Carousel - Universale per tutti i dispositivi */}
       <div
         className={`relative w-full py-4 pb-16 lg:pb-4 overflow-hidden ${
